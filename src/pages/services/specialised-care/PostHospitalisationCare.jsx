@@ -25,16 +25,16 @@ const PostHospitalisationCare = () => {
                 <span>Continue Your Care Beyond the Hospital</span>
               </div>
               <h1 className="service-hero-title">Post-Hospitalisation Care</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#1e293b' }}>
                   After discharge, patients may still require assistance, monitoring, rehabilitation or everyday support.
                 </p>
-                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#cbd5e1' }}>
+                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#1e293b' }}>
                   AMPLR HEALTH SERVICES helps families coordinate appropriate home healthcare services based on individual requirements.
                 </p>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: '12px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', marginBottom: '2rem' }}>
-                <h3 style={{ fontSize: '1.4rem', color: '#fff', fontWeight: '700', lineHeight: '1.6', margin: 0 }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '1.5rem', borderRadius: '12px', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.1)', marginBottom: '2rem' }}>
+                <h3 style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '700', lineHeight: '1.6', margin: 0 }}>
                   Make the Transition Home Easier.
                 </h3>
               </div>
@@ -70,3 +70,5 @@ const PostHospitalisationCare = () => {
 };
 
 export default PostHospitalisationCare;
+
+

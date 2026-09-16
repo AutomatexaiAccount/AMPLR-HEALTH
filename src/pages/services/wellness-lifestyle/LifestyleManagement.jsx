@@ -37,11 +37,11 @@ const LifestyleManagement = () => {
                 <span>Small Changes. Meaningful Progress.</span>
               </div>
               <h1 className="service-hero-title">Lifestyle Management</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#1e293b' }}>
                   Modern lifestyles can contribute to concerns such as excess weight, diabetes, high blood pressure, stress and poor sleep.
                 </p>
-                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#cbd5e1' }}>
+                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#1e293b' }}>
                   Professional lifestyle guidance can help individuals build healthier everyday habits.
                 </p>
               </div>
@@ -69,7 +69,7 @@ const LifestyleManagement = () => {
               </li>
             ))}
           </ul>
-          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#475569', lineHeight: '1.8', fontWeight: '500' }}>
+          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#1e293b', lineHeight: '1.8', fontWeight: '500' }}>
             <strong>A Balanced Approach</strong><br />
             Nutrition + Activity + Sleep + Healthy Habits + Regular Monitoring
           </div>
@@ -95,3 +95,5 @@ const LifestyleManagement = () => {
 };
 
 export default LifestyleManagement;
+
+

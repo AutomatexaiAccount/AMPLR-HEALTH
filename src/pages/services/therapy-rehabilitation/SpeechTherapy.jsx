@@ -36,8 +36,8 @@ const SpeechTherapy = () => {
                 <span>Helping Every Voice Be Heard.</span>
               </div>
               <h1 className="service-hero-title">Speech & Language Therapy</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#1e293b' }}>
                   Speech and communication difficulties can affect children and adults in different ways. Professional assessment and therapy can help address individual communication needs.
                 </p>
               </div>
@@ -65,7 +65,7 @@ const SpeechTherapy = () => {
               </li>
             ))}
           </ul>
-          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#475569', lineHeight: '1.6', fontWeight: '500' }}>
+          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#1e293b', lineHeight: '1.6', fontWeight: '500' }}>
             Every Voice Matters. Every Step Counts.
           </div>
         </div>
@@ -90,3 +90,5 @@ const SpeechTherapy = () => {
 };
 
 export default SpeechTherapy;
+
+

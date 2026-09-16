@@ -1,108 +1,126 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import { PhoneCall, CalendarCheck, AlertTriangle, CheckCircle, Navigation, Clock } from 'lucide-react';
+import { PhoneCall, Ambulance, CheckCircle2, Phone, ShieldAlert } from 'lucide-react';
 import '../../service-pages.css';
 
 const AmbulanceServices = () => {
   const whatsappNumber = "917997888448";
-  const whatsappMsg = "Hi! I need an Ambulance / Patient Transport Service.";
-  const BOOK_SERVICE_LINK = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMsg)}`;
+  const whatsappMsg = "Hi! I need an Ambulance immediately.";
+  const waLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMsg)}`;
   const CALL_NUMBER = '7997888448';
 
-  const ambulanceServicesIncluded = [
-    "Basic Life Support (BLS) Ambulance",
-    "Advanced Life Support (ALS / ICU) Ambulance",
-    "Patient transport vehicles",
-    "Inter-city / outstation patient transfer",
-    "Hospital-to-hospital transfer",
-    "Home-to-hospital transfer",
-    "Scheduled transport for treatments (e.g. dialysis, chemotherapy)"
-  ];
-
-  const ambulanceFeatures = [
-    "Coordinated emergency response",
-    "Trained medical personnel (where applicable)",
-    "Essential medical equipment (as per ambulance type)",
-    "Prompt booking and dispatch"
-  ];
+  const openBookingModal = (e) => {
+    e.preventDefault();
+    window.dispatchEvent(new CustomEvent('open-booking-modal'));
+  };
 
   return (
     <div className="service-page">
       <Helmet>
-        <title>Ambulance Services | AMPLR Health</title>
-        <meta name="description" content="Emergency & Patient Transport Support. AMPLR Health connects you with ambulance providers." />
+        <title>24/7 Ambulance Services | AMPLR Health</title>
+        <meta name="description" content="Fast and reliable 24/7 ambulance services in Vijayawada. BLS, ALS, and Patient Transport Vehicles available for emergencies." />
       </Helmet>
 
-      <section className="service-hero hero-cyan">
+      <section className="service-hero hero-rose">
         <div className="container">
-          <div className="service-hero-inner" style={{ gridTemplateColumns: '1fr', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+          <div className="service-hero-inner">
             <div>
               <div className="service-hero-badge">
-                <AlertTriangle size={16} />
-                <span>Emergency & Patient Transport Support</span>
+                <ShieldAlert size={16} color="#e11d48" />
+                <span style={{ color: '#e11d48' }}>Emergency Medical Transport</span>
               </div>
-              <h1 className="service-hero-title">Ambulance Services</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#cbd5e1' }}>
-                  In an emergency, every minute counts. AMPLR HEALTH SERVICES helps patients connect with appropriate ambulance service providers for emergencies, hospital transfers and planned medical transportation.
-                </p>
-              </div>
-              <div className="service-hero-actions" style={{ justifyContent: 'center' }}>
-                <a href={`tel:${CALL_NUMBER}`} className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none', background: '#e11d48', color: 'white', border: 'none' }}>
-                  <PhoneCall size={20} /> Call for Emergency
+              <h1 className="service-hero-title">24/7 Ambulance Services</h1>
+              <p className="service-hero-desc">
+                In a medical emergency, every second counts. We provide swift, fully-equipped ambulance services with trained paramedics to ensure safe transportation to the nearest medical facility.
+              </p>
+              
+              <div className="service-hero-actions">
+                <a href={`tel:${CALL_NUMBER}`} className="btn-primary" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', boxShadow: '0 4px 15px rgba(239, 68, 68, 0.4)' }}>
+                  <PhoneCall size={20} /> Emergency Call: {CALL_NUMBER}
                 </a>
-                <a href={BOOK_SERVICE_LINK} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none', background: 'transparent', border: '2px solid white' }}>
-                  <CalendarCheck size={20} /> Schedule Transport
+                <a href="#" onClick={openBookingModal} className="btn-secondary">
+                  <Ambulance size={20} /> Pre-book Transport
                 </a>
               </div>
+            </div>
+            
+            <div className="service-hero-img-wrap">
+              <img src="/ambulance.jpg" alt="Ambulance Services" className="service-hero-img" />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="service-benefits" style={{ padding: '4rem 0', background: '#f8fafc' }}>
-        <div className="container" style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
-            
-            <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-              <h3 style={{ fontSize: '1.4rem', color: 'var(--premium-blue)', marginBottom: '1.5rem' }}>Ambulance Services May Include</h3>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                {ambulanceServicesIncluded.map((item, i) => (
-                  <li key={i} className="service-check-item" style={{ padding: '0.4rem 0' }}>
-                    <CheckCircle size={16} style={{ color: 'var(--premium-red)', marginTop: '3px', flexShrink: 0 }} />
-                    <span style={{ fontSize: '0.95rem' }}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-              <h3 style={{ fontSize: '1.4rem', color: 'var(--premium-blue)', marginBottom: '1.5rem' }}>Ambulance Support Features</h3>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                {ambulanceFeatures.map((item, i) => (
-                  <li key={i} className="service-check-item" style={{ padding: '0.4rem 0' }}>
-                    <Navigation size={16} style={{ color: '#10b981', marginTop: '3px', flexShrink: 0 }} />
-                    <span style={{ fontSize: '0.95rem' }}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-          </div>
-
-          <div style={{ background: '#fff1f2', color: '#be123c', padding: '2.5rem', borderRadius: '16px', border: '1px solid #fda4af', marginBottom: '2rem', display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <AlertTriangle size={32} />
-              <h4 style={{ fontSize: '1.4rem', fontWeight: 'bold', margin: 0 }}>Important Notice Regarding Emergencies</h4>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '1.05rem', lineHeight: '1.6' }}>
+      <section className="service-content">
+        <div className="container">
+          <div className="content-grid">
+            <div className="content-text">
+              <h2>Types of Ambulances Available</h2>
               <p>
-                AMPLR HEALTH SERVICES acts as a coordinator connecting patients with third-party ambulance providers. Availability, response time, and equipment depend on the ambulance service provider and current location constraints.
+                We coordinate a fleet of well-maintained ambulances to cater to different medical requirements, ensuring patient safety and comfort during transit.
               </p>
-              <p style={{ fontWeight: 'bold' }}>
-                In severe emergencies, please directly dial national emergency numbers (e.g. 108) while simultaneously reaching out for private support to ensure maximum safety.
-              </p>
+              <div className="features-checklist" style={{ marginTop: '2rem' }}>
+                <div className="feature-check-item">
+                  <CheckCircle2 className="text-primary" size={24} />
+                  <span><strong>Basic Life Support (BLS):</strong> For stable patients needing basic monitoring.</span>
+                </div>
+                <div className="feature-check-item">
+                  <CheckCircle2 className="text-primary" size={24} />
+                  <span><strong>Advanced Life Support (ALS / ICU):</strong> Equipped with ventilators and defibrillators.</span>
+                </div>
+                <div className="feature-check-item">
+                  <CheckCircle2 className="text-primary" size={24} />
+                  <span><strong>Patient Transport Vehicle (PTV):</strong> For non-emergency hospital visits/discharges.</span>
+                </div>
+                <div className="feature-check-item">
+                  <CheckCircle2 className="text-primary" size={24} />
+                  <span><strong>Inter-City Transfer:</strong> Safe out-station transport for long distances.</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Pricing Card */}
+            <div className="pricing-wrapper" style={{ margin: '0' }}>
+              <h3>Pricing Details</h3>
+              <p className="pricing-subtitle">Indicative starting prices for transport</p>
+              
+              <table className="pricing-table-modern">
+                <thead>
+                  <tr>
+                    <th>Ambulance Type</th>
+                    <th style={{ textAlign: 'right' }}>Starting Price (Local)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="service-name">Patient Transport (Non-Emergency)</td>
+                    <td className="service-price">₹1,499</td>
+                  </tr>
+                  <tr>
+                    <td className="service-name">BLS Ambulance (with Oxygen)</td>
+                    <td className="service-price">₹1,999</td>
+                  </tr>
+                  <tr>
+                    <td className="service-name">ALS / ICU Ambulance (with Paramedic)</td>
+                    <td className="service-price">₹3,499</td>
+                  </tr>
+                  <tr>
+                    <td className="service-name">Inter-City Transport</td>
+                    <td className="service-price" style={{ color: '#64748b', fontSize: '0.9rem' }}>₹25 - ₹40 per km</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <div className="pricing-cta">
+                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1rem' }}>
+                  *Prices vary based on exact distance, traffic conditions, and required medical equipment.
+                </p>
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '1rem', borderRadius: '12px' }}>
+                  <p style={{ color: '#b91c1c', fontWeight: '700', fontSize: '1.1rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <Phone size={20} /> Call {CALL_NUMBER} for immediate dispatch
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

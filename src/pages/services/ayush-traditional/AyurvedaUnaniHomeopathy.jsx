@@ -32,14 +32,14 @@ const AyurvedaUnaniHomeopathy = () => {
                 <span>Traditional Wellness, Professionally Guided.</span>
               </div>
               <h1 className="service-hero-title">Ayurveda, Unani & Homeopathy</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#1e293b' }}>
                   AMPLR HEALTH SERVICES provides access to consultation options from appropriately qualified practitioners across selected traditional healthcare systems, subject to availability.
                 </p>
-                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#cbd5e1' }}>
+                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#1e293b' }}>
                   Our goal is to make professional consultation more convenient while respecting individual healthcare choices.
                 </p>
-                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#cbd5e1' }}>
+                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#1e293b' }}>
                   AMPLR HEALTH Connects with qualified Ayurvedic practitioners, Unani practitioners, homoeopathic practitioners for consultation and guidance based on individual needs.
                 </p>
               </div>
@@ -67,7 +67,7 @@ const AyurvedaUnaniHomeopathy = () => {
               </li>
             ))}
           </ul>
-          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#475569', lineHeight: '1.6', fontWeight: '500' }}>
+          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#1e293b', lineHeight: '1.6', fontWeight: '500' }}>
             Your Choice. Your Healthcare Journey.<br /><br />
             Whether you are looking for conventional healthcare, rehabilitation, nutrition or traditional healthcare consultation, AMPLR HEALTH SERVICES aims to help you access appropriate professional support conveniently.<br /><br />
             AYUSH and traditional healthcare services should be provided by appropriately qualified practitioners. These services may not be suitable for every condition and should not delay necessary emergency or conventional medical care.
@@ -94,3 +94,5 @@ const AyurvedaUnaniHomeopathy = () => {
 };
 
 export default AyurvedaUnaniHomeopathy;
+
+

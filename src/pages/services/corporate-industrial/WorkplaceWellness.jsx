@@ -39,8 +39,8 @@ const WorkplaceWellness = () => {
 
               <h1 className="service-hero-title">Workplace Wellness</h1>
 
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ marginBottom: '0.5rem', textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ marginBottom: '0.5rem', textAlign: 'left', color: '#1e293b' }}>
                   Support your employees beyond routine medical screening with health and wellness initiatives.
                 </p>
               </div>
@@ -93,3 +93,5 @@ const WorkplaceWellness = () => {
 };
 
 export default WorkplaceWellness;
+
+

@@ -25,17 +25,17 @@ const PregnancyMaternityCare = () => {
                 <span>Thoughtful Support for Mother and Baby</span>
               </div>
               <h1 className="service-hero-title">Pregnancy & Maternity Care</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#1e293b' }}>
                   Pregnancy is a special journey that deserves the right care, attention and support.
                 </p>
-                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#cbd5e1' }}>
+                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#1e293b' }}>
                   AMPLR HEALTH SERVICES helps expectant mothers and families access appropriate healthcare and support services throughout pregnancy and the postnatal period, subject to professional assessment and service availability.
                 </p>
               </div>
-              <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: '12px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)', marginBottom: '2rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '1.5rem', borderRadius: '12px', backdropFilter: 'blur(10px)', border: '1px solid rgba(0,0,0,0.1)', marginBottom: '2rem' }}>
                 <h4 style={{ color: '#fb7185', fontSize: '1.1rem', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Support Through Every Stage</h4>
-                <h3 style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '700', lineHeight: '1.8', margin: 0 }}>
+                <h3 style={{ fontSize: '1.2rem', color: '#0f172a', fontWeight: '700', lineHeight: '1.8', margin: 0 }}>
                   Pregnancy Care → Antenatal Support → Delivery Support Coordination → Postnatal Care → Mother &amp; Baby Support
                 </h3>
                 <p style={{ color: '#94a3b8', marginTop: '1rem', fontSize: '1rem' }}>
@@ -57,7 +57,7 @@ const PregnancyMaternityCare = () => {
 
       <section className="service-benefits" style={{ padding: '3rem 0', background: '#f8fafc' }}>
         <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <div style={{ padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#475569', lineHeight: '1.6', fontWeight: '500' }}>
+          <div style={{ padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#1e293b', lineHeight: '1.6', fontWeight: '500' }}>
             Pregnancy requires regular care from qualified medical professionals. AMPLR services complement, but do not replace, routine antenatal or emergency medical care.
           </div>
         </div>
@@ -82,3 +82,5 @@ const PregnancyMaternityCare = () => {
 };
 
 export default PregnancyMaternityCare;
+
+

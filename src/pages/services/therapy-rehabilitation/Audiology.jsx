@@ -36,11 +36,11 @@ const Audiology = () => {
                 <span>Better Hearing. Better Communication.</span>
               </div>
               <h1 className="service-hero-title">Audiology & Hearing Services</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#1e293b' }}>
                   Hearing plays an important role in communication, learning and everyday life.
                 </p>
-                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#cbd5e1' }}>
+                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#1e293b' }}>
                   AMPLR HEALTH SERVICES helps coordinate hearing and audiology-related services through appropriate professionals.
                 </p>
               </div>
@@ -68,7 +68,7 @@ const Audiology = () => {
               </li>
             ))}
           </ul>
-          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#475569', lineHeight: '1.6', fontWeight: '500' }}>
+          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#1e293b', lineHeight: '1.6', fontWeight: '500' }}>
             Listen Better. Connect Better.
           </div>
         </div>
@@ -93,3 +93,5 @@ const Audiology = () => {
 };
 
 export default Audiology;
+
+

@@ -36,8 +36,8 @@ const YogaWellness = () => {
                 <span>Move. Breathe. Relax.</span>
               </div>
               <h1 className="service-hero-title">Yoga & Wellness</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#1e293b' }}>
                   Guided yoga and wellness sessions can complement a healthy lifestyle and support flexibility, mobility, relaxation and mind-body wellbeing.
                 </p>
               </div>
@@ -65,7 +65,7 @@ const YogaWellness = () => {
               </li>
             ))}
           </ul>
-          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#475569', lineHeight: '1.8', fontWeight: '500' }}>
+          <div style={{ marginTop: '3rem', padding: '1.5rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center', color: '#1e293b', lineHeight: '1.8', fontWeight: '500' }}>
             Wellness That Fits Your Lifestyle.<br /><br />
             Yoga and wellness services are complementary and should not replace necessary medical treatment.
           </div>
@@ -91,3 +91,5 @@ const YogaWellness = () => {
 };
 
 export default YogaWellness;
+
+

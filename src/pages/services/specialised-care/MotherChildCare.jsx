@@ -25,11 +25,11 @@ const MotherChildCare = () => {
                 <span>Caring for Mothers. Supporting Children.</span>
               </div>
               <h1 className="service-hero-title">Mother & Child Care</h1>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#cbd5e1' }}>
+              <div style={{ background: 'rgba(255,255,255,0.6)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)', marginBottom: '2rem', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <p className="service-hero-desc" style={{ marginBottom: '1rem', textAlign: 'left', color: '#1e293b' }}>
                   Families may need additional help during pregnancy, after delivery and throughout a child's early years.
                 </p>
-                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#cbd5e1' }}>
+                <p className="service-hero-desc" style={{ textAlign: 'left', color: '#1e293b' }}>
                   AMPLR HEALTH SERVICES helps coordinate suitable healthcare and supportive services for mothers and children.
                 </p>
               </div>
@@ -65,3 +65,5 @@ const MotherChildCare = () => {
 };
 
 export default MotherChildCare;
+
+

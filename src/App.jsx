@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
-  HeartPulse, Menu, X, PhoneCall, MessageCircle, Phone, Mail, MapPin, ShieldCheck, ChevronRight, Clock, Calendar, Ambulance, Stethoscope, Activity
+  HeartPulse, Menu, X, PhoneCall, MessageCircle, Phone, Mail, MapPin, ShieldCheck, ChevronRight, Clock, Calendar, Ambulance, Stethoscope, Activity, Search
 } from 'lucide-react';
 import Home from './pages/Home';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -98,10 +98,106 @@ const ScrollToHash = () => {
   return null;
 };
 
+/* ── BOOKING MODAL COMPONENT ── */
+const BookingModal = ({ isOpen, onClose, redirectUrl }) => {
+  const [formData, setFormData] = useState({
+    name: '', phone: '', service: '', city: '', date: ''
+  });
+
+  const serviceOptions = [
+    'Lab Sample Collection', 'Nursing Services', 'Caregiver / Caretaker',
+    'ECG at Home', 'Doctor Consultation', 'Ambulance Services', 'Physiotherapy',
+    'Elder Care', 'Pregnancy & Maternity Care', 'Mother & Child Care',
+    'Post-Surgery Care', 'Post-Hospitalisation Care', 'Bedridden Care',
+    'Speech Therapy', 'Audiology', 'Occupational Therapy', 'Rehabilitation Support',
+    'Dietician & Nutrition', 'Lifestyle Management', 'Yoga & Wellness',
+    'Preventive Health', 'AYUSH Consultation', 'Health Camps',
+    'Employee Checkups', 'Workplace Wellness', 'Other'
+  ];
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const whatsappNumber = "917997888448";
+    const msg = `Hi! I want to book a service with AMPLR Health.\n\n*Name:* ${formData.name}\n*Phone:* ${formData.phone}\n*Service:* ${formData.service}\n*City:* ${formData.city}\n*Preferred Date:* ${formData.date || 'Flexible'}`;
+    const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
+    window.open(waUrl, '_blank');
+    onClose();
+    setFormData({ name: '', phone: '', service: '', city: '', date: '' });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="booking-modal-overlay" onClick={onClose}>
+      <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="booking-modal-close" onClick={onClose} aria-label="Close">
+          <X size={20} />
+        </button>
+        <div className="booking-modal-header">
+          <img src="/amplr-logo.jpeg" alt="AMPLR Health" className="booking-modal-logo" />
+          <h2>Book a Service</h2>
+          <p>Fill in your details and we'll connect with you on WhatsApp</p>
+        </div>
+        <form className="booking-modal-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="booking-name">Full Name *</label>
+            <input type="text" id="booking-name" name="name" value={formData.name} onChange={handleChange} placeholder="Enter your name" required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="booking-phone">Phone Number *</label>
+            <input type="tel" id="booking-phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter your phone number" required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="booking-service">Service Required *</label>
+            <select id="booking-service" name="service" value={formData.service} onChange={handleChange} required>
+              <option value="">Select a service</option>
+              {serviceOptions.map((s, i) => <option key={i} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="booking-city">City *</label>
+              <input type="text" id="booking-city" name="city" value={formData.city} onChange={handleChange} placeholder="Your city" required />
+            </div>
+            <div className="form-group">
+              <label htmlFor="booking-date">Preferred Date</label>
+              <input type="date" id="booking-date" name="date" value={formData.date} onChange={handleChange} />
+            </div>
+          </div>
+          <button type="submit" className="booking-modal-submit">
+            <MessageCircle size={18} />
+            Continue to WhatsApp
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+
+  // Listen for booking modal events from other components
+  useEffect(() => {
+    const handler = (e) => {
+      setBookingModalOpen(true);
+    };
+    window.addEventListener('open-booking-modal', handler);
+    return () => window.removeEventListener('open-booking-modal', handler);
+  }, []);
+
+  const openBookingModal = (e) => {
+    if (e) e.preventDefault();
+    setBookingModalOpen(true);
+  };
 
   const handleSearch = (e) => {
     const q = e.target.value;
@@ -128,6 +224,7 @@ function App() {
   const [specialisedExpanded, setSpecialisedExpanded] = useState(false);
   const [therapyExpanded, setTherapyExpanded] = useState(false);
   const [wellnessExpanded, setWellnessExpanded] = useState(false);
+  const [corporateExpanded, setCorporateExpanded] = useState(false);
   const whatsappNumber = "917997888448";
   const phoneCallNumber = "+917997888448";
   const whatsappMsg = "Hi! I want to book a healthcare service with AMPLR Health.";
@@ -139,6 +236,7 @@ function App() {
     setSpecialisedExpanded(false);
     setTherapyExpanded(false);
     setWellnessExpanded(false);
+    setCorporateExpanded(false);
     document.body.style.overflow = '';
   };
 
@@ -152,6 +250,9 @@ function App() {
       <ScrollToHash />
       <div className="app">
 
+        {/* Booking Modal */}
+        <BookingModal isOpen={bookingModalOpen} onClose={() => setBookingModalOpen(false)} />
+
         {/* ── TOP BAR ── */}
         <div className="top-bar">
           <div className="container top-bar-inner">
@@ -164,7 +265,7 @@ function App() {
             </div>
             <div className="top-bar-right">
               <a href={`tel:${phoneCallNumber}`} className="top-link">
-                <Phone size={13} /> <span className="top-link-text">Call 24/7</span>
+                <Phone size={13} /> <span className="top-link-text">Call: 7997888448</span>
               </a>
               <span className="divider" aria-hidden="true">|</span>
               <a href="mailto:amplrhealth@gmail.com" className="top-link">
@@ -179,15 +280,9 @@ function App() {
           <nav className="navbar" role="navigation" aria-label="Main navigation">
             <div className="container nav-container">
 
-              {/* Logo */}
+              {/* Logo — actual image */}
               <Link to="/" className="brand-logo" onClick={closeMenu} aria-label="AMPLR Health – Home">
-                <div className="logo-emblem" aria-hidden="true">
-                  <HeartPulse size={20} className="pulse-icon" />
-                </div>
-                <div className="logo-text-group">
-                  <div className="logo-name">AMPLR<span>HEALTH</span></div>
-                  <span className="logo-tagline">HOSPITAL CARE AT HOME</span>
-                </div>
+                <img src="/amplr-logo.jpeg" alt="AMPLR Health" className="brand-logo-img" />
               </Link>
 
               {/* ── DESKTOP NAV ── */}
@@ -212,45 +307,18 @@ function App() {
 
                 <div className="nav-dropdown" role="menuitem">
                   <span className="nav-dropdown-trigger">
-                    Specialised Care <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                    Corporate <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
                   </span>
                   <div className="nav-dropdown-content" role="menu">
-                    <Link to="/services/specialised-care/elder-care" role="menuitem">Elder Care</Link>
-                    <Link to="/services/specialised-care/pregnancy-maternity-care" role="menuitem">Pregnancy & Maternity</Link>
-                    <Link to="/services/specialised-care/mother-child-care" role="menuitem">Mother & Child Care</Link>
-                    <Link to="/services/specialised-care/post-surgery-care" role="menuitem">Post-Surgery Care</Link>
-                    <Link to="/services/specialised-care/post-hospitalisation-care" role="menuitem">Post-Hospitalisation</Link>
-                    <Link to="/services/specialised-care/bedridden-care" role="menuitem">Bedridden Care</Link>
-                  </div>
-                </div>
-
-                <div className="nav-dropdown" role="menuitem">
-                  <span className="nav-dropdown-trigger">
-                    Therapy & Rehab <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
-                  </span>
-                  <div className="nav-dropdown-content" role="menu">
-                    <Link to="/services/physiotherapy" role="menuitem">Physiotherapy</Link>
-                    <Link to="/services/therapy-rehabilitation/speech-therapy" role="menuitem">Speech Therapy</Link>
-                    <Link to="/services/therapy-rehabilitation/audiology" role="menuitem">Audiology</Link>
-                    <Link to="/services/therapy-rehabilitation/occupational-therapy" role="menuitem">Occupational Therapy</Link>
-                    <Link to="/services/therapy-rehabilitation/rehabilitation-support" role="menuitem">Rehab Support</Link>
-                  </div>
-                </div>
-
-                <div className="nav-dropdown" role="menuitem">
-                  <span className="nav-dropdown-trigger">
-                    Wellness & AYUSH <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
-                  </span>
-                  <div className="nav-dropdown-content" role="menu">
-                    <Link to="/services/wellness-lifestyle/dietician-nutrition" role="menuitem">Dietician & Nutrition</Link>
-                    <Link to="/services/wellness-lifestyle/lifestyle-management" role="menuitem">Lifestyle Management</Link>
-                    <Link to="/services/wellness-lifestyle/yoga-wellness" role="menuitem">Yoga & Wellness</Link>
-                    <Link to="/services/wellness-lifestyle/preventive-health" role="menuitem">Preventive Health</Link>
-                    <Link to="/services/ayush-traditional/ayurveda-unani-homeopathy" role="menuitem">AYUSH Consultation</Link>
+                    <Link to="/services/corporate-industrial/health-camps" role="menuitem">Health Camps</Link>
+                    <Link to="/services/corporate-industrial/employee-checkups" role="menuitem">Employee Checkups</Link>
+                    <Link to="/services/corporate-industrial/workplace-wellness" role="menuitem">Workplace Wellness</Link>
                   </div>
                 </div>
 
                 <Link to="/#about" className="nav-item-link">About Us</Link>
+                <Link to="/partner" className="nav-item-link">Partner with Us</Link>
+                <Link to="/terms" className="nav-item-link">Terms & Conditions</Link>
               </div>
 
               {/* ── DESKTOP ACTION AREA ── */}
@@ -281,9 +349,9 @@ function App() {
                 </div>
                 <a href={`tel:${phoneCallNumber}`} className="btn-call-nav" title="Call Emergency Helpline">
                   <PhoneCall size={15} aria-hidden="true" />
-                  <span>Call 24/7</span>
+                  <span>Call: 7997888448</span>
                 </a>
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary-nav">
+                <a href="#" onClick={openBookingModal} className="btn-primary-nav">
                   <MessageCircle size={15} aria-hidden="true" />
                   <span>WhatsApp</span>
                 </a>
@@ -291,10 +359,17 @@ function App() {
 
               {/* ── MOBILE ICON ROW ── */}
               <div className="mobile-header-actions">
+                <button
+                  className="mobile-icon-btn search-btn"
+                  onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                  style={{ background: 'var(--surface)', border: '1px solid var(--border-subtle)', color: 'var(--navy-dark)' }}
+                  aria-label="Search"
+                >
+                  <Search size={18} />
+                </button>
                 <a
-                  href={waLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="#"
+                  onClick={openBookingModal}
                   className="mobile-icon-btn wa-btn"
                   aria-label="Book on WhatsApp"
                 >
@@ -310,6 +385,37 @@ function App() {
                 </button>
               </div>
             </div>
+
+            {/* ── MOBILE SEARCH DROPDOWN ── */}
+            {mobileSearchOpen && (
+              <div className="mobile-header-search-wrap">
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="search"
+                    className="mobile-header-search-input"
+                    placeholder="Search services…"
+                    aria-label="Search services"
+                    value={searchQuery}
+                    onChange={handleSearch}
+                    autoFocus
+                  />
+                  {searchResults.length > 0 && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, minWidth: '100%', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', marginTop: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 1000, maxHeight: '250px', overflowY: 'auto' }}>
+                      {searchResults.map((result, i) => (
+                        <Link 
+                          key={i} 
+                          to={result.path} 
+                          onClick={() => { clearSearch(); setMobileSearchOpen(false); }}
+                          style={{ display: 'block', padding: '10px 12px', color: '#334155', textDecoration: 'none', borderBottom: i === searchResults.length - 1 ? 'none' : '1px solid #f1f5f9', fontSize: '0.85rem' }}
+                        >
+                          {result.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </nav>
 
           {/* ── MOBILE OVERLAY ── */}
@@ -329,13 +435,7 @@ function App() {
             {/* Drawer header */}
             <div className="mobile-drawer-header">
               <Link to="/" className="brand-logo" onClick={closeMenu}>
-                <div className="logo-emblem">
-                  <HeartPulse size={18} className="pulse-icon" />
-                </div>
-                <div className="logo-text-group">
-                  <div className="logo-name">AMPLR<span>HEALTH</span></div>
-                  <span className="logo-tagline">HOSPITAL CARE AT HOME</span>
-                </div>
+                <img src="/amplr-logo.jpeg" alt="AMPLR Health" className="brand-logo-img" />
               </Link>
               <button className="mobile-menu-toggle active" onClick={closeMenu} aria-label="Close navigation menu">
                 <X size={22} />
@@ -352,31 +452,7 @@ function App() {
                 <a href={`tel:${phoneCallNumber}`}>+91 7997888448</a>
               </div>
 
-              {/* Mobile search */}
-              <div className="mobile-search-wrap" style={{ position: 'relative' }}>
-                <input
-                  type="search"
-                  className="mobile-search-input"
-                  placeholder="Search services…"
-                  aria-label="Search services"
-                  value={searchQuery}
-                  onChange={handleSearch}
-                />
-                {searchResults.length > 0 && (
-                  <div style={{ position: 'absolute', top: '100%', left: 0, minWidth: '100%', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', marginTop: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 1000, maxHeight: '250px', overflowY: 'auto' }}>
-                    {searchResults.map((result, i) => (
-                      <Link 
-                        key={i} 
-                        to={result.path} 
-                        onClick={() => { clearSearch(); closeMenu(); }}
-                        style={{ display: 'block', padding: '10px 12px', color: '#334155', textDecoration: 'none', borderBottom: i === searchResults.length - 1 ? 'none' : '1px solid #f1f5f9', fontSize: '0.85rem' }}
-                      >
-                        {result.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
+              {/* Mobile search removed from here (moved to header) */}
 
               {/* Nav links */}
               <nav className="mobile-nav-links">
@@ -484,6 +560,29 @@ function App() {
                     </div>
                   )}
                 </div>
+
+                {/* Corporate expandable group */}
+                <div className="mobile-nav-group">
+                  <button
+                    className="mobile-nav-group-header"
+                    onClick={() => setCorporateExpanded(s => !s)}
+                    aria-expanded={corporateExpanded}
+                  >
+                    <span>Corporate & Industrial</span>
+                    <ChevronRight
+                      size={16}
+                      className={`mobile-nav-chevron ${corporateExpanded ? 'rotated' : ''}`}
+                    />
+                  </button>
+                  {corporateExpanded && (
+                    <div className="mobile-nav-sub">
+                      <Link to="/services/corporate-industrial/health-camps" onClick={closeMenu}>Health Camps</Link>
+                      <Link to="/services/corporate-industrial/employee-checkups" onClick={closeMenu}>Employee Checkups</Link>
+                      <Link to="/services/corporate-industrial/workplace-wellness" onClick={closeMenu}>Workplace Wellness</Link>
+                    </div>
+                  )}
+                </div>
+
                 <Link to="/#about" onClick={closeMenu} className="mobile-link">
                   <span>About Us</span><ChevronRight size={16} />
                 </Link>
@@ -497,11 +596,11 @@ function App() {
 
               {/* CTA buttons */}
               <div className="mobile-drawer-cta">
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary full-width" onClick={closeMenu}>
+                <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); setBookingModalOpen(true); }} className="btn-primary full-width">
                   <MessageCircle size={18} /> Book Instant on WhatsApp
                 </a>
                 <a href={`tel:${phoneCallNumber}`} className="btn-secondary full-width" onClick={closeMenu}>
-                  <Phone size={18} /> Emergency: +91 7997888448
+                  <Phone size={18} /> Call: +91 7997888448
                 </a>
               </div>
             </div>
@@ -556,13 +655,7 @@ function App() {
               {/* Brand Col */}
               <div className="footer-col-brand">
                 <div className="brand-logo footer-logo">
-                  <div className="logo-emblem">
-                    <HeartPulse size={20} className="pulse-icon" />
-                  </div>
-                  <div className="logo-text-group">
-                    <div className="logo-name" style={{ color: 'white' }}>AMPLR<span style={{ color: '#ff4d6d' }}>HEALTH</span></div>
-                    <span className="logo-tagline" style={{ color: '#94a3b8' }}>HOSPITAL CARE AT HOME</span>
-                  </div>
+                  <img src="/amplr-logo.jpeg" alt="AMPLR Health" className="brand-logo-img footer-logo-img" />
                 </div>
                 <p className="footer-brand-text">
                   Bringing compassionate, hospital-level medical attention, verified caregivers, and 24/7 emergency ICU ambulance services directly to your doorstep.
@@ -593,9 +686,6 @@ function App() {
                 </ul>
               </div>
 
-              {/* Timings & Availability */}
-              
-
               {/* Emergency Contact Card */}
               <div className="footer-col-contact">
                 <div className="footer-emergency-box">
@@ -615,7 +705,7 @@ function App() {
                       <span>Vijayawada, AP 520013</span>
                     </div>
                   </div>
-                  <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary footer-wa-btn">
+                  <a href="#" onClick={openBookingModal} className="btn-primary footer-wa-btn">
                     <MessageCircle size={16} /> WhatsApp Us Now
                   </a>
                 </div>
@@ -637,9 +727,9 @@ function App() {
         <div className="mobile-bottom-bar">
           <a href={`tel:${phoneCallNumber}`} className="bottom-bar-btn call">
             <PhoneCall size={18} />
-            <span>Call 24/7</span>
+            <span>Call: 7997888448</span>
           </a>
-          <a href={waLink} target="_blank" rel="noopener noreferrer" className="bottom-bar-btn whatsapp">
+          <a href="#" onClick={openBookingModal} className="bottom-bar-btn whatsapp">
             <MessageCircle size={18} />
             <span>WhatsApp Us</span>
           </a>
