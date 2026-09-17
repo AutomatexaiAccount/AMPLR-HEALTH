@@ -27,21 +27,16 @@ const CaregiverCaretaker = () => {
             <div>
               <div className="service-hero-badge">
                 <HeartHandshake size={16} />
-                <span>Everyday Assistance</span>
+                <span>3. CAREGIVER / CARETAKER SERVICES</span>
               </div>
-              <h1 className="service-hero-title">Caregiver / Caretaker Services</h1>
-              <p className="service-hero-desc">
-                Reliable and compassionate care for your loved ones. Our trained caretakers assist with daily activities, hygiene, mobility, and feeding for the elderly and bedridden patients.
-              </p>
+              <h1 className="service-hero-title">Compassionate Everyday Care at Home</h1>
               
-              <div className="service-hero-actions">
-                <a href="#" onClick={openBookingModal} className="btn-primary">
-                  <MessageCircle size={20} /> Book a Caregiver
-                </a>
-                <a href={`tel:${CALL_NUMBER}`} className="btn-secondary">
-                  <PhoneCall size={20} /> Call: {CALL_NUMBER}
-                </a>
-              </div>
+              <p className="service-hero-desc" style={{ marginTop: '1.5rem' }}>
+                Sometimes patients and elderly family members need <strong>reliable day to day assistance</strong>, rather than medical treatment.
+              </p>
+              <p className="service-hero-desc" style={{ marginTop: '1rem' }}>
+                AMPLR HEALTH SERVICES helps families arrange caregiver/caretaker support for elderly persons, children, mothers, recovering patients and individuals who need assistance with daily activities.
+              </p>
             </div>
             
             <div className="service-hero-img-wrap">
@@ -53,71 +48,59 @@ const CaregiverCaretaker = () => {
 
       <section className="service-content">
         <div className="container">
-          <div className="content-grid">
+          <div className="content-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="content-text">
-              <h2>Support for Daily Living</h2>
-              <p>
-                When a family member needs continuous assistance with their daily routine, our trained patient attendants are there to help with empathy and dignity.
-              </p>
-              <div className="features-checklist" style={{ marginTop: '2rem' }}>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Assistance with bathing, grooming & hygiene</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Help with feeding and medication reminders</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Mobility assistance and wheelchair support</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Companionship for the elderly</span>
-                </div>
-              </div>
+              <h2 style={{ marginBottom: '1.5rem' }}>Caregiver Support May Include</h2>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                <li>Personal assistance</li>
+                <li>Mobility assistance</li>
+                <li>Assistance with daily activities</li>
+                <li>Feeding assistance</li>
+                <li>Elderly care</li>
+                <li>Child care support</li>
+                <li>Mother and baby support</li>
+                <li>Bedridden patient assistance</li>
+                <li>Post-surgery support</li>
+                <li>Companion care</li>
+                <li>Basic patient assistance</li>
+                <li>Support for patients with limited mobility</li>
+              </ul>
+              
+              <h2 style={{ marginBottom: '1.5rem' }}>Flexible Duration</h2>
+              <p style={{ marginBottom: '1rem', color: 'var(--navy-light)' }}>Caregiver services can be arranged according to requirement, subject to availability:</p>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                <li>Short duration care</li>
+                <li>Half-day support</li>
+                <li>Full-day support</li>
+                <li>Extended-day support</li>
+                <li>Overnight support</li>
+                <li>24-hour care</li>
+                <li>Monthly caregiver arrangements</li>
+              </ul>
             </div>
             
-            {/* Pricing Card */}
-            <div className="pricing-wrapper" style={{ margin: '0' }}>
-              <h3>Pricing Details</h3>
-              <p className="pricing-subtitle">Indicative starting prices for caretakers</p>
-              
-              <table className="pricing-table-modern">
-                <thead>
-                  <tr>
-                    <th>Service Duration</th>
-                    <th style={{ textAlign: 'right' }}>Starting Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="service-name">12-Hour Shift (Day or Night)</td>
-                    <td className="service-price">₹799</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">24-Hour Continuous Care</td>
-                    <td className="service-price">₹1,299</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Weekly Package (12-Hrs)</td>
-                    <td className="service-price">₹5,200</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Monthly Package (12-Hrs)</td>
-                    <td className="service-price">₹20,000</td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <div className="pricing-cta">
-                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1rem' }}>
-                  *Prices vary based on patient condition (e.g., bedridden) and location.
+            <div className="content-text">
+              <div className="pricing-wrapper" style={{ margin: '0', backgroundColor: 'var(--bg-alt)' }}>
+                
+                <h2 style={{ marginBottom: '1.5rem' }}>Specialised Care Support</h2>
+                <p style={{ marginBottom: '1rem', color: 'var(--navy-light)' }}>We can help families arrange support for:</p>
+                <p style={{ fontWeight: '600', color: 'var(--navy-dark)', lineHeight: '1.8', marginBottom: '2.5rem' }}>
+                  Elderly Care | Child Care | Mother & Baby Care | Pregnant Care | Bedridden Care | Post-Surgery Care | Daily Assistance
                 </p>
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: '100%' }}>
-                  <MessageCircle size={18} /> Discuss Needs on WhatsApp
-                </a>
+
+                <h2 style={{ marginBottom: '1.5rem' }}>More Than Assistance — Compassionate Support</h2>
+                <p style={{ marginBottom: '2.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                  Our objective is to help families provide their loved ones with <strong>comfort, companionship and dependable day to day assistance at home.</strong>
+                </p>
+
+                <div className="pricing-cta">
+                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
+                    Book Caregiver / Caretaker Service
+                  </a>
+                  <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '1.5rem', fontStyle: 'italic', textAlign: 'center', lineHeight: '1.6' }}>
+                    Caregiver services are non-medical support services unless specifically provided by a qualified healthcare professional.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

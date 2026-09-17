@@ -27,21 +27,16 @@ const ECGAtHome = () => {
             <div>
               <div className="service-hero-badge">
                 <HeartPulse size={16} />
-                <span>Cardiac Care Diagnostics</span>
+                <span>4. ECG AT HOME</span>
               </div>
-              <h1 className="service-hero-title">ECG at Home</h1>
-              <p className="service-hero-desc">
-                Experiencing chest pain or irregular heartbeats? Need a routine check-up? Get a clinical-grade ECG done quickly and safely in the comfort of your home by our trained technicians.
-              </p>
+              <h1 className="service-hero-title">ECG Testing Without Leaving Home</h1>
               
-              <div className="service-hero-actions">
-                <a href="#" onClick={openBookingModal} className="btn-primary">
-                  <MessageCircle size={20} /> Book ECG
-                </a>
-                <a href={`tel:${CALL_NUMBER}`} className="btn-secondary">
-                  <PhoneCall size={20} /> Call: {CALL_NUMBER}
-                </a>
-              </div>
+              <p className="service-hero-desc" style={{ marginTop: '1.5rem' }}>
+                For patients who need an ECG, travelling to a diagnostic centre may not always be convenient.
+              </p>
+              <p className="service-hero-desc" style={{ marginTop: '1rem' }}>
+                AMPLR HEALTH SERVICES helps arrange <strong>ECG services at home</strong>, subject to location and service availability.
+              </p>
             </div>
             
             <div className="service-hero-img-wrap">
@@ -53,67 +48,50 @@ const ECGAtHome = () => {
 
       <section className="service-content">
         <div className="container">
-          <div className="content-grid">
+          <div className="content-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="content-text">
-              <h2>Fast & Reliable Cardiac Testing</h2>
-              <p>
-                Cardiac conditions require immediate attention. Travelling to a clinic can cause unnecessary stress. Our portable 12-channel ECG machines ensure accurate results instantly without the wait.
-              </p>
-              <div className="features-checklist" style={{ marginTop: '2rem' }}>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Clinical-grade 12-lead ECG machines</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Trained technicians for accurate placement</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Instant digital and physical reports</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Ideal for bedridden and elderly patients</span>
-                </div>
+              <h2 style={{ marginBottom: '1.5rem' }}>ECG at Home May Be Convenient For</h2>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                <li>Elderly patients</li>
+                <li>Patients with mobility difficulties</li>
+                <li>Bedridden patients</li>
+                <li>Post-hospitalisation patients</li>
+                <li>Patients advised to undergo ECG testing</li>
+                <li>Individuals who require convenient diagnostic support</li>
+              </ul>
+              
+              <div style={{ backgroundColor: '#fff1f2', borderLeft: '4px solid #e11d48', padding: '1.5rem', borderRadius: '0 8px 8px 0', marginTop: '2rem' }}>
+                <h3 style={{ color: '#e11d48', marginBottom: '1rem', fontSize: '1.2rem' }}>Important</h3>
+                <p style={{ marginBottom: '1rem', color: 'var(--navy-dark)' }}>
+                  An ECG is a diagnostic test and does not by itself provide a complete medical diagnosis.
+                </p>
+                <p style={{ color: 'var(--navy-dark)', fontWeight: '500' }}>
+                  If you experience emergency symptoms such as severe chest pain, severe breathing difficulty, fainting or other serious symptoms, seek <strong>immediate emergency medical care</strong> rather than waiting for a home ECG appointment.
+                </p>
               </div>
             </div>
             
-            {/* Pricing Card */}
-            <div className="pricing-wrapper" style={{ margin: '0' }}>
-              <h3>Pricing Details</h3>
-              <p className="pricing-subtitle">Indicative starting prices for ECG</p>
-              
-              <table className="pricing-table-modern">
-                <thead>
-                  <tr>
-                    <th>Service Type</th>
-                    <th style={{ textAlign: 'right' }}>Starting Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="service-name">Standard 12-Lead ECG</td>
-                    <td className="service-price">₹499</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">ECG with Cardiologist Review</td>
-                    <td className="service-price">₹799</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Emergency ECG (Within 2 hrs)</td>
-                    <td className="service-price">₹999</td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <div className="pricing-cta">
-                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1rem' }}>
-                  *Prices may vary slightly based on distance and emergency requirements.
+            <div className="content-text">
+              <div className="pricing-wrapper" style={{ margin: '0', backgroundColor: 'var(--bg-alt)' }}>
+                
+                <h2 style={{ marginBottom: '1.5rem' }}>Simple Process</h2>
+                <div style={{ padding: '1.5rem', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border-subtle)', marginBottom: '1.5rem' }}>
+                  <p style={{ fontWeight: '600', color: 'var(--primary)', fontSize: '1.1rem', textAlign: 'center', lineHeight: '1.8' }}>
+                    Book ECG &rarr; Professional Visits Your Home &rarr; ECG Performed &rarr; Report / Result Processed
+                  </p>
+                </div>
+                <p style={{ marginBottom: '2.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                  The ECG is performed using appropriate equipment by the assigned healthcare professional/service provider.
                 </p>
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: '100%' }}>
-                  <MessageCircle size={18} /> Book on WhatsApp
-                </a>
+
+                <div className="pricing-cta">
+                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
+                    Book ECG at Home
+                  </a>
+                  <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '1.5rem', fontStyle: 'italic', textAlign: 'center', lineHeight: '1.6' }}>
+                    Availability, report format and turnaround time may vary according to the service provider and location.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -27,21 +27,16 @@ const Physiotherapy = () => {
             <div>
               <div className="service-hero-badge">
                 <Activity size={16} />
-                <span>Rehabilitation & Recovery</span>
+                <span>7. PHYSIOTHERAPY AT HOME</span>
               </div>
-              <h1 className="service-hero-title">Physiotherapy Services</h1>
-              <p className="service-hero-desc">
-                Recover faster in the comfort of your home. Our expert physiotherapists provide personalized treatment plans for pain management, post-surgical rehabilitation, and mobility improvement.
-              </p>
+              <h1 className="service-hero-title">Professional Physiotherapy at Your Doorstep</h1>
               
-              <div className="service-hero-actions">
-                <a href="#" onClick={openBookingModal} className="btn-primary">
-                  <MessageCircle size={20} /> Book a Session
-                </a>
-                <a href={`tel:${CALL_NUMBER}`} className="btn-secondary">
-                  <PhoneCall size={20} /> Call: {CALL_NUMBER}
-                </a>
-              </div>
+              <p className="service-hero-desc" style={{ marginTop: '1.5rem' }}>
+                Recovery and mobility can require regular physiotherapy. Travelling to a clinic may be difficult for patients with limited mobility.
+              </p>
+              <p className="service-hero-desc" style={{ marginTop: '1rem' }}>
+                AMPLR HEALTH SERVICES helps arrange <strong>physiotherapy services at home</strong> according to the patient's requirement and service availability.
+              </p>
             </div>
             
             <div className="service-hero-img-wrap">
@@ -53,71 +48,62 @@ const Physiotherapy = () => {
 
       <section className="service-content">
         <div className="container">
-          <div className="content-grid">
+          <div className="content-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="content-text">
-              <h2>Regain Your Mobility</h2>
-              <p>
-                Whether you are recovering from a sports injury, surgery, or dealing with chronic joint pain, our qualified physiotherapists bring the necessary equipment to your home for effective healing.
+              <h2 style={{ marginBottom: '1.5rem' }}>Physiotherapy May Support</h2>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                <li>Post-surgery rehabilitation</li>
+                <li>Orthopaedic recovery</li>
+                <li>Mobility improvement</li>
+                <li>Strength and flexibility</li>
+                <li>Elderly mobility support</li>
+                <li>Post injury rehabilitation</li>
+                <li>Back and neck-related rehabilitation</li>
+                <li>Joint and muscle rehabilitation</li>
+                <li>Recovery after prolonged hospitalisation</li>
+                <li>Bedridden patient rehabilitation</li>
+                <li>General functional recovery</li>
+              </ul>
+              
+              <h2 style={{ marginBottom: '1.5rem' }}>Personalised Home Sessions</h2>
+              <p style={{ marginBottom: '2.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                A physiotherapist can assess the patient's condition and provide appropriate exercises and therapy according to the individual's needs.
               </p>
-              <div className="features-checklist" style={{ marginTop: '2rem' }}>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Post-operative Rehabilitation</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Stroke & Neurological Rehab</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Back, Neck & Joint Pain Management</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Geriatric (Elderly) Physiotherapy</span>
-                </div>
-              </div>
             </div>
             
-            {/* Pricing Card */}
-            <div className="pricing-wrapper" style={{ margin: '0' }}>
-              <h3>Pricing Details</h3>
-              <p className="pricing-subtitle">Indicative starting prices for physiotherapy</p>
-              
-              <table className="pricing-table-modern">
-                <thead>
-                  <tr>
-                    <th>Session Type / Package</th>
-                    <th style={{ textAlign: 'right' }}>Starting Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="service-name">Single Assessment Session</td>
-                    <td className="service-price">₹699</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Standard Therapy Session (45 mins)</td>
-                    <td className="service-price">₹599</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">5 Sessions Package</td>
-                    <td className="service-price">₹2,799</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">10 Sessions Package</td>
-                    <td className="service-price">₹5,499</td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <div className="pricing-cta">
-                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1rem' }}>
-                  *Prices vary based on the type of therapy required and equipment needed.
+            <div className="content-text">
+              <div className="pricing-wrapper" style={{ margin: '0', backgroundColor: 'var(--bg-alt)' }}>
+                
+                <h2 style={{ marginBottom: '1.5rem' }}>Benefits of Home Physiotherapy</h2>
+                
+                <h3 style={{ color: 'var(--navy-dark)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Comfort</h3>
+                <p style={{ marginBottom: '1.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                  Receive therapy in your familiar home environment.
                 </p>
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: '100%' }}>
-                  <MessageCircle size={18} /> Discuss Treatment Plan
-                </a>
+
+                <h3 style={{ color: 'var(--navy-dark)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Convenience</h3>
+                <p style={{ marginBottom: '1.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                  Reduce unnecessary travel.
+                </p>
+
+                <h3 style={{ color: 'var(--navy-dark)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Personal Attention</h3>
+                <p style={{ marginBottom: '1.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                  Sessions can focus on the patient's individual requirements.
+                </p>
+
+                <h3 style={{ color: 'var(--navy-dark)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Continuity</h3>
+                <p style={{ marginBottom: '2.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                  Regular sessions can help support an organised rehabilitation plan.
+                </p>
+
+                <div className="pricing-cta">
+                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
+                    Book Physiotherapy at Home
+                  </a>
+                  <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '1.5rem', fontStyle: 'italic', textAlign: 'center', lineHeight: '1.6' }}>
+                    Physiotherapy treatment depends on professional assessment and clinical suitability.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

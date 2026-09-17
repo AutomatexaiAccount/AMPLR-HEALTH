@@ -28,21 +28,21 @@ const LabBloodCollection = () => {
             <div>
               <div className="service-hero-badge">
                 <Syringe size={16} />
-                <span>Home Diagnostic Services</span>
+                <span>1. Home Healthcare Services</span>
               </div>
-              <h1 className="service-hero-title">Lab & Blood Sample Collection</h1>
-              <p className="service-hero-desc">
-                Skip the clinic waiting rooms. Get your blood tests and diagnostic samples collected safely and hygienically from the comfort of your home by our trained phlebotomists.
-              </p>
+              <h1 className="service-hero-title">Lab Sample Collection</h1>
               
-              <div className="service-hero-actions">
-                <a href="#" onClick={openBookingModal} className="btn-primary">
-                  <MessageCircle size={20} /> Book Home Collection
-                </a>
-                <a href={`tel:${CALL_NUMBER}`} className="btn-secondary">
-                  <PhoneCall size={20} /> Call: {CALL_NUMBER}
-                </a>
-              </div>
+              <h3 style={{ color: 'var(--primary)', marginTop: '1rem', marginBottom: '1.5rem' }}>Your Tests. Your Home. Your Convenience.</h3>
+              
+              <p className="service-hero-desc">
+                No need to travel to a laboratory for every blood test.
+              </p>
+              <p className="service-hero-desc" style={{ marginTop: '1rem' }}>
+                AMPLR HEALTH SERVICES helps you arrange home sample collection through trained and appropriate laboratory service professionals.
+              </p>
+              <p className="service-hero-desc" style={{ marginTop: '1rem' }}>
+                Our service is designed to make diagnostic testing more convenient for children, senior citizens, working professionals, patients and families.
+              </p>
             </div>
             
             <div className="service-hero-img-wrap">
@@ -55,75 +55,57 @@ const LabBloodCollection = () => {
       {/* Main Content */}
       <section className="service-content">
         <div className="container">
-          <div className="content-grid">
+          <div className="content-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="content-text">
-              <h2>Why Choose Home Sample Collection?</h2>
-              <p>
-                Whether it's a routine health checkup, specialized blood tests, or monitoring chronic conditions, visiting a diagnostic lab isn't always convenient. Our home collection service ensures you get accurate results without stepping out.
-              </p>
-              <div className="features-checklist" style={{ marginTop: '2rem' }}>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Trained & Certified Phlebotomists</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Strict Hygiene & Safety Protocols</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Accurate Reports from Partnered NABL Labs</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span>Digital Reports delivered directly to you</span>
-                </div>
-              </div>
+              <h2 style={{ marginBottom: '1.5rem' }}>Services Include</h2>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                <li>Blood sample collection at home</li>
+                <li>Routine diagnostic sample collection</li>
+                <li>Preventive health test sample collection</li>
+                <li>Specialised test sample collection</li>
+                <li>Health packages</li>
+                <li>Hormonal tests</li>
+                <li>Vitamin tests</li>
+                <li>Diabetic tests</li>
+                <li>Allergy tests</li>
+                <li>PCOD / irregular-period related tests</li>
+                <li>Fertility-related tests</li>
+                <li>Genetic / DNA tests</li>
+                <li>Cancer marker tests</li>
+                <li>Other laboratory investigations as available</li>
+              </ul>
+              
+              <h2 style={{ marginBottom: '1.5rem' }}>Ideal For</h2>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                <li>Senior citizens</li>
+                <li>Children</li>
+                <li>Patients with mobility difficulties</li>
+                <li>Busy professionals</li>
+                <li>Families</li>
+                <li>Patients requiring regular testing</li>
+              </ul>
             </div>
             
-            {/* Pricing Card */}
-            <div className="pricing-wrapper" style={{ margin: '0' }}>
-              <h3>Pricing Details</h3>
-              <p className="pricing-subtitle">Indicative starting prices for common tests</p>
-              
-              <table className="pricing-table-modern">
-                <thead>
-                  <tr>
-                    <th>Test Profile</th>
-                    <th style={{ textAlign: 'right' }}>Starting Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="service-name">Routine Blood Tests (CBC, Sugar)</td>
-                    <td className="service-price">₹199</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Thyroid Profile (T3, T4, TSH)</td>
-                    <td className="service-price">₹399</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Lipid Profile (Cholesterol)</td>
-                    <td className="service-price">₹499</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Comprehensive Master Health Check</td>
-                    <td className="service-price">₹1,499</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Home Collection Charge</td>
-                    <td className="service-price" style={{ color: '#64748b', fontSize: '0.9rem' }}>Varies by distance</td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <div className="pricing-cta">
-                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1rem' }}>
-                  *Prices are indicative. Final pricing depends on the specific tests prescribed by your doctor.
+            <div className="content-text">
+              <div className="pricing-wrapper" style={{ margin: '0', backgroundColor: 'var(--bg-alt)' }}>
+                <h2 style={{ marginBottom: '1.5rem' }}>How It Works</h2>
+                <div style={{ padding: '1.5rem', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border-subtle)', marginBottom: '1.5rem' }}>
+                  <p style={{ fontWeight: '600', color: 'var(--primary)', fontSize: '1.1rem', textAlign: 'center', lineHeight: '1.8' }}>
+                    Book &rarr; Schedule &rarr; Home Collection &rarr; Laboratory Testing &rarr; Online Report
+                  </p>
+                </div>
+                <p style={{ marginBottom: '2.5rem', color: 'var(--navy-light)' }}>
+                  Our team coordinates the sample collection according to the requested test and service availability.
                 </p>
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: '100%' }}>
-                  <FileText size={18} /> Upload Prescription on WhatsApp
-                </a>
+
+                <div className="pricing-cta">
+                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
+                    Book Home Sample Collection
+                  </a>
+                  <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '1.5rem', fontStyle: 'italic', textAlign: 'center' }}>
+                    Test availability, laboratory processing and report delivery depend on the selected laboratory/service provider.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

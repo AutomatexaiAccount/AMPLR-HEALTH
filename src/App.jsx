@@ -17,6 +17,7 @@ import DoctorConsultation from './pages/services/DoctorConsultation';
 import AmbulanceServices from './pages/services/AmbulanceServices';
 import BecomePartner from './pages/BecomePartner';
 import ContactUs from './pages/ContactUs';
+import WhyAmplr from './pages/WhyAmplr';
 import './index.css';
 import './service-pages.css';
 
@@ -292,12 +293,12 @@ function App() {
 
                 <div className="nav-dropdown" role="menuitem">
                   <span className="nav-dropdown-trigger">
-                    Services <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                    AMPLR Healthcare Services <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
                   </span>
                   <div className="nav-dropdown-content" role="menu">
                     <Link to="/services/lab-blood-collection" role="menuitem">Lab Sample Collection</Link>
                     <Link to="/services/nursing-services" role="menuitem">Nursing Services</Link>
-                    <Link to="/services/caregiver-caretaker" role="menuitem">Caregiver Services</Link>
+                    <Link to="/services/caregiver-caretaker" role="menuitem">Caregiver services</Link>
                     <Link to="/services/physiotherapy" role="menuitem">Physiotherapy Services</Link>
                     <Link to="/services/ecg-at-home" role="menuitem">ECG at Home Services</Link>
                     <Link to="/services/doctor-consultation" role="menuitem">Doctor Consultation</Link>
@@ -307,18 +308,33 @@ function App() {
 
                 <div className="nav-dropdown" role="menuitem">
                   <span className="nav-dropdown-trigger">
-                    Corporate <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                    Quick Links <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
                   </span>
                   <div className="nav-dropdown-content" role="menu">
-                    <Link to="/services/corporate-industrial/health-camps" role="menuitem">Health Camps</Link>
-                    <Link to="/services/corporate-industrial/employee-checkups" role="menuitem">Employee Checkups</Link>
-                    <Link to="/services/corporate-industrial/workplace-wellness" role="menuitem">Workplace Wellness</Link>
+                    <Link to="/" role="menuitem">Home</Link>
+                    <Link to="/#about" role="menuitem">About us</Link>
+                    <Link to="/#services" role="menuitem">Our Services</Link>
+                    <Link to="/partner" role="menuitem">Partner with us</Link>
+                    <Link to="/contact" role="menuitem">Contact us</Link>
+                    <Link to="/privacy" role="menuitem">Privacy policy</Link>
+                    <Link to="/terms" role="menuitem">Terms & Conditions</Link>
                   </div>
                 </div>
 
-                <Link to="/#about" className="nav-item-link">About Us</Link>
-                <Link to="/partner" className="nav-item-link">Partner with Us</Link>
-                <Link to="/terms" className="nav-item-link">Terms & Conditions</Link>
+                <div className="nav-dropdown" role="menuitem">
+                  <span className="nav-dropdown-trigger">
+                    Legal <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                  </span>
+                  <div className="nav-dropdown-content" role="menu">
+                    <Link to="/privacy" role="menuitem">Privacy policy</Link>
+                    <Link to="/terms" role="menuitem">Terms & Conditions</Link>
+                    <Link to="/cancellation-refund" role="menuitem">Cancellation & Refund Policy</Link>
+                    <Link to="/disclaimer" role="menuitem">Healthcare Disclaimer</Link>
+                  </div>
+                </div>
+
+                <a href="#" onClick={openBookingModal} className="nav-item-link">Book a Service</a>
+                <Link to="/partner" className="nav-item-link">Become a Partner</Link>
               </div>
 
               {/* ── DESKTOP ACTION AREA ── */}
@@ -462,14 +478,13 @@ function App() {
                   <ChevronRight size={16} />
                 </Link>
 
-                {/* Services expandable group */}
                 <div className="mobile-nav-group">
                   <button
                     className="mobile-nav-group-header"
                     onClick={() => setServicesExpanded(s => !s)}
                     aria-expanded={servicesExpanded}
                   >
-                    <span>Home Healthcare</span>
+                    <span>AMPLR Healthcare Services</span>
                     <ChevronRight
                       size={16}
                       className={`mobile-nav-chevron ${servicesExpanded ? 'rotated' : ''}`}
@@ -479,23 +494,22 @@ function App() {
                     <div className="mobile-nav-sub">
                       <Link to="/services/lab-blood-collection" onClick={closeMenu}>Lab Sample Collection</Link>
                       <Link to="/services/nursing-services" onClick={closeMenu}>Nursing Services</Link>
-                      <Link to="/services/caregiver-caretaker" onClick={closeMenu}>Caregiver Services</Link>
+                      <Link to="/services/caregiver-caretaker" onClick={closeMenu}>Caregiver services</Link>
                       <Link to="/services/physiotherapy" onClick={closeMenu}>Physiotherapy Services</Link>
-                      <Link to="/services/ecg-at-home" onClick={closeMenu}>ECG at Home</Link>
+                      <Link to="/services/ecg-at-home" onClick={closeMenu}>ECG at Home Services</Link>
                       <Link to="/services/doctor-consultation" onClick={closeMenu}>Doctor Consultation</Link>
                       <Link to="/services/ambulance-services" onClick={closeMenu}>Ambulance Services</Link>
                     </div>
                   )}
                 </div>
 
-                {/* Specialised Care expandable group */}
                 <div className="mobile-nav-group">
                   <button
                     className="mobile-nav-group-header"
                     onClick={() => setSpecialisedExpanded(s => !s)}
                     aria-expanded={specialisedExpanded}
                   >
-                    <span>Specialised Care</span>
+                    <span>Quick Links</span>
                     <ChevronRight
                       size={16}
                       className={`mobile-nav-chevron ${specialisedExpanded ? 'rotated' : ''}`}
@@ -503,24 +517,24 @@ function App() {
                   </button>
                   {specialisedExpanded && (
                     <div className="mobile-nav-sub">
-                      <Link to="/services/specialised-care/elder-care" onClick={closeMenu}>Elder Care</Link>
-                      <Link to="/services/specialised-care/pregnancy-maternity-care" onClick={closeMenu}>Pregnancy & Maternity</Link>
-                      <Link to="/services/specialised-care/mother-child-care" onClick={closeMenu}>Mother & Child Care</Link>
-                      <Link to="/services/specialised-care/post-surgery-care" onClick={closeMenu}>Post-Surgery Care</Link>
-                      <Link to="/services/specialised-care/post-hospitalisation-care" onClick={closeMenu}>Post-Hospitalisation</Link>
-                      <Link to="/services/specialised-care/bedridden-care" onClick={closeMenu}>Bedridden Care</Link>
+                      <Link to="/" onClick={closeMenu}>Home</Link>
+                      <Link to="/#about" onClick={closeMenu}>About us</Link>
+                      <Link to="/#services" onClick={closeMenu}>Our Services</Link>
+                      <Link to="/partner" onClick={closeMenu}>Partner with us</Link>
+                      <Link to="/contact" onClick={closeMenu}>Contact us</Link>
+                      <Link to="/privacy" onClick={closeMenu}>Privacy policy</Link>
+                      <Link to="/terms" onClick={closeMenu}>Terms & Conditions</Link>
                     </div>
                   )}
                 </div>
 
-                {/* Therapy & Rehab expandable group */}
                 <div className="mobile-nav-group">
                   <button
                     className="mobile-nav-group-header"
                     onClick={() => setTherapyExpanded(s => !s)}
                     aria-expanded={therapyExpanded}
                   >
-                    <span>Therapy & Rehab</span>
+                    <span>Legal</span>
                     <ChevronRight
                       size={16}
                       className={`mobile-nav-chevron ${therapyExpanded ? 'rotated' : ''}`}
@@ -528,69 +542,19 @@ function App() {
                   </button>
                   {therapyExpanded && (
                     <div className="mobile-nav-sub">
-                      <Link to="/services/physiotherapy" onClick={closeMenu}>Physiotherapy</Link>
-                      <Link to="/services/therapy-rehabilitation/speech-therapy" onClick={closeMenu}>Speech Therapy</Link>
-                      <Link to="/services/therapy-rehabilitation/audiology" onClick={closeMenu}>Audiology</Link>
-                      <Link to="/services/therapy-rehabilitation/occupational-therapy" onClick={closeMenu}>Occupational Therapy</Link>
-                      <Link to="/services/therapy-rehabilitation/rehabilitation-support" onClick={closeMenu}>Rehab Support</Link>
+                      <Link to="/privacy" onClick={closeMenu}>Privacy policy</Link>
+                      <Link to="/terms" onClick={closeMenu}>Terms & Conditions</Link>
+                      <Link to="/cancellation-refund" onClick={closeMenu}>Cancellation & Refund Policy</Link>
+                      <Link to="/disclaimer" onClick={closeMenu}>Healthcare Disclaimer</Link>
                     </div>
                   )}
                 </div>
 
-                {/* Wellness & AYUSH expandable group */}
-                <div className="mobile-nav-group">
-                  <button
-                    className="mobile-nav-group-header"
-                    onClick={() => setWellnessExpanded(s => !s)}
-                    aria-expanded={wellnessExpanded}
-                  >
-                    <span>Wellness & AYUSH</span>
-                    <ChevronRight
-                      size={16}
-                      className={`mobile-nav-chevron ${wellnessExpanded ? 'rotated' : ''}`}
-                    />
-                  </button>
-                  {wellnessExpanded && (
-                    <div className="mobile-nav-sub">
-                      <Link to="/services/wellness-lifestyle/dietician-nutrition" onClick={closeMenu}>Dietician & Nutrition</Link>
-                      <Link to="/services/wellness-lifestyle/lifestyle-management" onClick={closeMenu}>Lifestyle Management</Link>
-                      <Link to="/services/wellness-lifestyle/yoga-wellness" onClick={closeMenu}>Yoga & Wellness</Link>
-                      <Link to="/services/wellness-lifestyle/preventive-health" onClick={closeMenu}>Preventive Health</Link>
-                      <Link to="/services/ayush-traditional/ayurveda-unani-homeopathy" onClick={closeMenu}>AYUSH Consultation</Link>
-                    </div>
-                  )}
-                </div>
-
-                {/* Corporate expandable group */}
-                <div className="mobile-nav-group">
-                  <button
-                    className="mobile-nav-group-header"
-                    onClick={() => setCorporateExpanded(s => !s)}
-                    aria-expanded={corporateExpanded}
-                  >
-                    <span>Corporate & Industrial</span>
-                    <ChevronRight
-                      size={16}
-                      className={`mobile-nav-chevron ${corporateExpanded ? 'rotated' : ''}`}
-                    />
-                  </button>
-                  {corporateExpanded && (
-                    <div className="mobile-nav-sub">
-                      <Link to="/services/corporate-industrial/health-camps" onClick={closeMenu}>Health Camps</Link>
-                      <Link to="/services/corporate-industrial/employee-checkups" onClick={closeMenu}>Employee Checkups</Link>
-                      <Link to="/services/corporate-industrial/workplace-wellness" onClick={closeMenu}>Workplace Wellness</Link>
-                    </div>
-                  )}
-                </div>
-
-                <Link to="/#about" onClick={closeMenu} className="mobile-link">
-                  <span>About Us</span><ChevronRight size={16} />
-                </Link>
+                <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); setBookingModalOpen(true); }} className="mobile-link">
+                  <span>Book a Service</span><ChevronRight size={16} />
+                </a>
                 <Link to="/partner" onClick={closeMenu} className="mobile-link">
                   <span>Become a Partner</span><ChevronRight size={16} />
-                </Link>
-                <Link to="/contact" onClick={closeMenu} className="mobile-link">
-                  <span>Contact Us</span><ChevronRight size={16} />
                 </Link>
               </nav>
 
@@ -623,6 +587,7 @@ function App() {
           <Route path="/services/ambulance-services" element={<AmbulanceServices />} />
           <Route path="/partner" element={<BecomePartner />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/why-amplr" element={<WhyAmplr />} />
           
           <Route path="/services/specialised-care/elder-care" element={<ElderCare />} />
           <Route path="/services/specialised-care/pregnancy-maternity-care" element={<PregnancyMaternityCare />} />
@@ -654,16 +619,13 @@ function App() {
             <div className="footer-top-grid">
               {/* Brand Col */}
               <div className="footer-col-brand">
-                <div className="brand-logo footer-logo">
-                  <img src="/amplr-logo.jpeg" alt="AMPLR Health" className="brand-logo-img footer-logo-img" />
-                </div>
-                <p className="footer-brand-text">
-                  Bringing compassionate, hospital-level medical attention, verified caregivers, and 24/7 emergency ICU ambulance services directly to your doorstep.
+                <h3 className="footer-brand-title" style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--navy-dark)' }}>AMPLR HEALTH SERVICES</h3>
+                <p className="footer-brand-tagline" style={{ fontStyle: 'italic', marginBottom: '1rem', color: 'var(--brand-primary)' }}>
+                  Brings Hospital Care to Your Home
                 </p>
-                <div className="gov-reg-pill">
-                  <ShieldCheck size={16} className="text-emerald" />
-                  <span>Govt. Reg: <strong>UDYAM-AP-20-0098719</strong></span>
-                </div>
+                <p className="footer-brand-services" style={{ fontSize: '0.9rem', lineHeight: '1.6', color: 'var(--slate-dark)' }}>
+                  Home Healthcare | Lab Sample Collection | Nursing | Caregiver | Physiotherapy | ECG at Home | Doctor Virtual Consultation | Ambulance
+                </p>
               </div>
 
               {/* Quick Links Col */}
@@ -672,52 +634,48 @@ function App() {
                 <ul className="footer-link-list">
                   <li><Link to="/"><ChevronRight size={14} /> Home</Link></li>
                   <li><Link to="/#about"><ChevronRight size={14} /> About Us</Link></li>
+                  <li><Link to="/why-amplr"><ChevronRight size={14} /> Why AMPLR?</Link></li>
+                  <li><Link to="/#services"><ChevronRight size={14} /> Services</Link></li>
+                  <li><Link to="/#how-it-works"><ChevronRight size={14} /> How It Works</Link></li>
                   <li><Link to="/partner"><ChevronRight size={14} /> Partner With Us</Link></li>
                   <li><Link to="/contact"><ChevronRight size={14} /> Contact Us</Link></li>
+                  <li><Link to="/privacy"><ChevronRight size={14} /> Privacy Policy</Link></li>
+                  <li><Link to="/terms"><ChevronRight size={14} /> Terms & Conditions</Link></li>
                 </ul>
               </div>
+
+              {/* Support Col */}
+              <div className="footer-col">
+                <h4 className="footer-heading">Support</h4>
+                <ul className="footer-link-list">
+                  <li><a href="#" onClick={openBookingModal}><ChevronRight size={14} /> WhatsApp</a></li>
+                  <li><Link to="/contact"><ChevronRight size={14} /> Customer Support</Link></li>
+                  <li><a href={`tel:${phoneCallNumber}`}><ChevronRight size={14} /> Emergency Assistance</a></li>
+                  <li><Link to="/contact"><ChevronRight size={14} /> Service Availability</Link></li>
+                </ul>
+              </div>
+
+              {/* Legal Col */}
               <div className="footer-col">
                 <h4 className="footer-heading">Legal</h4>
                 <ul className="footer-link-list">
                   <li><Link to="/privacy"><ChevronRight size={14} /> Privacy Policy</Link></li>
                   <li><Link to="/terms"><ChevronRight size={14} /> Terms & Conditions</Link></li>
-                  <li><Link to="/cancellation-refund"><ChevronRight size={14} /> Cancellation & Refund</Link></li>
+                  <li><Link to="/cancellation-refund"><ChevronRight size={14} /> Cancellation & Refund Policy</Link></li>
                   <li><Link to="/disclaimer"><ChevronRight size={14} /> Healthcare Disclaimer</Link></li>
                 </ul>
               </div>
+            </div>
 
-              {/* Emergency Contact Card */}
-              <div className="footer-col-contact">
-                <div className="footer-emergency-box">
-                  <div className="emergency-box-tag">EMERGENCY HELPLINE</div>
-                  <a href={`tel:${phoneCallNumber}`} className="emergency-phone-link">
-                    <PhoneCall size={20} />
-                    <span>+91 7997888448</span>
-                  </a>
-                  <p className="emergency-box-sub">Direct dispatch & instant support</p>
-                  <div className="footer-contact-items">
-                    <div className="footer-contact-item">
-                      <Mail size={15} />
-                      <a href="mailto:amplrhealth@gmail.com">amplrhealth@gmail.com</a>
-                    </div>
-                    <div className="footer-contact-item">
-                      <MapPin size={15} />
-                      <span>Vijayawada, AP 520013</span>
-                    </div>
-                  </div>
-                  <a href="#" onClick={openBookingModal} className="btn-primary footer-wa-btn">
-                    <MessageCircle size={16} /> WhatsApp Us Now
-                  </a>
-                </div>
-              </div>
+            <div className="footer-disclaimer-section" style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid var(--border-subtle)', textAlign: 'justify' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--slate-medium)', lineHeight: '1.6' }}>
+                <strong style={{ color: 'var(--navy-dark)' }}>Important Healthcare Disclaimer</strong> AMPLR HEALTH SERVICES facilitates and coordinates healthcare services through healthcare professionals and service providers. Service availability, clinical suitability, pricing and outcomes may vary depending on the service, patient requirement, location and assigned service provider. AMPLR HEALTH SERVICES does not replace emergency medical care. In an emergency, please contact the appropriate emergency medical services or visit the nearest hospital.
+              </p>
             </div>
 
             <div className="footer-bottom-bar">
-              <div className="footer-bottom-inner">
-                <p>&copy; {new Date().getFullYear()} AMPLR HEALTH. All rights reserved.</p>
-                <p className="footer-credit">
-                  Designed & Developed by <a href="https://automatexai.co.in/" target="_blank" rel="noopener noreferrer">automatexai.co.in</a>
-                </p>
+              <div className="footer-bottom-inner" style={{ justifyContent: 'center' }}>
+                <p>&copy; AMPLR HEALTH SERVICES. All Rights Reserved.</p>
               </div>
             </div>
           </div>

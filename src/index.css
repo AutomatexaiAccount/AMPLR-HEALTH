@@ -653,7 +653,7 @@ a {
    RESPONSIVE HEADER
    ============================================================ */
 
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
   .nav-links,
   .nav-actions {
     display: none !important;
@@ -667,17 +667,17 @@ a {
   .top-bar { display: none; } /* Hide top-bar on small mobiles since we have bottom bar and drawer */
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1199px) {
   .top-bar { display: block; }
   .top-bar-right { display: none; }
   .top-bar-inner { justify-content: center; }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .mobile-drawer, .mobile-drawer-overlay { display: none !important; }
 }
 
-@media (min-width: 1024px) and (max-width: 1279px) {
+@media (min-width: 1200px) and (max-width: 1350px) {
   .nav-item-link,
   .nav-dropdown-trigger {
     padding: 0.4rem 0.5rem;

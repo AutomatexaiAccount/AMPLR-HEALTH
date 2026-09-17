@@ -63,7 +63,7 @@ const BecomePartner = () => {
                 <MapPin size={24} />
               </div>
               <h3 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '1rem' }}>Local Opportunities</h3>
-              <p style={{ color: '#64748b', lineHeight: '1.6' }}>Receive suitable service requirements in your local area and neighborhood.</p>
+              <p style={{ color: '#64748b', lineHeight: '1.6' }}>Receive suitable service requirements in your area.</p>
             </div>
 
             <div style={{ padding: '2rem', background: '#f1f5f9', borderRadius: '16px' }}>
@@ -71,7 +71,7 @@ const BecomePartner = () => {
                 <Briefcase size={24} />
               </div>
               <h3 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '1rem' }}>Digital Support</h3>
-              <p style={{ color: '#64748b', lineHeight: '1.6' }}>Manage service requests through our simplified digital/WhatsApp platform.</p>
+              <p style={{ color: '#64748b', lineHeight: '1.6' }}>Manage service requests through our digital/WhatsApp platform.</p>
             </div>
 
             <div style={{ padding: '2rem', background: '#f1f5f9', borderRadius: '16px' }}>
@@ -79,7 +79,7 @@ const BecomePartner = () => {
                 <Building2 size={24} />
               </div>
               <h3 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '1rem' }}>Flexible Partnership</h3>
-              <p style={{ color: '#64748b', lineHeight: '1.6' }}>Accept suitable services based on your own schedule and availability.</p>
+              <p style={{ color: '#64748b', lineHeight: '1.6' }}>Accept suitable services based on your availability.</p>
             </div>
 
             <div style={{ padding: '2rem', background: '#f1f5f9', borderRadius: '16px' }}>
@@ -87,7 +87,7 @@ const BecomePartner = () => {
                 <Stethoscope size={24} />
               </div>
               <h3 style={{ fontSize: '1.4rem', color: '#0f172a', marginBottom: '1rem' }}>Professional Network</h3>
-              <p style={{ color: '#64748b', lineHeight: '1.6' }}>Be part of a growing and trusted healthcare network focused on quality care.</p>
+              <p style={{ color: '#64748b', lineHeight: '1.6' }}>Be part of a growing and trusted healthcare network.</p>
             </div>
 
           </div>
@@ -107,7 +107,7 @@ const BecomePartner = () => {
             <div>
               <div style={{ width: '60px', height: '60px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--primary)' }}>1</div>
               <h4 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: 'white' }}>Register</h4>
-              <p style={{ color: '#94a3b8' }}>Submit your details and credentials.</p>
+              <p style={{ color: '#94a3b8' }}>Submit your details</p>
             </div>
 
             <div>
@@ -119,7 +119,7 @@ const BecomePartner = () => {
             <div>
               <div style={{ width: '60px', height: '60px', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--accent)' }}>3</div>
               <h4 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: 'white' }}>Activate</h4>
-              <p style={{ color: '#94a3b8' }}>Approved partners are successfully onboarded.</p>
+              <p style={{ color: '#94a3b8' }}>Approved partners are onboarded</p>
             </div>
 
             <div>

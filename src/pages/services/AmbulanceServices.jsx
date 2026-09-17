@@ -27,21 +27,16 @@ const AmbulanceServices = () => {
             <div>
               <div className="service-hero-badge">
                 <ShieldAlert size={16} color="#e11d48" />
-                <span style={{ color: '#e11d48' }}>Emergency Medical Transport</span>
+                <span style={{ color: '#e11d48' }}>6. AMBULANCE SERVICES</span>
               </div>
-              <h1 className="service-hero-title">24/7 Ambulance Services</h1>
-              <p className="service-hero-desc">
-                In a medical emergency, every second counts. We provide swift, fully-equipped ambulance services with trained paramedics to ensure safe transportation to the nearest medical facility.
-              </p>
+              <h1 className="service-hero-title">Emergency & Patient Transport Support</h1>
               
-              <div className="service-hero-actions">
-                <a href={`tel:${CALL_NUMBER}`} className="btn-primary" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', boxShadow: '0 4px 15px rgba(239, 68, 68, 0.4)' }}>
-                  <PhoneCall size={20} /> Emergency Call: {CALL_NUMBER}
-                </a>
-                <a href="#" onClick={openBookingModal} className="btn-secondary">
-                  <Ambulance size={20} /> Pre-book Transport
-                </a>
-              </div>
+              <p className="service-hero-desc" style={{ marginTop: '1.5rem' }}>
+                When every minute matters, dependable patient transportation is important.
+              </p>
+              <p className="service-hero-desc" style={{ marginTop: '1rem' }}>
+                AMPLR HEALTH SERVICES helps customers arrange <strong>ambulance and patient transport services</strong> according to the patient's condition and transportation requirement.
+              </p>
             </div>
             
             <div className="service-hero-img-wrap">
@@ -53,72 +48,68 @@ const AmbulanceServices = () => {
 
       <section className="service-content">
         <div className="container">
-          <div className="content-grid">
+          <div className="content-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <div className="content-text">
-              <h2>Types of Ambulances Available</h2>
-              <p>
-                We coordinate a fleet of well-maintained ambulances to cater to different medical requirements, ensuring patient safety and comfort during transit.
+              <h2 style={{ marginBottom: '1.5rem' }}>Ambulance Options</h2>
+              
+              <h3 style={{ color: 'var(--navy-dark)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Basic Ambulance</h3>
+              <p style={{ marginBottom: '1.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                Suitable for patients requiring basic medical transportation and assistance.
               </p>
-              <div className="features-checklist" style={{ marginTop: '2rem' }}>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span><strong>Basic Life Support (BLS):</strong> For stable patients needing basic monitoring.</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span><strong>Advanced Life Support (ALS / ICU):</strong> Equipped with ventilators and defibrillators.</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span><strong>Patient Transport Vehicle (PTV):</strong> For non-emergency hospital visits/discharges.</span>
-                </div>
-                <div className="feature-check-item">
-                  <CheckCircle2 className="text-primary" size={24} />
-                  <span><strong>Inter-City Transfer:</strong> Safe out-station transport for long distances.</span>
-                </div>
-              </div>
+
+              <h3 style={{ color: 'var(--navy-dark)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>ICU Ambulance</h3>
+              <p style={{ marginBottom: '1.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                For patients who require higher-level medical support during transportation, subject to vehicle and medical team availability.
+              </p>
+
+              <h3 style={{ color: 'var(--navy-dark)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Advanced Ambulance</h3>
+              <p style={{ marginBottom: '1.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                For transportation requirements involving additional medical equipment and professional support.
+              </p>
+
+              <h3 style={{ color: 'var(--navy-dark)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>Patient Transport</h3>
+              <p style={{ marginBottom: '2.5rem', color: 'var(--navy-light)', lineHeight: '1.8' }}>
+                Suitable for planned transfers, hospital visits, discharge transportation and other patient movement requirements, where appropriate.
+              </p>
+              
+              <h2 style={{ marginBottom: '1.5rem' }}>Additional Requirements</h2>
+              <p style={{ marginBottom: '1rem', color: 'var(--navy-light)' }}>Depending on the ambulance selected, additional services may include:</p>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                <li>Oxygen support</li>
+                <li>Paramedic support</li>
+                <li>Ventilator support</li>
+                <li>Patient attendant</li>
+                <li>Extended waiting</li>
+                <li>Long-distance transportation</li>
+                <li>Hospital-to-hospital transfer</li>
+              </ul>
             </div>
             
-            {/* Pricing Card */}
-            <div className="pricing-wrapper" style={{ margin: '0' }}>
-              <h3>Pricing Details</h3>
-              <p className="pricing-subtitle">Indicative starting prices for transport</p>
-              
-              <table className="pricing-table-modern">
-                <thead>
-                  <tr>
-                    <th>Ambulance Type</th>
-                    <th style={{ textAlign: 'right' }}>Starting Price (Local)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="service-name">Patient Transport (Non-Emergency)</td>
-                    <td className="service-price">₹1,499</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">BLS Ambulance (with Oxygen)</td>
-                    <td className="service-price">₹1,999</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">ALS / ICU Ambulance (with Paramedic)</td>
-                    <td className="service-price">₹3,499</td>
-                  </tr>
-                  <tr>
-                    <td className="service-name">Inter-City Transport</td>
-                    <td className="service-price" style={{ color: '#64748b', fontSize: '0.9rem' }}>₹25 - ₹40 per km</td>
-                  </tr>
-                </tbody>
-              </table>
-              
-              <div className="pricing-cta">
-                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1rem' }}>
-                  *Prices vary based on exact distance, traffic conditions, and required medical equipment.
-                </p>
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '1rem', borderRadius: '12px' }}>
-                  <p style={{ color: '#b91c1c', fontWeight: '700', fontSize: '1.1rem', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <Phone size={20} /> Call {CALL_NUMBER} for immediate dispatch
+            <div className="content-text">
+              <div className="pricing-wrapper" style={{ margin: '0', backgroundColor: 'var(--bg-alt)' }}>
+                
+                <h2 style={{ marginBottom: '1.5rem' }}>Ambulance Types</h2>
+                <p style={{ marginBottom: '1rem', color: 'var(--navy-light)' }}>Depending on availability and requirement:</p>
+                <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', marginBottom: '2.5rem', lineHeight: '1.8' }}>
+                  <li>Omni / Toofan type ambulance</li>
+                  <li>Tempo Traveller / larger patient transport</li>
+                  <li>Other suitable ambulance vehicles</li>
+                </ul>
+
+                <div style={{ backgroundColor: '#fff1f2', borderLeft: '4px solid #e11d48', padding: '1.5rem', borderRadius: '0 8px 8px 0', marginBottom: '2.5rem' }}>
+                  <h3 style={{ color: '#e11d48', marginBottom: '1rem', fontSize: '1.2rem' }}>Important</h3>
+                  <p style={{ marginBottom: '1rem', color: 'var(--navy-dark)' }}>
+                    Ambulance availability and equipment depend on the patient's requirement, location and service provider.
                   </p>
+                  <p style={{ color: 'var(--navy-dark)', fontWeight: '500' }}>
+                    For a life-threatening emergency, contact your local emergency services immediately.
+                  </p>
+                </div>
+
+                <div className="pricing-cta">
+                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
+                    Book Ambulance Service
+                  </a>
                 </div>
               </div>
             </div>

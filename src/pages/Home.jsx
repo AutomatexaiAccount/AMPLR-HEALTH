@@ -114,6 +114,14 @@ const Home = () => {
             <p className="section-subtitle">Brings Hospital Care to Your Home</p>
           </div>
 
+          <div className="about-content" style={{ marginBottom: '3rem', fontSize: '1.05rem', lineHeight: '1.8' }}>
+            <h4 style={{ color: 'var(--primary)', marginBottom: '1rem', fontSize: '1.25rem' }}>Trusted Healthcare Services at Your Doorstep</h4>
+            <p style={{ fontWeight: '600', marginBottom: '0.5rem', color: 'var(--navy-dark)' }}>Quality healthcare, made simpler.</p>
+            <p style={{ fontStyle: 'italic', marginBottom: '1.5rem', color: 'var(--navy-medium)' }}>The Care You Need. Where You Need It.</p>
+            <p style={{ marginBottom: '1rem' }}>Travelling to hospitals, clinics and diagnostic centres isn't always easy — especially for elderly people, children, recovering patients and families caring for loved ones.</p>
+            <p>AMPLR HEALTH SERVICES helps make suitable healthcare services accessible at home through a coordinated network of healthcare professionals and service partners.</p>
+          </div>
+
           <div className="about-vision-grid">
             {/* Vision */}
             <div className="vision-mission-card">
@@ -136,6 +144,7 @@ const Home = () => {
               </div>
               <h3>OUR MISSION</h3>
               <h4 className="vm-subtitle-secondary">Making Healthcare Easier, Accessible and Closer to Home.</h4>
+              <p style={{ marginBottom: '1rem' }}>We are committed to:</p>
               <ul className="mission-list">
                 <li><CheckCircle2 size={20} className="text-secondary" /> Improving access to home healthcare services</li>
                 <li><CheckCircle2 size={20} className="text-secondary" /> Connecting customers with suitable healthcare professionals</li>
@@ -145,43 +154,44 @@ const Home = () => {
                 <li><CheckCircle2 size={20} className="text-secondary" /> Building a reliable healthcare service network</li>
                 <li><CheckCircle2 size={20} className="text-secondary" /> Using technology to simplify healthcare coordination</li>
               </ul>
+              <p style={{ marginTop: '1.5rem', fontWeight: '600', color: 'var(--navy-dark)' }}>Simple booking. Convenient care. Trusted coordination.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Working Process — LIGHT */}
-      <section className="section-soft">
+      <section id="how-it-works" className="section-soft">
         <div className="container">
           <div className="section-header-left">
-            <div className="section-pill">How It Works</div>
-            <h2>Healthcare Made Simple</h2>
+            <div className="section-pill">Working Process</div>
+            <h2>AMPLR HEALTH SERVICES working process.....</h2>
             <p className="section-subtitle">Simple booking. Convenient care. Trusted coordination.</p>
           </div>
 
-          <div className="steps-grid">
+          <div className="steps-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
             <div className="step-card">
               <div className="step-number">01</div>
               <h4>Select & Check</h4>
-              <p>Choose the required service and view details/price before booking.</p>
+              <p>Select the Required Service &rarr; Check price</p>
             </div>
 
             <div className="step-card">
               <div className="step-number">02</div>
               <h4>Book & Details</h4>
-              <p>Select your preferred date/time and provide basic customer and patient details.</p>
+              <p>Select Date and Time &rarr; Fill Customer details</p>
             </div>
 
             <div className="step-card">
               <div className="step-number">03</div>
               <h4>Confirm & Pay</h4>
-              <p>Complete booking with secure online payment and receive confirmation.</p>
+              <p>Do the Payment &rarr; Receive Confirmation</p>
             </div>
 
             <div className="step-card">
               <div className="step-number">04</div>
               <h4>Service & Feedback</h4>
-              <p>Share your location, get the service completed, and share your feedback.</p>
+              <p>Send Location &rarr; Get the Service Complete &rarr; Share Feedback</p>
             </div>
           </div>
         </div>
