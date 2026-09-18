@@ -21,6 +21,7 @@ import WhyAmplr from './pages/WhyAmplr';
 import './index.css';
 import './service-pages.css';
 
+
 // Specialised Care
 import ElderCare from './pages/services/specialised-care/ElderCare';
 import PregnancyMaternityCare from './pages/services/specialised-care/PregnancyMaternityCare';
@@ -225,7 +226,10 @@ function App() {
   const [specialisedExpanded, setSpecialisedExpanded] = useState(false);
   const [therapyExpanded, setTherapyExpanded] = useState(false);
   const [wellnessExpanded, setWellnessExpanded] = useState(false);
+  const [ayushExpanded, setAyushExpanded] = useState(false);
   const [corporateExpanded, setCorporateExpanded] = useState(false);
+  const [quickLinksExpanded, setQuickLinksExpanded] = useState(false);
+  const [legalExpanded, setLegalExpanded] = useState(false);
   const whatsappNumber = "917997888448";
   const phoneCallNumber = "+917997888448";
   const whatsappMsg = "Hi! I want to book a healthcare service with AMPLR Health.";
@@ -237,7 +241,10 @@ function App() {
     setSpecialisedExpanded(false);
     setTherapyExpanded(false);
     setWellnessExpanded(false);
+    setAyushExpanded(false);
     setCorporateExpanded(false);
+    setQuickLinksExpanded(false);
+    setLegalExpanded(false);
     document.body.style.overflow = '';
   };
 
@@ -265,10 +272,35 @@ function App() {
               </span>
             </div>
             <div className="top-bar-right">
-              <a href={`tel:${phoneCallNumber}`} className="top-link">
-                <Phone size={13} /> <span className="top-link-text">Call: 7997888448</span>
+              <div className="nav-search-wrap" style={{ position: 'relative' }}>
+                <input
+                  type="search"
+                  className="nav-search-input"
+                  placeholder="Search services…"
+                  aria-label="Search services"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                />
+                {searchResults.length > 0 && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, minWidth: '100%', width: '220px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', marginTop: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 1000, maxHeight: '350px', overflowY: 'auto' }}>
+                    {searchResults.map((result, i) => (
+                      <Link 
+                        key={i} 
+                        to={result.path} 
+                        onClick={clearSearch}
+                        style={{ display: 'block', padding: '10px 12px', color: '#334155', textDecoration: 'none', borderBottom: i === searchResults.length - 1 ? 'none' : '1px solid #f1f5f9', fontSize: '0.85rem' }}
+                      >
+                        {result.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <a href="#" onClick={openBookingModal} className="btn-primary-nav" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>
+                <MessageCircle size={14} aria-hidden="true" />
+                <span>WhatsApp</span>
               </a>
-              <span className="divider" aria-hidden="true">|</span>
+              <span className="divider" aria-hidden="true" style={{ color: 'var(--border-strong)' }}>|</span>
               <a href="mailto:amplrhealth@gmail.com" className="top-link">
                 <Mail size={13} /> <span className="top-link-text">amplrhealth@gmail.com</span>
               </a>
@@ -293,7 +325,7 @@ function App() {
 
                 <div className="nav-dropdown" role="menuitem">
                   <span className="nav-dropdown-trigger">
-                    AMPLR Healthcare Services <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                    Healthcare Services <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
                   </span>
                   <div className="nav-dropdown-content" role="menu">
                     <Link to="/services/lab-blood-collection" role="menuitem">Lab Sample Collection</Link>
@@ -303,6 +335,64 @@ function App() {
                     <Link to="/services/ecg-at-home" role="menuitem">ECG at Home Services</Link>
                     <Link to="/services/doctor-consultation" role="menuitem">Doctor Consultation</Link>
                     <Link to="/services/ambulance-services" role="menuitem">Ambulance Services</Link>
+                  </div>
+                </div>
+
+                <div className="nav-dropdown" role="menuitem">
+                  <span className="nav-dropdown-trigger">
+                    Specialised Care <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                  </span>
+                  <div className="nav-dropdown-content" role="menu">
+                    <Link to="/services/specialised-care/elder-care" role="menuitem">Elder Care</Link>
+                    <Link to="/services/specialised-care/pregnancy-maternity-care" role="menuitem">Pregnancy & Maternity</Link>
+                    <Link to="/services/specialised-care/mother-child-care" role="menuitem">Mother & Child Care</Link>
+                    <Link to="/services/specialised-care/post-surgery-care" role="menuitem">Post-Surgery Care</Link>
+                    <Link to="/services/specialised-care/post-hospitalisation-care" role="menuitem">Post-Hospitalisation</Link>
+                    <Link to="/services/specialised-care/bedridden-care" role="menuitem">Bedridden Care</Link>
+                  </div>
+                </div>
+
+                <div className="nav-dropdown" role="menuitem">
+                  <span className="nav-dropdown-trigger">
+                    Therapy <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                  </span>
+                  <div className="nav-dropdown-content" role="menu">
+                    <Link to="/services/therapy-rehabilitation/speech-therapy" role="menuitem">Speech Therapy</Link>
+                    <Link to="/services/therapy-rehabilitation/audiology" role="menuitem">Audiology</Link>
+                    <Link to="/services/therapy-rehabilitation/occupational-therapy" role="menuitem">Occupational Therapy</Link>
+                    <Link to="/services/therapy-rehabilitation/rehabilitation-support" role="menuitem">Rehabilitation Support</Link>
+                  </div>
+                </div>
+
+                <div className="nav-dropdown" role="menuitem">
+                  <span className="nav-dropdown-trigger">
+                    Wellness <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                  </span>
+                  <div className="nav-dropdown-content" role="menu">
+                    <Link to="/services/wellness-lifestyle/dietician-nutrition" role="menuitem">Dietician & Nutrition</Link>
+                    <Link to="/services/wellness-lifestyle/lifestyle-management" role="menuitem">Lifestyle Management</Link>
+                    <Link to="/services/wellness-lifestyle/yoga-wellness" role="menuitem">Yoga & Wellness</Link>
+                    <Link to="/services/wellness-lifestyle/preventive-health" role="menuitem">Preventive Health</Link>
+                  </div>
+                </div>
+
+                <div className="nav-dropdown" role="menuitem">
+                  <span className="nav-dropdown-trigger">
+                    Ayush <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                  </span>
+                  <div className="nav-dropdown-content" role="menu">
+                    <Link to="/services/ayush-traditional/ayurveda-unani-homeopathy" role="menuitem">AYUSH Consultation</Link>
+                  </div>
+                </div>
+
+                <div className="nav-dropdown" role="menuitem">
+                  <span className="nav-dropdown-trigger">
+                    Corporate <ChevronRight size={12} className="nav-chevron" aria-hidden="true" />
+                  </span>
+                  <div className="nav-dropdown-content" role="menu">
+                    <Link to="/services/corporate-industrial/health-camps" role="menuitem">Health Camps</Link>
+                    <Link to="/services/corporate-industrial/employee-checkups" role="menuitem">Employee Checkups</Link>
+                    <Link to="/services/corporate-industrial/workplace-wellness" role="menuitem">Workplace Wellness</Link>
                   </div>
                 </div>
 
@@ -337,40 +427,8 @@ function App() {
                 <Link to="/partner" className="nav-item-link">Become a Partner</Link>
               </div>
 
-              {/* ── DESKTOP ACTION AREA ── */}
-              <div className="nav-actions">
-                <div className="nav-search-wrap" style={{ position: 'relative' }}>
-                  <input
-                    type="search"
-                    className="nav-search-input"
-                    placeholder="Search services…"
-                    aria-label="Search services"
-                    value={searchQuery}
-                    onChange={handleSearch}
-                  />
-                  {searchResults.length > 0 && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, minWidth: '100%', width: '220px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', marginTop: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 1000, maxHeight: '350px', overflowY: 'auto' }}>
-                      {searchResults.map((result, i) => (
-                        <Link 
-                          key={i} 
-                          to={result.path} 
-                          onClick={clearSearch}
-                          style={{ display: 'block', padding: '10px 12px', color: '#334155', textDecoration: 'none', borderBottom: i === searchResults.length - 1 ? 'none' : '1px solid #f1f5f9', fontSize: '0.85rem' }}
-                        >
-                          {result.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <a href={`tel:${phoneCallNumber}`} className="btn-call-nav" title="Call Emergency Helpline">
-                  <PhoneCall size={15} aria-hidden="true" />
-                  <span>Call: 7997888448</span>
-                </a>
-                <a href="#" onClick={openBookingModal} className="btn-primary-nav">
-                  <MessageCircle size={15} aria-hidden="true" />
-                  <span>WhatsApp</span>
-                </a>
+              {/* ── DESKTOP ACTION AREA (Moved to Top Bar) ── */}
+              <div className="nav-actions" style={{ display: 'none' }}>
               </div>
 
               {/* ── MOBILE ICON ROW ── */}
@@ -484,7 +542,7 @@ function App() {
                     onClick={() => setServicesExpanded(s => !s)}
                     aria-expanded={servicesExpanded}
                   >
-                    <span>AMPLR Healthcare Services</span>
+                    <span>Healthcare Services</span>
                     <ChevronRight
                       size={16}
                       className={`mobile-nav-chevron ${servicesExpanded ? 'rotated' : ''}`}
@@ -509,6 +567,114 @@ function App() {
                     onClick={() => setSpecialisedExpanded(s => !s)}
                     aria-expanded={specialisedExpanded}
                   >
+                    <span>Specialised Care</span>
+                    <ChevronRight
+                      size={16}
+                      className={`mobile-nav-chevron ${specialisedExpanded ? 'rotated' : ''}`}
+                    />
+                  </button>
+                  {specialisedExpanded && (
+                    <div className="mobile-nav-sub">
+                      <Link to="/services/specialised-care/elder-care" onClick={closeMenu}>Elder Care</Link>
+                      <Link to="/services/specialised-care/pregnancy-maternity-care" onClick={closeMenu}>Pregnancy & Maternity</Link>
+                      <Link to="/services/specialised-care/mother-child-care" onClick={closeMenu}>Mother & Child Care</Link>
+                      <Link to="/services/specialised-care/post-surgery-care" onClick={closeMenu}>Post-Surgery Care</Link>
+                      <Link to="/services/specialised-care/post-hospitalisation-care" onClick={closeMenu}>Post-Hospitalisation</Link>
+                      <Link to="/services/specialised-care/bedridden-care" onClick={closeMenu}>Bedridden Care</Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mobile-nav-group">
+                  <button
+                    className="mobile-nav-group-header"
+                    onClick={() => setTherapyExpanded(s => !s)}
+                    aria-expanded={therapyExpanded}
+                  >
+                    <span>Therapy</span>
+                    <ChevronRight
+                      size={16}
+                      className={`mobile-nav-chevron ${therapyExpanded ? 'rotated' : ''}`}
+                    />
+                  </button>
+                  {therapyExpanded && (
+                    <div className="mobile-nav-sub">
+                      <Link to="/services/therapy-rehabilitation/speech-therapy" onClick={closeMenu}>Speech Therapy</Link>
+                      <Link to="/services/therapy-rehabilitation/audiology" onClick={closeMenu}>Audiology</Link>
+                      <Link to="/services/therapy-rehabilitation/occupational-therapy" onClick={closeMenu}>Occupational Therapy</Link>
+                      <Link to="/services/therapy-rehabilitation/rehabilitation-support" onClick={closeMenu}>Rehabilitation Support</Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mobile-nav-group">
+                  <button
+                    className="mobile-nav-group-header"
+                    onClick={() => setWellnessExpanded(s => !s)}
+                    aria-expanded={wellnessExpanded}
+                  >
+                    <span>Wellness</span>
+                    <ChevronRight
+                      size={16}
+                      className={`mobile-nav-chevron ${wellnessExpanded ? 'rotated' : ''}`}
+                    />
+                  </button>
+                  {wellnessExpanded && (
+                    <div className="mobile-nav-sub">
+                      <Link to="/services/wellness-lifestyle/dietician-nutrition" onClick={closeMenu}>Dietician & Nutrition</Link>
+                      <Link to="/services/wellness-lifestyle/lifestyle-management" onClick={closeMenu}>Lifestyle Management</Link>
+                      <Link to="/services/wellness-lifestyle/yoga-wellness" onClick={closeMenu}>Yoga & Wellness</Link>
+                      <Link to="/services/wellness-lifestyle/preventive-health" onClick={closeMenu}>Preventive Health</Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mobile-nav-group">
+                  <button
+                    className="mobile-nav-group-header"
+                    onClick={() => setAyushExpanded(s => !s)}
+                    aria-expanded={ayushExpanded}
+                  >
+                    <span>Ayush</span>
+                    <ChevronRight
+                      size={16}
+                      className={`mobile-nav-chevron ${ayushExpanded ? 'rotated' : ''}`}
+                    />
+                  </button>
+                  {ayushExpanded && (
+                    <div className="mobile-nav-sub">
+                      <Link to="/services/ayush-traditional/ayurveda-unani-homeopathy" onClick={closeMenu}>AYUSH Consultation</Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mobile-nav-group">
+                  <button
+                    className="mobile-nav-group-header"
+                    onClick={() => setCorporateExpanded(s => !s)}
+                    aria-expanded={corporateExpanded}
+                  >
+                    <span>Corporate</span>
+                    <ChevronRight
+                      size={16}
+                      className={`mobile-nav-chevron ${corporateExpanded ? 'rotated' : ''}`}
+                    />
+                  </button>
+                  {corporateExpanded && (
+                    <div className="mobile-nav-sub">
+                      <Link to="/services/corporate-industrial/health-camps" onClick={closeMenu}>Health Camps</Link>
+                      <Link to="/services/corporate-industrial/employee-checkups" onClick={closeMenu}>Employee Checkups</Link>
+                      <Link to="/services/corporate-industrial/workplace-wellness" onClick={closeMenu}>Workplace Wellness</Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mobile-nav-group">
+                  <button
+                    className="mobile-nav-group-header"
+                    onClick={() => setQuickLinksExpanded(s => !s)}
+                    aria-expanded={quickLinksExpanded}
+                  >
                     <span>Quick Links</span>
                     <ChevronRight
                       size={16}
@@ -531,16 +697,16 @@ function App() {
                 <div className="mobile-nav-group">
                   <button
                     className="mobile-nav-group-header"
-                    onClick={() => setTherapyExpanded(s => !s)}
-                    aria-expanded={therapyExpanded}
+                    onClick={() => setLegalExpanded(s => !s)}
+                    aria-expanded={legalExpanded}
                   >
                     <span>Legal</span>
                     <ChevronRight
                       size={16}
-                      className={`mobile-nav-chevron ${therapyExpanded ? 'rotated' : ''}`}
+                      className={`mobile-nav-chevron ${legalExpanded ? 'rotated' : ''}`}
                     />
                   </button>
-                  {therapyExpanded && (
+                  {legalExpanded && (
                     <div className="mobile-nav-sub">
                       <Link to="/privacy" onClick={closeMenu}>Privacy policy</Link>
                       <Link to="/terms" onClick={closeMenu}>Terms & Conditions</Link>
@@ -563,16 +729,12 @@ function App() {
                 <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); setBookingModalOpen(true); }} className="btn-primary full-width">
                   <MessageCircle size={18} /> Book Instant on WhatsApp
                 </a>
-                <a href={`tel:${phoneCallNumber}`} className="btn-secondary full-width" onClick={closeMenu}>
-                  <Phone size={18} /> Call: +91 7997888448
-                </a>
               </div>
             </div>
           </div>
         </header>
 
-
-        <Routes>
+            <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -681,7 +843,8 @@ function App() {
           </div>
         </footer>
 
-        {/* Mobile Sticky Bottom Floating Action Bar */}
+
+    {/* Mobile Sticky Bottom Floating Action Bar */}
         <div className="mobile-bottom-bar">
           <a href={`tel:${phoneCallNumber}`} className="bottom-bar-btn call">
             <PhoneCall size={18} />

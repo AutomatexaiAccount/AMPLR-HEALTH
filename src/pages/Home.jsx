@@ -197,40 +197,9 @@ const Home = () => {
         </div>
       </section>
 
-      {/* All Services Grid — ICON ONLY, NO IMAGES, WITH PRICES */}
-      <section id="services" className="section section-light">
-        <div className="container">
-          <div className="section-header-left">
-            <div className="section-pill">Our Services</div>
-            <h2>Home Healthcare Services</h2>
-            <p className="section-subtitle">Appropriate healthcare support closer to your home.</p>
-          </div>
-
-          <div className="services-grid-clean">
-            {services.map(s => {
-              const Icon = s.icon;
-              return (
-                <Link key={s.id} to={s.link} className="service-card-clean">
-                  <div className="service-card-icon-wrap">
-                    <Icon size={28} strokeWidth={1.8} />
-                  </div>
-                  <div className="service-card-info">
-                    <span className="service-tag-pill">{s.tag}</span>
-                    <h3>{s.title}</h3>
-                    <div className="service-card-price">Starting from <strong>{s.price}</strong></div>
-                    <span className="service-card-link">
-                      View Details <ChevronRight size={14} />
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* Specialised & More Services */}
-      <section className="section-soft">
+      <section id="services" className="section-soft">
         <div className="container">
           <div className="section-header-left">
             <div className="section-pill">More Services</div>

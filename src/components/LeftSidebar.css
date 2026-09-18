@@ -1,0 +1,109 @@
+/* ============================================================
+   LeftSidebar.css — Sticky sidebar inside a dedicated column
+   ============================================================ */
+
+/* The sidebar CARD — sticky inside its column container */
+.left-sidebar {
+  position: sticky;
+  top: 140px; /* offset below header */
+
+  /* Sizing */
+  width: 100%;
+
+  /* Appearance */
+  background: #fff;
+  border: 1px solid #e8ecf1;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03);
+
+  /* Hidden by default — shown via page-layout media queries */
+  display: block;
+}
+
+.left-sidebar-inner {
+  padding: 1rem 0.5rem;
+}
+
+/* ── Menu list ── */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sidebar-item {
+  margin: 0;
+}
+
+/* ── Link / button items ── */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  color: #475569;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.82rem;
+  border-radius: 8px;
+  transition: background 0.18s ease, color 0.18s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* For the Quick Links button with chevron on right */
+.sidebar-link[aria-expanded] {
+  justify-content: space-between;
+}
+
+.sidebar-link:hover,
+.sidebar-link[aria-expanded="true"] {
+  background-color: rgba(220, 38, 38, 0.06);
+  color: var(--brand-primary, #dc2626);
+}
+
+.sidebar-link svg {
+  flex-shrink: 0;
+  color: #94a3b8;
+  transition: color 0.18s ease;
+}
+
+.sidebar-link:hover svg,
+.sidebar-link[aria-expanded="true"] svg {
+  color: var(--brand-primary, #dc2626);
+}
+
+/* ── Sub-menu (Quick Links dropdown) ── */
+.sidebar-submenu {
+  list-style: none;
+  margin: 2px 0 4px 1rem;
+  padding: 0;
+  border-left: 2px solid #e2e8f0;
+}
+
+.sidebar-submenu li {
+  margin: 0;
+}
+
+.sidebar-submenu a {
+  display: block;
+  padding: 0.35rem 0.7rem;
+  color: #64748b;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 450;
+  border-radius: 5px;
+  transition: color 0.18s ease, background 0.18s ease;
+}
+
+.sidebar-submenu a:hover {
+  color: var(--brand-primary, #dc2626);
+  background-color: rgba(220, 38, 38, 0.04);
+}
