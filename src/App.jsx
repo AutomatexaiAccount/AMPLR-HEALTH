@@ -261,8 +261,10 @@ function App() {
         {/* Booking Modal */}
         <BookingModal isOpen={bookingModalOpen} onClose={() => setBookingModalOpen(false)} />
 
-        {/* ── TOP BAR ── */}
-        <div className="top-bar">
+        {/* ── STICKY HEADER WRAPPER ── */}
+        <div className="header-sticky-wrapper">
+          {/* ── TOP BAR ── */}
+          <div className="top-bar">
           <div className="container top-bar-inner">
             <div className="top-bar-left">
               <span className="live-pulse" aria-hidden="true"></span>
@@ -733,6 +735,7 @@ function App() {
             </div>
           </div>
         </header>
+        </div>
 
             <Routes>
           <Route path="/" element={<Home />} />

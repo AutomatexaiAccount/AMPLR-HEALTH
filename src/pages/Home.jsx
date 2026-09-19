@@ -102,6 +102,14 @@ const Home = () => {
               </div>
             </div>
           </div>
+
+          <div className="hero-image-wrapper">
+            <img 
+              src="/WeCares.jpg" 
+              alt="Healthcare professionals caring for you" 
+              className="hero-image" 
+            />
+          </div>
         </div>
       </section>
 
