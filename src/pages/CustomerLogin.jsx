@@ -30,6 +30,7 @@ const CustomerLogin = () => {
           email,
           password,
           options: {
+            emailRedirectTo: 'https://amplrhealth.com/verified',
             data: {
               full_name: fullName,
             }
