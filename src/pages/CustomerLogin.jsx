@@ -49,7 +49,7 @@ const CustomerLogin = () => {
 
         if (signInError) {
            if (signInError.message.includes('Email not confirmed')) {
-             throw new Error("Please verify your email address before logging in.");
+             throw new Error("Your account is not activated yet. Please confirm your email address using the link sent to your inbox, and then you will be allowed to log in.");
            }
            throw signInError;
         }

@@ -22,7 +22,11 @@ const Verified = () => {
         </div>
         <h1 className="verified-title">Email Verified!</h1>
         <p className="verified-message">
-          Your email address has been successfully verified. Your account is now fully active.
+          Your email address has been verified.<br/>
+          Your account is fully activated.
+        </p>
+        <p className="verified-welcome" style={{ fontWeight: '600', color: 'var(--navy-dark)', marginBottom: '2rem', fontSize: '1.1rem' }}>
+          Welcome to AMPLR Health family!
         </p>
         <Link to="/login" className="verified-btn">
           Proceed to Login

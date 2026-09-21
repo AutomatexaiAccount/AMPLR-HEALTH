@@ -192,8 +192,9 @@ function AppContent() {
   const navigate = useNavigate();
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isCustomerLoginRoute = location.pathname === '/login';
+  const isVerifiedRoute = location.pathname === '/verified';
   
-  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute;
+  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute || isVerifiedRoute;
 
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
