@@ -203,27 +203,33 @@ function AppContent() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
+  // Synchronous check before Supabase clears the URL hash
+  if (typeof window !== 'undefined' && window.location.hash.includes('type=signup')) {
+    if (!sessionStorage.getItem('signup_redirect_pending')) {
+      sessionStorage.setItem('signup_redirect_pending', 'true');
+    }
+  }
+
   // Listen for Auth changes
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user || null);
-      // Check on initial load if the URL has the signup hash
-      const hash = window.location.hash;
-      if (hash && hash.includes('type=signup')) {
-        window.location.hash = '';
-        navigate('/verified');
+      
+      // If we flagged a signup redirect, execute it now (Supabase has processed the token)
+      if (sessionStorage.getItem('signup_redirect_pending')) {
+        sessionStorage.removeItem('signup_redirect_pending');
+        setTimeout(() => {
+          navigate('/verified');
+        }, 100); // Small delay ensures Supabase finishes its internal state updates
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user || null);
-      // Also check on auth state change
-      if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
-        const hash = window.location.hash;
-        if (hash && hash.includes('type=signup')) {
-          window.location.hash = '';
-          navigate('/verified');
-        }
+      // Fallback check
+      if (event === 'SIGNED_IN' && sessionStorage.getItem('signup_redirect_pending')) {
+        sessionStorage.removeItem('signup_redirect_pending');
+        navigate('/verified');
       }
     });
 
