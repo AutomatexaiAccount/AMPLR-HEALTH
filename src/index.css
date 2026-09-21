@@ -1,29 +1,47 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Primary Brand Color - AMPLR Red */
-  --primary: #c1121f; 
+  /* ── PRIMARY BRAND ── */
+  --primary: #c1121f;
   --primary-hover: #a10f1a;
-  
-  /* Refined Navy Colors for Healthcare */
-  --navy-dark: #0f172a;    /* Primary headings */
-  --navy-medium: #1e293b;  /* Secondary headings / Important text */
+  --primary-light: rgba(193, 18, 31, 0.08); /* subtle tinted bg for active states */
+  --brand-primary: #c1121f;                  /* alias used in components */
+  --accent-red: #c1121f;                     /* alias used in profile nav */
+
+  /* ── HEALTHCARE NAVY PALETTE ── */
+  --navy-dark: #0f172a;    /* Page headings, highest contrast text */
+  --navy-medium: #1e293b;  /* Sub-headings, important text on white bg */
   --navy-light: #334155;   /* Body text */
-  --navy-muted: #64748b;   /* Supporting / Muted text */
-  
-  /* Backgrounds */
-  --bg-main: #f8fafc;      /* Soft off-white / very light blue */
-  --bg-alt: #f1f5f9;       /* Subtle tonal variation for sections */
-  --surface: #ffffff;      /* Cards and modals */
-  
-  /* Borders */
+  --navy-muted: #64748b;   /* Captions, helper text */
+
+  /* ── TEXT ALIASES (fixes undefined variable fallbacks) ── */
+  --text-dark: #0f172a;    /* alias → --navy-dark */
+  --text-muted: #64748b;   /* alias → --navy-muted */
+  --slate-dark: #334155;   /* alias → --navy-light */
+
+  /* ── BACKGROUNDS ── */
+  --bg-main: #f8fafc;          /* Main page canvas */
+  --bg-alt: #f1f5f9;           /* Alternate section bg */
+  --surface: #ffffff;          /* Cards, modals, panels */
+  --surface-light: #f8fafc;    /* alias → --bg-main (fixes undefined fallback) */
+
+  /* ── SEMANTIC STATUS COLORS ── */
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --error: #c1121f;
+  --error-light: #fef2f2;
+
+  /* ── BORDERS ── */
   --border-subtle: #e2e8f0;
   --border-strong: #cbd5e1;
-  
-  /* Soft Shadows (No heavy/black shadows) */
+
+  /* ── SHADOWS (subtle, professional) ── */
   --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.10), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
 }
 
 * {
@@ -190,9 +208,9 @@ a {
 }
 
 .navbar {
-  background: linear-gradient(90deg, #ffe4e6 0%, #e0f2fe 33%, #dcfce7 66%, #fef3c7 100%);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
   padding: 0.85rem 0;
 }
 

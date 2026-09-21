@@ -193,8 +193,10 @@ function AppContent() {
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isCustomerLoginRoute = location.pathname === '/login';
   const isVerifiedRoute = location.pathname === '/verified';
+  const isProfileRoute = location.pathname === '/profile';
   
-  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute || isVerifiedRoute;
+  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute || isVerifiedRoute || isProfileRoute;
+  const hideFooter = hideHeaderFooter;
 
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -357,6 +359,24 @@ function AppContent() {
                   </div>
                 )}
               </div>
+
+              {/* ── TOP BAR AUTH LINKS ── */}
+              {user ? (
+                <>
+                  <Link to="/profile" className="top-link" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                    <User size={13} /> <span className="top-link-text">My Profile</span>
+                  </Link>
+                  <a href="#" onClick={handleLogout} className="top-link" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--accent-red)' }}>
+                    <LogOut size={13} /> <span className="top-link-text">Logout</span>
+                  </a>
+                </>
+              ) : (
+                <Link to="/login" className="top-link" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                  <User size={13} /> <span className="top-link-text">Login</span>
+                </Link>
+              )}
+              <span className="divider" aria-hidden="true" style={{ color: 'var(--border-strong)' }}>|</span>
+
               <a href="#" onClick={openBookingModal} className="btn-primary-nav" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>
                 <MessageCircle size={14} aria-hidden="true" />
                 <span>WhatsApp</span>
@@ -488,20 +508,6 @@ function AppContent() {
                 <a href="#" onClick={openBookingModal} className="nav-item-link">Book a Service</a>
                 <Link to="/partner" className="nav-item-link">Become a Partner</Link>
                 
-                {user ? (
-                  <>
-                    <Link to="/profile" className="nav-item-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
-                      <User size={16} /> My Profile
-                    </Link>
-                    <a href="#" onClick={handleLogout} className="nav-item-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-red)' }}>
-                      <LogOut size={16} /> Logout
-                    </a>
-                  </>
-                ) : (
-                  <Link to="/login" className="nav-item-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
-                    <User size={16} /> Login
-                  </Link>
-                )}
               </div>
 
               {/* ── DESKTOP ACTION AREA (Moved to Top Bar) ── */}
@@ -897,7 +903,7 @@ function AppContent() {
         </Routes>
 
         {/* Enhanced Modern Footer */}
-        {!hideHeaderFooter && (
+        {!hideFooter && (
         <>
         <footer id="contact" className="footer">
           <div className="container">
