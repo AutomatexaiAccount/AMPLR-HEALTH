@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  HeartPulse, Menu, X, PhoneCall, MessageCircle, Phone, Mail, MapPin, ShieldCheck, ChevronRight, Clock, Calendar, Ambulance, Stethoscope, Activity, Search
+  HeartPulse, Menu, X, PhoneCall, MessageCircle, Phone, Mail, MapPin, ShieldCheck, ChevronRight, Clock, Calendar, Ambulance, Stethoscope, Activity, Search, User, LogOut
 } from 'lucide-react';
+import { supabase } from './lib/supabase';
 import Home from './pages/Home';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -15,12 +16,17 @@ import Physiotherapy from './pages/services/Physiotherapy';
 import ECGAtHome from './pages/services/ECGAtHome';
 import DoctorConsultation from './pages/services/DoctorConsultation';
 import AmbulanceServices from './pages/services/AmbulanceServices';
+import HospitalAssistance from './pages/services/HospitalAssistance';
 import BecomePartner from './pages/BecomePartner';
 import ContactUs from './pages/ContactUs';
 import WhyAmplr from './pages/WhyAmplr';
+import AdminLogin from './pages/Admin/AdminLogin';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import CustomerLogin from './pages/CustomerLogin';
+import CustomerProfile from './pages/CustomerProfile';
+import Verified from './pages/Verified';
 import './index.css';
 import './service-pages.css';
-
 
 // Specialised Care
 import ElderCare from './pages/services/specialised-care/ElderCare';
@@ -61,6 +67,7 @@ const searchData = [
   { name: 'ECG at Home Services', path: '/services/ecg-at-home', keywords: ['ecg', 'heart', 'cardiac', 'test'] },
   { name: 'Doctor Consultation', path: '/services/doctor-consultation', keywords: ['doctor', 'consult', 'physician', 'appointment'] },
   { name: 'Ambulance Services', path: '/services/ambulance-services', keywords: ['ambulance', 'transport', 'emergency'] },
+  { name: 'Hospital Assistance', path: '/services/hospital-assistance', keywords: ['hospital', 'booking', 'admission', 'assistance', 'help'] },
   { name: 'Elder Care', path: '/services/specialised-care/elder-care', keywords: ['elder', 'senior', 'old age', 'geriatric'] },
   { name: 'Pregnancy & Maternity', path: '/services/specialised-care/pregnancy-maternity-care', keywords: ['pregnancy', 'maternity', 'pregnant', 'baby', 'antenatal', 'prenatal'] },
   { name: 'Mother & Child Care', path: '/services/specialised-care/mother-child-care', keywords: ['mother', 'child', 'baby', 'pediatric', 'neonatal'] },
@@ -108,7 +115,7 @@ const BookingModal = ({ isOpen, onClose, redirectUrl }) => {
 
   const serviceOptions = [
     'Lab Sample Collection', 'Nursing Services', 'Caregiver / Caretaker',
-    'ECG at Home', 'Doctor Consultation', 'Ambulance Services', 'Physiotherapy',
+    'ECG at Home', 'Doctor Consultation', 'Ambulance Services', 'Hospital Assistance', 'Physiotherapy',
     'Elder Care', 'Pregnancy & Maternity Care', 'Mother & Child Care',
     'Post-Surgery Care', 'Post-Hospitalisation Care', 'Bedridden Care',
     'Speech Therapy', 'Audiology', 'Occupational Therapy', 'Rehabilitation Support',
@@ -180,25 +187,69 @@ const BookingModal = ({ isOpen, onClose, redirectUrl }) => {
   );
 };
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isCustomerLoginRoute = location.pathname === '/login';
+  
+  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute;
+
+  const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
+  // Listen for Auth changes
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+      // Check on initial load if the URL has the signup hash
+      const hash = window.location.hash;
+      if (hash && hash.includes('type=signup')) {
+        window.location.hash = '';
+        navigate('/verified');
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+      // Also check on auth state change
+      if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') {
+        const hash = window.location.hash;
+        if (hash && hash.includes('type=signup')) {
+          window.location.hash = '';
+          navigate('/verified');
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
   // Listen for booking modal events from other components
   useEffect(() => {
     const handler = (e) => {
-      setBookingModalOpen(true);
+      openBookingModal();
     };
     window.addEventListener('open-booking-modal', handler);
     return () => window.removeEventListener('open-booking-modal', handler);
-  }, []);
+  }, [user]);
 
   const openBookingModal = (e) => {
     if (e) e.preventDefault();
-    setBookingModalOpen(true);
+    if (!user) {
+      navigate('/login', { state: { from: location.pathname } });
+    } else {
+      setBookingModalOpen(true);
+    }
+  };
+
+  const handleLogout = async (e) => {
+    if (e) e.preventDefault();
+    await supabase.auth.signOut();
   };
 
   const handleSearch = (e) => {
@@ -254,14 +305,15 @@ function App() {
   };
 
   return (
-    <Router>
+    <>
       <ScrollToHash />
       <div className="app">
 
         {/* Booking Modal */}
-        <BookingModal isOpen={bookingModalOpen} onClose={() => setBookingModalOpen(false)} />
+        {!hideHeaderFooter && <BookingModal isOpen={bookingModalOpen} onClose={() => setBookingModalOpen(false)} />}
 
         {/* ── STICKY HEADER WRAPPER ── */}
+        {!hideHeaderFooter && (
         <div className="header-sticky-wrapper">
           {/* ── TOP BAR ── */}
           <div className="top-bar">
@@ -337,6 +389,7 @@ function App() {
                     <Link to="/services/ecg-at-home" role="menuitem">ECG at Home Services</Link>
                     <Link to="/services/doctor-consultation" role="menuitem">Doctor Consultation</Link>
                     <Link to="/services/ambulance-services" role="menuitem">Ambulance Services</Link>
+                    <Link to="/services/hospital-assistance" role="menuitem">Hospital Assistance</Link>
                   </div>
                 </div>
 
@@ -427,6 +480,21 @@ function App() {
 
                 <a href="#" onClick={openBookingModal} className="nav-item-link">Book a Service</a>
                 <Link to="/partner" className="nav-item-link">Become a Partner</Link>
+                
+                {user ? (
+                  <>
+                    <Link to="/profile" className="nav-item-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+                      <User size={16} /> My Profile
+                    </Link>
+                    <a href="#" onClick={handleLogout} className="nav-item-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-red)' }}>
+                      <LogOut size={16} /> Logout
+                    </a>
+                  </>
+                ) : (
+                  <Link to="/login" className="nav-item-link" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+                    <User size={16} /> Login
+                  </Link>
+                )}
               </div>
 
               {/* ── DESKTOP ACTION AREA (Moved to Top Bar) ── */}
@@ -435,6 +503,25 @@ function App() {
 
               {/* ── MOBILE ICON ROW ── */}
               <div className="mobile-header-actions">
+                {user ? (
+                  <Link
+                    to="/profile"
+                    className="mobile-icon-btn profile-btn"
+                    style={{ background: 'var(--surface)', border: '1px solid var(--border-subtle)', color: 'var(--navy-dark)' }}
+                    aria-label="My Profile"
+                  >
+                    <User size={18} />
+                  </Link>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="mobile-icon-btn profile-btn"
+                    style={{ background: 'var(--surface)', border: '1px solid var(--border-subtle)', color: 'var(--navy-dark)' }}
+                    aria-label="Login"
+                  >
+                    <User size={18} />
+                  </Link>
+                )}
                 <button
                   className="mobile-icon-btn search-btn"
                   onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
@@ -559,6 +646,7 @@ function App() {
                       <Link to="/services/ecg-at-home" onClick={closeMenu}>ECG at Home Services</Link>
                       <Link to="/services/doctor-consultation" onClick={closeMenu}>Doctor Consultation</Link>
                       <Link to="/services/ambulance-services" onClick={closeMenu}>Ambulance Services</Link>
+                      <Link to="/services/hospital-assistance" onClick={closeMenu}>Hospital Assistance</Link>
                     </div>
                   )}
                 </div>
@@ -718,17 +806,31 @@ function App() {
                   )}
                 </div>
 
-                <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); setBookingModalOpen(true); }} className="mobile-link">
+                <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); openBookingModal(); }} className="mobile-link">
                   <span>Book a Service</span><ChevronRight size={16} />
                 </a>
                 <Link to="/partner" onClick={closeMenu} className="mobile-link">
                   <span>Become a Partner</span><ChevronRight size={16} />
                 </Link>
+                {user ? (
+                  <>
+                    <Link to="/profile" onClick={closeMenu} className="mobile-link" style={{ fontWeight: 600 }}>
+                      <span><User size={16} style={{marginRight:'8px', verticalAlign:'middle'}}/> My Profile</span>
+                    </Link>
+                    <a href="#" onClick={(e) => { closeMenu(); handleLogout(e); }} className="mobile-link" style={{ color: 'var(--accent-red)' }}>
+                      <span><LogOut size={16} style={{marginRight:'8px', verticalAlign:'middle'}}/> Logout</span>
+                    </a>
+                  </>
+                ) : (
+                  <Link to="/login" onClick={closeMenu} className="mobile-link" style={{ fontWeight: 600 }}>
+                    <span><User size={16} style={{marginRight:'8px', verticalAlign:'middle'}}/> Login / Sign Up</span>
+                  </Link>
+                )}
               </nav>
 
               {/* CTA buttons */}
               <div className="mobile-drawer-cta">
-                <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); setBookingModalOpen(true); }} className="btn-primary full-width">
+                <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); openBookingModal(); }} className="btn-primary full-width">
                   <MessageCircle size={18} /> Book Instant on WhatsApp
                 </a>
               </div>
@@ -736,8 +838,12 @@ function App() {
           </div>
         </header>
         </div>
+        )}
 
             <Routes>
+          <Route path="/login" element={<CustomerLogin />} />
+          <Route path="/profile" element={<CustomerProfile />} />
+          <Route path="/verified" element={<Verified />} />
           <Route path="/" element={<Home />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -750,6 +856,7 @@ function App() {
           <Route path="/services/ecg-at-home" element={<ECGAtHome />} />
           <Route path="/services/doctor-consultation" element={<DoctorConsultation />} />
           <Route path="/services/ambulance-services" element={<AmbulanceServices />} />
+          <Route path="/services/hospital-assistance" element={<HospitalAssistance />} />
           <Route path="/partner" element={<BecomePartner />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/why-amplr" element={<WhyAmplr />} />
@@ -776,9 +883,15 @@ function App() {
           <Route path="/services/corporate-industrial/health-camps" element={<HealthCamps />} />
           <Route path="/services/corporate-industrial/employee-checkups" element={<EmployeeCheckups />} />
           <Route path="/services/corporate-industrial/workplace-wellness" element={<WorkplaceWellness />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
 
         {/* Enhanced Modern Footer */}
+        {!hideHeaderFooter && (
+        <>
         <footer id="contact" className="footer">
           <div className="container">
             <div className="footer-top-grid">
@@ -847,7 +960,7 @@ function App() {
         </footer>
 
 
-    {/* Mobile Sticky Bottom Floating Action Bar */}
+        {/* Mobile Sticky Bottom Floating Action Bar */}
         <div className="mobile-bottom-bar">
           <a href={`tel:${phoneCallNumber}`} className="bottom-bar-btn call">
             <PhoneCall size={18} />
@@ -862,7 +975,17 @@ function App() {
             <span>Ambulance</span>
           </Link>
         </div>
+        </>
+        )}
       </div>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
