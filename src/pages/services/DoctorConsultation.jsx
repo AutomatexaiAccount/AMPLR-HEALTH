@@ -1,4 +1,6 @@
 import React from 'react';
+import ServiceCartBlock from '../../components/ServiceCartBlock';
+
 import { Helmet } from 'react-helmet';
 import { PhoneCall, UserPlus, MessageCircle, CheckCircle2, Video } from 'lucide-react';
 import '../../service-pages.css';
@@ -97,14 +99,11 @@ const DoctorConsultation = () => {
                   </p>
                 </div>
 
-                <div className="pricing-cta">
-                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
-                    Book Doctor Virtual Consultation
-                  </a>
-                  <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '1.5rem', fontStyle: 'italic', textAlign: 'center', lineHeight: '1.6' }}>
-                    Doctor availability, consultation duration and applicable charges may vary.
-                  </p>
-                </div>
+                
+      <div className="container" style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto' }}>
+        <ServiceCartBlock searchTitle={window.location.pathname.split('/').pop().replace(/-/g, ' ')} />
+      </div>
+
               </div>
             </div>
           </div>

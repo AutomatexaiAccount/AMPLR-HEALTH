@@ -1,4 +1,6 @@
 import React from 'react';
+import ServiceCartBlock from '../../components/ServiceCartBlock';
+
 import { Helmet } from 'react-helmet';
 import { Hospital, CheckCircle2 } from 'lucide-react';
 import '../../service-pages.css';
@@ -116,19 +118,11 @@ const HospitalAssistance = () => {
                   <li>Hospital charges and billing</li>
                 </ul>
 
-                <div className="pricing-cta">
-                  <h4 style={{ marginBottom: '1rem', textAlign: 'center', color: 'var(--navy-dark)' }}>Simple. Coordinated. Convenient.</h4>
-                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
-                    Book Hospital Assistance
-                  </a>
-                  
-                  <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', borderLeft: '4px solid #ef4444' }}>
-                    <p style={{ fontSize: '0.85rem', color: '#7f1d1d', lineHeight: '1.5', margin: 0 }}>
-                      <strong>Important Information:</strong> Appointments and admissions are subject to hospital availability, medical assessment and hospital policies. AMPLR does not guarantee admission, availability of a particular doctor or bed, or any specific medical outcome.<br/><br/>
-                      <strong>For a life-threatening emergency, patients should immediately contact emergency medical services or the nearest emergency department.</strong>
-                    </p>
-                  </div>
-                </div>
+                
+      <div className="container" style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto' }}>
+        <ServiceCartBlock searchTitle={window.location.pathname.split('/').pop().replace(/-/g, ' ')} />
+      </div>
+
               </div>
             </div>
           </div>

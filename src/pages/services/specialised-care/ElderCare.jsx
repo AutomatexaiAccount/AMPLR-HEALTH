@@ -1,4 +1,6 @@
 import React from 'react';
+import ServiceCartBlock from '../../../components/ServiceCartBlock';
+
 import { Helmet } from 'react-helmet';
 import { PhoneCall, CalendarCheck, Heart, MessageCircle, CheckCircle2 } from 'lucide-react';
 import '../../../service-pages.css';
@@ -34,14 +36,7 @@ const ElderCare = () => {
                 As our loved ones grow older, they may need additional support with healthcare, mobility and everyday activities. AMPLR HEALTH helps families arrange suitable support for senior citizens, based on their individual needs.
               </p>
               
-              <div className="service-hero-actions">
-                <a href="#" onClick={openBookingModal} className="btn-primary">
-                  <MessageCircle size={20} /> Book Elder Care
-                </a>
-                <a href={`tel:${CALL_NUMBER}`} className="btn-secondary">
-                  <PhoneCall size={20} /> Call: {CALL_NUMBER}
-                </a>
-              </div>
+              
             </div>
             
             <div className="service-hero-img-wrap">
@@ -110,14 +105,11 @@ const ElderCare = () => {
                 </tbody>
               </table>
               
-              <div className="pricing-cta">
-                <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '1rem' }}>
-                  *Prices vary based on the elder's medical condition and required level of assistance.
-                </p>
-                <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: '100%' }}>
-                  <MessageCircle size={18} /> Discuss Needs on WhatsApp
-                </a>
-              </div>
+              
+      <div className="container" style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto' }}>
+        <ServiceCartBlock searchTitle={window.location.pathname.split('/').pop().replace(/-/g, ' ')} />
+      </div>
+
             </div>
           </div>
         </div>

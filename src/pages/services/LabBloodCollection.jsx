@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { PhoneCall, CalendarCheck, Syringe, MessageCircle, FileText, CheckCircle2, ShieldCheck } from 'lucide-react';
 import '../../service-pages.css';
+import ServiceCartBlock from '../../components/ServiceCartBlock';
 
 const LabBloodCollection = () => {
   const whatsappNumber = "917997888448";
@@ -99,9 +100,7 @@ const LabBloodCollection = () => {
                 </p>
 
                 <div className="pricing-cta">
-                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
-                    Book Home Sample Collection
-                  </a>
+                  <ServiceCartBlock searchTitle="Lab Sample Collection" />
                   <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '1.5rem', fontStyle: 'italic', textAlign: 'center' }}>
                     Test availability, laboratory processing and report delivery depend on the selected laboratory/service provider.
                   </p>

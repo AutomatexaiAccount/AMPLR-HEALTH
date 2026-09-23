@@ -1,4 +1,6 @@
 import React from 'react';
+import ServiceCartBlock from '../../components/ServiceCartBlock';
+
 import { Helmet } from 'react-helmet';
 import { PhoneCall, HeartHandshake, MessageCircle, CheckCircle2 } from 'lucide-react';
 import '../../service-pages.css';
@@ -93,14 +95,11 @@ const CaregiverCaretaker = () => {
                   Our objective is to help families provide their loved ones with <strong>comfort, companionship and dependable day to day assistance at home.</strong>
                 </p>
 
-                <div className="pricing-cta">
-                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
-                    Book Caregiver / Caretaker Service
-                  </a>
-                  <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '1.5rem', fontStyle: 'italic', textAlign: 'center', lineHeight: '1.6' }}>
-                    Caregiver services are non-medical support services unless specifically provided by a qualified healthcare professional.
-                  </p>
-                </div>
+                
+      <div className="container" style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto' }}>
+        <ServiceCartBlock searchTitle={window.location.pathname.split('/').pop().replace(/-/g, ' ')} />
+      </div>
+
               </div>
             </div>
           </div>

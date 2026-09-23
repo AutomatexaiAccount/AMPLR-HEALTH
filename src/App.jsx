@@ -25,6 +25,8 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import CustomerLogin from './pages/CustomerLogin';
 import CustomerProfile from './pages/CustomerProfile';
 import Verified from './pages/Verified';
+import { CartProvider, useCart } from './context/CartContext';
+import CartDrawer from './components/CartDrawer';
 import './index.css';
 import './service-pages.css';
 
@@ -203,7 +205,7 @@ function AppContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const { setIsCartOpen } = useCart();
 
   // Synchronous check before Supabase clears the URL hash
   if (typeof window !== 'undefined' && window.location.hash.includes('type=signup')) {
@@ -252,7 +254,7 @@ function AppContent() {
     if (!user) {
       navigate('/login', { state: { from: location.pathname } });
     } else {
-      setBookingModalOpen(true);
+      setIsCartOpen(true);
     }
   };
 
@@ -318,8 +320,8 @@ function AppContent() {
       <ScrollToHash />
       <div className="app">
 
-        {/* Booking Modal */}
-        {!hideHeaderFooter && <BookingModal isOpen={bookingModalOpen} onClose={() => setBookingModalOpen(false)} />}
+        {/* Cart Drawer */}
+        <CartDrawer />
 
         {/* ── STICKY HEADER WRAPPER ── */}
         {!hideHeaderFooter && (
@@ -997,9 +999,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <CartProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </CartProvider>
   );
 }
 

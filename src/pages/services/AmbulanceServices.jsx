@@ -1,4 +1,6 @@
 import React from 'react';
+import ServiceCartBlock from '../../components/ServiceCartBlock';
+
 import { Helmet } from 'react-helmet';
 import { PhoneCall, Ambulance, CheckCircle2, Phone, ShieldAlert } from 'lucide-react';
 import '../../service-pages.css';
@@ -106,11 +108,11 @@ const AmbulanceServices = () => {
                   </p>
                 </div>
 
-                <div className="pricing-cta">
-                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
-                    Book Ambulance Service
-                  </a>
-                </div>
+                
+      <div className="container" style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto' }}>
+        <ServiceCartBlock searchTitle={window.location.pathname.split('/').pop().replace(/-/g, ' ')} />
+      </div>
+
               </div>
             </div>
           </div>

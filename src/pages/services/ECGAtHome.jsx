@@ -1,4 +1,6 @@
 import React from 'react';
+import ServiceCartBlock from '../../components/ServiceCartBlock';
+
 import { Helmet } from 'react-helmet';
 import { PhoneCall, HeartPulse, MessageCircle, CheckCircle2 } from 'lucide-react';
 import '../../service-pages.css';
@@ -84,14 +86,11 @@ const ECGAtHome = () => {
                   The ECG is performed using appropriate equipment by the assigned healthcare professional/service provider.
                 </p>
 
-                <div className="pricing-cta">
-                  <a href="#" onClick={openBookingModal} className="btn-primary" style={{ width: '100%', fontSize: '1.1rem', padding: '1rem' }}>
-                    Book ECG at Home
-                  </a>
-                  <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '1.5rem', fontStyle: 'italic', textAlign: 'center', lineHeight: '1.6' }}>
-                    Availability, report format and turnaround time may vary according to the service provider and location.
-                  </p>
-                </div>
+                
+      <div className="container" style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto' }}>
+        <ServiceCartBlock searchTitle={window.location.pathname.split('/').pop().replace(/-/g, ' ')} />
+      </div>
+
               </div>
             </div>
           </div>
