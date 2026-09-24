@@ -1112,7 +1112,11 @@ const AdminDashboard = () => {
                   <h1 className="adm-page-title">Bookings</h1>
                   <p className="adm-page-sub">Manage all customer service requests.</p>
                 </div>
-                <button className="adm-btn adm-btn--outline" onClick={fetchData}><RefreshCw size={14} /> Refresh</button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="adm-btn adm-btn--outline" onClick={() => exportToCSV(bookings, 'bookings_backup.csv')} title="Export backup"><Download size={14} /></button>
+                  <button className="adm-btn adm-btn--outline" onClick={() => triggerImport('bookings')} title="Restore backup"><Upload size={14} /></button>
+                  <button className="adm-btn adm-btn--outline" onClick={fetchData}><RefreshCw size={14} /> Refresh</button>
+                </div>
               </div>
 
               {/* Booking Filters */}
