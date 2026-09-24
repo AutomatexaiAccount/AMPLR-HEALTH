@@ -147,7 +147,8 @@ const CartDrawer = () => {
 
       // 1. Create Cashfree Order via backend proxy
       //    Pass return_path so mobile redirect lands back on the same page
-      const orderResponse = await fetch('/api/create-cashfree-order', {
+      const endpoint = import.meta.env.PROD ? '/api/create-cashfree-order.php' : '/api/create-cashfree-order';
+      const orderResponse = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
