@@ -7,7 +7,7 @@ import {
   Edit2, Save, X, Heart, TrendingUp,
   Phone, Mail, Calendar, RefreshCw, AlertCircle,
   ChevronRight, Loader2, Eye, User, Menu, ArrowRight,
-  Zap, FileText, UserPlus, Settings, ShieldCheck, Tag, Plus, Trash2
+  Zap, FileText, UserPlus, Settings, ShieldCheck, Tag, Plus, Trash2, Download, Upload
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import './AdminDashboard.css';
@@ -396,6 +396,90 @@ const AdminDashboard = () => {
         Swal.fire('Error', err.message || 'Unable to update booking status.', 'error');
       }
     });
+  };
+
+  /* ─── CSV EXPORT & IMPORT ─── */
+  const exportToCSV = (data, filename) => {
+    if (!data || data.length === 0) {
+      addToast('Error', 'No data to export', 'error');
+      return;
+    }
+    const headers = Object.keys(data[0]);
+    const csvRows = [];
+    csvRows.push(headers.join(','));
+    for (const row of data) {
+      const values = headers.map(header => {
+        const escaped = ('' + row[header]).replace(/"/g, '""');
+        return `"${escaped}"`;
+      });
+      csvRows.push(values.join(','));
+    }
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', filename);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const triggerImport = (tableName) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const text = await file.text();
+      const rows = text.split('\n').filter(r => r.trim() !== '');
+      if (rows.length < 2) {
+        Swal.fire('Error', 'Empty or invalid CSV', 'error');
+        return;
+      }
+      const headers = rows[0].split(',').map(h => h.trim());
+      const data = [];
+      for (let i = 1; i < rows.length; i++) {
+        // basic regex to split by comma outside quotes
+        const rowData = rows[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        const obj = {};
+        headers.forEach((h, index) => {
+          let val = rowData[index] || '';
+          if (val.startsWith('"') && val.endsWith('"')) {
+            val = val.substring(1, val.length - 1).replace(/""/g, '"');
+          }
+          if (val === 'null') val = null;
+          else if (val === 'true') val = true;
+          else if (val === 'false') val = false;
+          obj[h] = val;
+        });
+        data.push(obj);
+      }
+
+      const result = await Swal.fire({
+        title: 'Restore Data?',
+        text: `You are about to restore ${data.length} records to ${tableName}. Existing records with the same ID will be updated.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#0f766e',
+        cancelButtonText: 'Cancel',
+        confirmButtonText: 'Yes, Restore'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const { error } = await supabase.from(tableName).upsert(data);
+          if (error) throw error;
+          Swal.fire('Success', 'Data restored successfully!', 'success');
+          fetchData(); // Refresh the grid
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error', err.message || 'Failed to restore data', 'error');
+        }
+      }
+    };
+    input.click();
   };
 
   const saveServicePrice = async (serviceId) => {
@@ -1135,6 +1219,8 @@ const AdminDashboard = () => {
                   <p className="adm-page-sub">Manage available services and pricing.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="adm-btn adm-btn--outline" onClick={() => exportToCSV(services, 'services_backup.csv')} title="Export backup"><Download size={14} /></button>
+                  <button className="adm-btn adm-btn--outline" onClick={() => triggerImport('services')} title="Restore backup"><Upload size={14} /></button>
                   <button className="adm-btn adm-btn--outline" onClick={fetchData}><RefreshCw size={14} /> Refresh</button>
                   <button className="adm-btn adm-btn--primary" onClick={() => setAddServiceModalOpen(true)}><Plus size={14} /> Add Service</button>
                 </div>
@@ -1206,7 +1292,11 @@ const AdminDashboard = () => {
                   <h1 className="adm-page-title">Customers</h1>
                   <p className="adm-page-sub">Click any customer to view their full profile.</p>
                 </div>
-                <button className="adm-btn adm-btn--outline" onClick={fetchData}><RefreshCw size={14} /> Refresh</button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="adm-btn adm-btn--outline" onClick={() => exportToCSV(customers, 'customers_backup.csv')} title="Export backup"><Download size={14} /></button>
+                  <button className="adm-btn adm-btn--outline" onClick={() => triggerImport('users')} title="Restore backup"><Upload size={14} /></button>
+                  <button className="adm-btn adm-btn--outline" onClick={fetchData}><RefreshCw size={14} /> Refresh</button>
+                </div>
               </div>
 
               <div className="adm-card">
@@ -1261,6 +1351,8 @@ const AdminDashboard = () => {
                   <p className="adm-page-sub">Manage discounts and offers for customers.</p>
                 </div>
                 <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="adm-btn adm-btn--outline" onClick={() => exportToCSV(promoCodes, 'promocodes_backup.csv')} title="Export backup"><Download size={14} /></button>
+                  <button className="adm-btn adm-btn--outline" onClick={() => triggerImport('promo_codes')} title="Restore backup"><Upload size={14} /></button>
                   <button className="adm-btn adm-btn--outline" onClick={fetchData}><RefreshCw size={14} /> Refresh</button>
                   <button className="adm-btn adm-btn--primary" onClick={() => openPromoModal()}><Edit2 size={14} /> Add Promo</button>
                 </div>
