@@ -1,9 +1,31 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Helmet } from 'react-helmet';
-import { CheckCircle2, Building2, Stethoscope, Briefcase, MapPin, SearchCheck, Rocket, Handshake } from 'lucide-react';
+import { CheckCircle2, Building2, Stethoscope, Briefcase, MapPin, SearchCheck, Rocket, Handshake, ExternalLink } from 'lucide-react';
 import '../index.css';
 
+const partnerForms = [
+  { name: "Partner Ambulance", link: "https://forms.gle/bScLWDSmhg6RDQwh6" },
+  { name: "Partner Care Taker", link: "https://forms.gle/bScLWDSmhg6RDQwh6" },
+  { name: "Partner Doctor Consultation", link: "https://forms.gle/pob6vRt5reBS7YMq5" },
+  { name: "Partner ECG at Home", link: "https://forms.gle/ihAB8nruwNo9JJjC6" },
+  { name: "Partner Hospital/Clinic Tie-up", link: "https://forms.gle/iUWhwpiWwyGA176Q6" },
+  { name: "Partner Lab Sample Collection", link: "https://forms.gle/LXC4gU5E7wFVEAvcA" },
+  { name: "Partner Nursing Service", link: "https://forms.gle/wYAu8YUGAnjuHFwD6" },
+  { name: "Partner Physiotherapy", link: "https://forms.gle/QB2kwRWH8gpNnz1K8" },
+  { name: "Telugu Customer Form", link: "https://forms.gle/ndEuC7ToumgiiTy59" },
+  { name: "English Customer Form", link: "https://forms.gle/ndEuC7ToumgiiTy59" },
+];
+
 const BecomePartner = () => {
+  const formsSectionRef = useRef(null);
+
+  const scrollToForms = (e) => {
+    e.preventDefault();
+    if (formsSectionRef.current) {
+      formsSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="partner-page">
       <Helmet>
@@ -23,9 +45,58 @@ const BecomePartner = () => {
             <p style={{ fontSize: '1.2rem', color: '#94a3b8', marginBottom: '2rem' }}>
               We are building a reliable healthcare service network to make quality healthcare more accessible at home.
             </p>
-            <a href="https://wa.me/917997888448?text=Hi!%20I%20want%20to%20partner%20with%20AMPLR%20Health." target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ display: 'inline-block', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px' }}>
+            <a href="#application-forms" onClick={scrollToForms} className="btn-primary" style={{ display: 'inline-block', padding: '1rem 2.5rem', fontSize: '1.1rem', borderRadius: '50px' }}>
               Become a Partner
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Application Forms Section */}
+      <section id="application-forms" ref={formsSectionRef} style={{ padding: '5rem 0', background: 'white' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <h2 style={{ fontSize: '2.5rem', color: '#0f172a', marginBottom: '1rem' }}>Application Forms</h2>
+            <p style={{ fontSize: '1.1rem', color: '#64748b', maxWidth: '600px', margin: '0 auto' }}>Select the appropriate category below to fill out your partner or customer application form.</p>
+            <div style={{ width: '60px', height: '4px', background: 'var(--primary)', margin: '1.5rem auto 0', borderRadius: '2px' }}></div>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', maxWidth: '1000px', margin: '0 auto' }}>
+            {partnerForms.map((form, index) => (
+              <a 
+                key={index} 
+                href={form.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ 
+                  background: '#f8fafc', 
+                  padding: '1.5rem', 
+                  borderRadius: '12px', 
+                  border: '1px solid #e2e8f0',
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  textDecoration: 'none',
+                  color: '#334155',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.1)';
+                  e.currentTarget.style.borderColor = 'var(--primary)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
+              >
+                <span style={{ fontSize: '1.05rem', fontWeight: '600', color: '#0f172a' }}>{form.name}</span>
+                <ExternalLink size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+              </a>
+            ))}
           </div>
         </div>
       </section>
@@ -142,7 +213,7 @@ const BecomePartner = () => {
           <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', color: 'white' }}>Ready to Join?</h2>
           <p style={{ fontSize: '1.2rem', marginBottom: '2.5rem', opacity: '0.9' }}>Become a Partner with AMPLR HEALTH today.</p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="https://wa.me/917997888448?text=Hi!%20I%20want%20to%20partner%20with%20AMPLR%20Health." target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ background: 'white', color: 'var(--primary)', padding: '1rem 2rem', borderRadius: '50px', fontWeight: 'bold' }}>
+            <a href="#application-forms" onClick={scrollToForms} className="btn-secondary" style={{ background: 'white', color: 'var(--primary)', padding: '1rem 2rem', borderRadius: '50px', fontWeight: 'bold' }}>
               Become a Partner
             </a>
             <a href="tel:7997888448" className="btn-secondary" style={{ padding: '1rem 2rem', borderRadius: '50px', border: '2px solid white' }}>
