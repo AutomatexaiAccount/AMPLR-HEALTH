@@ -4,12 +4,13 @@ import { supabase } from '../../lib/supabase';
 import {
   LayoutDashboard, Users, CalendarCheck, LogOut,
   Search, Bell, Activity, Clock, CheckCircle, XCircle,
-  Edit2, Save, X, Heart, TrendingUp,
+  Edit2, Save, X, Heart, TrendingUp, Handshake,
   Phone, Mail, Calendar, RefreshCw, AlertCircle,
   ChevronRight, Loader2, Eye, User, Menu, ArrowRight,
   Zap, FileText, UserPlus, Settings, ShieldCheck, Tag, Plus, Trash2, Download, Upload
 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import AdminPartners from './AdminPartners';
 import './AdminDashboard.css';
 
 /* ─── Module-level SwalToast mixin (created once, never re-created on re-renders) ─── */
@@ -785,6 +786,7 @@ const AdminDashboard = () => {
     { id: 'customers', icon: Users, label: 'Customers' },
     { id: 'services', icon: Activity, label: 'Services' },
     { id: 'promocodes', icon: Tag, label: 'Promo Codes' },
+    { id: 'partners', icon: Handshake, label: 'Partners' },
   ];
 
   /* ═══ RENDER ═══ */
@@ -1415,6 +1417,11 @@ const AdminDashboard = () => {
                 )}
               </div>
             </div>
+          )}
+
+          {/* PARTNERS */}
+          {activeTab === 'partners' && !fetchError && (
+            <AdminPartners />
           )}
 
         </div>

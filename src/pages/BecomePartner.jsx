@@ -1,23 +1,25 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { CheckCircle2, Building2, Stethoscope, Briefcase, MapPin, SearchCheck, Rocket, Handshake, ExternalLink } from 'lucide-react';
+import { CheckCircle2, Building2, Stethoscope, Briefcase, MapPin, SearchCheck, Rocket, Handshake, ExternalLink, FileText } from 'lucide-react';
 import '../index.css';
+import DynamicFormModal from '../components/DynamicFormModal';
 
 const partnerForms = [
-  { name: "Partner Ambulance", link: "https://forms.gle/bScLWDSmhg6RDQwh6" },
-  { name: "Partner Care Taker", link: "https://forms.gle/bScLWDSmhg6RDQwh6" },
-  { name: "Partner Doctor Consultation", link: "https://forms.gle/pob6vRt5reBS7YMq5" },
-  { name: "Partner ECG at Home", link: "https://forms.gle/ihAB8nruwNo9JJjC6" },
-  { name: "Partner Hospital/Clinic Tie-up", link: "https://forms.gle/iUWhwpiWwyGA176Q6" },
-  { name: "Partner Lab Sample Collection", link: "https://forms.gle/LXC4gU5E7wFVEAvcA" },
-  { name: "Partner Nursing Service", link: "https://forms.gle/wYAu8YUGAnjuHFwD6" },
-  { name: "Partner Physiotherapy", link: "https://forms.gle/QB2kwRWH8gpNnz1K8" },
-  { name: "Telugu Customer Form", link: "https://forms.gle/ndEuC7ToumgiiTy59" },
-  { name: "English Customer Form", link: "https://forms.gle/ndEuC7ToumgiiTy59" },
+  { name: "Partner Ambulance", formKey: "ambulance" },
+  { name: "Partner Care Taker", formKey: "ambulance" },
+  { name: "Partner Doctor Consultation", formKey: "doctor" },
+  { name: "Partner ECG at Home", formKey: "ecg" },
+  { name: "Partner Hospital/Clinic Tie-up", formKey: "hospital" },
+  { name: "Partner Lab Sample Collection", formKey: "lab_technician" },
+  { name: "Partner Nursing Service", formKey: "nursing" },
+  { name: "Partner Physiotherapy", formKey: "physiotherapy" },
+  { name: "Telugu Customer Form", formKey: "customer_telugu" },
+  { name: "English Customer Form", formKey: "customer_english" },
 ];
 
 const BecomePartner = () => {
   const formsSectionRef = useRef(null);
+  const [activeFormKey, setActiveFormKey] = useState(null);
 
   const scrollToForms = (e) => {
     e.preventDefault();
@@ -27,6 +29,7 @@ const BecomePartner = () => {
   };
 
   return (
+    <>
     <div className="partner-page">
       <Helmet>
         <title>Become a Partner | AMPLR Health</title>
@@ -63,11 +66,9 @@ const BecomePartner = () => {
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', maxWidth: '1000px', margin: '0 auto' }}>
             {partnerForms.map((form, index) => (
-              <a 
+              <button 
                 key={index} 
-                href={form.link} 
-                target="_blank" 
-                rel="noopener noreferrer"
+                onClick={() => setActiveFormKey(form.formKey)}
                 style={{ 
                   background: '#f8fafc', 
                   padding: '1.5rem', 
@@ -80,7 +81,9 @@ const BecomePartner = () => {
                   textDecoration: 'none',
                   color: '#334155',
                   transition: 'all 0.2s ease',
-                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                  cursor: 'pointer',
+                  textAlign: 'left'
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.transform = 'translateY(-3px)';
@@ -94,8 +97,8 @@ const BecomePartner = () => {
                 }}
               >
                 <span style={{ fontSize: '1.05rem', fontWeight: '600', color: '#0f172a' }}>{form.name}</span>
-                <ExternalLink size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-              </a>
+                <FileText size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+              </button>
             ))}
           </div>
         </div>
@@ -225,6 +228,13 @@ const BecomePartner = () => {
       </section>
 
     </div>
+
+      <DynamicFormModal 
+        isOpen={!!activeFormKey} 
+        onClose={() => setActiveFormKey(null)} 
+        formKey={activeFormKey} 
+      />
+    </>
   );
 };
 
