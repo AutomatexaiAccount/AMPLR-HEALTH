@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="100%" height="100%">
+  <!-- Icon Section -->
+  <g transform="translate(15, 10)">
+    <!-- Map Pin / Drop Shape -->
+    <path d="M25 0C11.193 0 0 11.193 0 25C0 41.5 25 60 25 60C25 60 50 41.5 50 25C50 11.193 38.807 0 25 0Z" fill="none" stroke="#0f172a" stroke-width="3"/>
+    
+    <!-- Medical Cross -->
+    <path d="M20 15H30V20H35V30H30V35H20V30H15V20H20V15Z" fill="#c1121f"/>
+    
+    <!-- Heartbeat / Pulse overlapping -->
+    <path d="M5 25 L15 25 L20 15 L30 40 L35 25 L45 25" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Text Section -->
+  <g transform="translate(80, 40)">
+    <text x="0" y="0" font-family="'Outfit', -apple-system, sans-serif" font-weight="800" font-size="32" fill="#0f172a" letter-spacing="1">AMPLR</text>
+    <text x="3" y="18" font-family="'Outfit', -apple-system, sans-serif" font-weight="600" font-size="12" fill="#c1121f" letter-spacing="4">HEALTH</text>
+  </g>
+</svg>
