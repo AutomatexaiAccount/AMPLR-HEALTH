@@ -20,6 +20,7 @@ import HospitalAssistance from './pages/services/HospitalAssistance';
 import BecomePartner from './pages/BecomePartner';
 import ContactUs from './pages/ContactUs';
 import WhyAmplr from './pages/WhyAmplr';
+import Offers from './pages/Offers';
 import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import CustomerLogin from './pages/CustomerLogin';
@@ -205,7 +206,7 @@ function AppContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  const { setIsCartOpen } = useCart();
+  const { setIsCartOpen, globalDiscount } = useCart();
 
   // Synchronous check before Supabase clears the URL hash
   if (typeof window !== 'undefined' && window.location.hash.includes('type=signup')) {
@@ -326,6 +327,11 @@ function AppContent() {
         {/* ── STICKY HEADER WRAPPER ── */}
         {!hideHeaderFooter && (
         <div className="header-sticky-wrapper">
+          {globalDiscount && (
+            <div style={{ background: '#fef08a', color: '#854d0e', textAlign: 'center', padding: '8px', fontSize: '0.9rem', fontWeight: '600' }}>
+              🎉 Special Offer: {globalDiscount.discount_type === 'percentage' ? `${globalDiscount.discount_amount}%` : `₹${globalDiscount.discount_amount}`} Off! Automatically applied at checkout.
+            </div>
+          )}
           {/* ── TOP BAR ── */}
           <div className="top-bar">
           <div className="container top-bar-inner">
@@ -405,6 +411,7 @@ function AppContent() {
               <div className="nav-links" role="menubar">
 
                 <Link to="/" className="nav-item-link">Home</Link>
+                <Link to="/offers" className="nav-item-link" style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>Offers</Link>
 
                 <div className="nav-dropdown" role="menuitem">
                   <span className="nav-dropdown-trigger">
@@ -639,6 +646,10 @@ function AppContent() {
                   <span>Home</span>
                   <ChevronRight size={16} />
                 </Link>
+                <Link to="/offers" onClick={closeMenu} className="mobile-link" style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>
+                  <span>Offers & Coupons</span>
+                  <ChevronRight size={16} />
+                </Link>
 
                 <div className="mobile-nav-group">
                   <button
@@ -860,6 +871,7 @@ function AppContent() {
           <Route path="/profile" element={<CustomerProfile />} />
           <Route path="/verified" element={<Verified />} />
           <Route path="/" element={<Home />} />
+          <Route path="/offers" element={<Offers />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/cancellation-refund" element={<CancellationRefund />} />

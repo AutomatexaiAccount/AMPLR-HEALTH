@@ -9,7 +9,43 @@ import {
   ChevronRight, Loader2, Eye, User, Menu, ArrowRight,
   Zap, FileText, UserPlus, Settings, ShieldCheck, Tag, Plus, Trash2
 } from 'lucide-react';
+import Swal from 'sweetalert2';
 import './AdminDashboard.css';
+
+/* ─── Module-level SwalToast mixin (created once, never re-created on re-renders) ─── */
+const SwalToast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 5000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
+
+/* ─── Module-level AudioContext (created once, avoids autoplay restriction stacking) ─── */
+let _audioCtx = null;
+const playNotifBeep = () => {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _audioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.15);
+  } catch (e) {
+    // Silently ignore — browser autoplay policy may block before first user interaction
+  }
+};
 
 /* ═══════════════════════════════════════════════
    HELPER COMPONENTS
@@ -43,7 +79,7 @@ const ToastContainer = ({ toasts, onDismiss }) => (
 const StatusBadge = ({ status }) => {
   const map = {
     pending:   { label: 'Pending',   cls: 'adm-badge--pending' },
-    confirmed: { label: 'Confirmed', cls: 'adm-badge--confirmed' },
+    confirmed: { label: 'Accepted',  cls: 'adm-badge--confirmed' },
     completed: { label: 'Completed', cls: 'adm-badge--completed' },
     cancelled: { label: 'Cancelled', cls: 'adm-badge--cancelled' },
   };
@@ -151,7 +187,7 @@ const AdminDashboard = () => {
   // Promo Code editing
   const [showPromoModal, setShowPromoModal] = useState(false);
   const [editingPromoId, setEditingPromoId] = useState(null);
-  const [promoForm, setPromoForm] = useState({ code: '', discount_amount: '', discount_type: 'percentage', is_active: true });
+  const [promoForm, setPromoForm] = useState({ code: '', discount_amount: '', discount_type: 'percentage', is_active: true, is_auto_apply: false });
   const [promoSaving, setPromoSaving] = useState(false);
 
   // Toasts & notifications
@@ -163,22 +199,29 @@ const AdminDashboard = () => {
   // Activity feed
   const [activityFeed, setActivityFeed] = useState([]);
 
-  // Search
+  // Search and Filter
   const [searchQuery, setSearchQuery] = useState('');
+  const [bookingFilter, setBookingFilter] = useState('active');
 
   const navigate = useNavigate();
   const notifRef = useRef(null);
   const toastCounter = useRef(0);
 
-  /* ─── Toast helpers ─── */
+  /* ─── Toast / notification helpers ─── */
+  // Uses module-level SwalToast (stable, never re-created on render)
   const addToast = useCallback((title, message = '', type = 'info') => {
-    const id = ++toastCounter.current;
-    setToasts(prev => [...prev.slice(-4), { id, title, message, type }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 5000);
-  }, []);
+    let icon = 'info';
+    if (type === 'success') icon = 'success';
+    if (type === 'error') icon = 'error';
+    if (type === 'realtime') {
+      icon = 'info';
+      playNotifBeep(); // uses module-level stable function
+    }
+    SwalToast.fire({ icon, title, text: message });
+  }, []); // safe: SwalToast and playNotifBeep are module-level constants
 
-  const dismissToast = useCallback((id) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+  const dismissToast = useCallback(() => {
+    // No-op: toasts are managed by SwalToast, not local state
   }, []);
 
   const addNotification = useCallback((title, message, type = 'info') => {
@@ -317,28 +360,78 @@ const AdminDashboard = () => {
   /* ─── Actions ─── */
   const handleLogout = async () => { await supabase.auth.signOut(); navigate('/admin'); };
 
-  const updateBookingStatus = async (bookingId, newStatus) => {
-    try {
-      const { error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId);
-      if (error) throw error;
-      setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
-      addToast('Status Updated', `Booking marked as ${newStatus}.`, 'success');
-    } catch {
-      addToast('Update Failed', 'Unable to update booking status.', 'error');
-    }
+  const updateBookingStatus = (bookingId, newStatus, selectEl) => {
+    const currentBooking = bookings.find(b => b.id === bookingId);
+    const prevStatus = currentBooking?.status || 'pending';
+
+    Swal.fire({
+      title: 'Update Booking Status?',
+      text: `Change status to "${newStatus.toUpperCase()}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0f766e',
+      cancelButtonColor: '#94a3b8',
+      confirmButtonText: 'Yes, Update!',
+      cancelButtonText: 'Cancel'
+    }).then(async (result) => {
+      if (!result.isConfirmed) {
+        if (selectEl) selectEl.value = prevStatus;
+        return;
+      }
+      try {
+        const { error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId);
+        if (error) throw error;
+        setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
+        Swal.fire({
+          title: 'Updated!',
+          text: `Booking marked as ${newStatus}.`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false,
+          confirmButtonColor: '#0f766e'
+        });
+      } catch (err) {
+        console.error('Update Booking Error:', err);
+        if (selectEl) selectEl.value = prevStatus;
+        Swal.fire('Error', err.message || 'Unable to update booking status.', 'error');
+      }
+    });
   };
 
   const saveServicePrice = async (serviceId) => {
     const price = parseFloat(editPriceValue);
-    if (isNaN(price) || price < 0) { addToast('Invalid Price', 'Enter a valid number.', 'error'); return; }
+    if (isNaN(price) || price < 0) { 
+      Swal.fire('Invalid Price', 'Enter a valid number.', 'error'); 
+      return; 
+    }
+
+    const result = await Swal.fire({
+      title: 'Update Service Price?',
+      text: 'Are you sure you want to change the price for this service?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0f766e',
+      cancelButtonColor: '#cbd5e1',
+      confirmButtonText: 'Yes, Update',
+      backdrop: true
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const { error } = await supabase.from('services').update({ price }).eq('id', serviceId);
       if (error) throw error;
       setServices(prev => prev.map(s => s.id === serviceId ? { ...s, price } : s));
       setEditingServiceId(null);
-      addToast('Price Updated', 'Service price saved.', 'success');
+      Swal.fire({
+        title: 'Updated!',
+        text: 'Service price has been saved.',
+        icon: 'success',
+        confirmButtonColor: '#0f766e',
+        backdrop: true
+      });
     } catch {
-      addToast('Save Failed', 'Unable to update price.', 'error');
+      Swal.fire('Error', 'Unable to update price.', 'error');
     }
   };
 
@@ -346,9 +439,23 @@ const AdminDashboard = () => {
     e.preventDefault();
     const price = parseFloat(newServiceForm.price);
     if (!newServiceForm.title.trim() || isNaN(price) || price < 0) {
-      addToast('Validation Error', 'Title and valid price are required.', 'error');
+      Swal.fire('Validation Error', 'Title and valid price are required.', 'error');
       return;
     }
+
+    const result = await Swal.fire({
+      title: 'Add New Service',
+      text: 'You are about to add a new service to the live catalog. Please ensure all details are correct.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0f766e',
+      cancelButtonColor: '#cbd5e1',
+      confirmButtonText: 'Understood, Proceed',
+      backdrop: true
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const { data, error } = await supabase.from('services').insert([
         { title: newServiceForm.title, category: newServiceForm.category, price: price }
@@ -358,10 +465,16 @@ const AdminDashboard = () => {
         setServices(prev => [...prev, data[0]]);
         setAddServiceModalOpen(false);
         setNewServiceForm({ title: '', category: 'HEALTHCARE SERVICES', price: 0 });
-        addToast('Service Added', 'New service created successfully.', 'success');
+        Swal.fire({
+          title: 'Success!',
+          text: 'New service created successfully.',
+          icon: 'success',
+          confirmButtonColor: '#0f766e',
+          backdrop: true
+        });
       }
     } catch (err) {
-      addToast('Error', 'Unable to add service.', 'error');
+      Swal.fire('Error', 'Unable to add service.', 'error');
     }
   };
 
@@ -385,9 +498,23 @@ const AdminDashboard = () => {
     e.preventDefault();
     const price = parseFloat(newSubServiceForm.price);
     if (!newSubServiceForm.title.trim() || isNaN(price) || price < 0) {
-      addToast('Validation Error', 'Title and valid price are required.', 'error');
+      Swal.fire('Validation Error', 'Title and valid price are required.', 'error');
       return;
     }
+
+    const result = await Swal.fire({
+      title: 'Add New Sub-Service',
+      text: 'You are about to add a new sub-service. Please ensure all details are correct.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0f766e',
+      cancelButtonColor: '#cbd5e1',
+      confirmButtonText: 'Understood, Proceed',
+      backdrop: true
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const { data, error } = await supabase.from('sub_services').insert([
         { service_id: manageSubServiceData.id, title: newSubServiceForm.title, price: price, is_active: true }
@@ -396,22 +523,46 @@ const AdminDashboard = () => {
       if (data && data.length > 0) {
         setSubServicesList(prev => [...prev, data[0]]);
         setNewSubServiceForm({ title: '', price: 0 });
-        addToast('Added', 'Sub-service added successfully.', 'success');
+        Swal.fire({
+          title: 'Success!',
+          text: 'Sub-service added successfully.',
+          icon: 'success',
+          confirmButtonColor: '#0f766e',
+          backdrop: true
+        });
       }
     } catch (err) {
-      addToast('Error', 'Unable to add sub-service.', 'error');
+      Swal.fire('Error', 'Unable to add sub-service.', 'error');
     }
   };
 
   const handleDeleteSubService = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this test?")) return;
+    const result = await Swal.fire({
+      title: 'Remove Sub-Service?',
+      text: 'Are you sure you want to remove this from the live inventory?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#cbd5e1',
+      confirmButtonText: 'Yes, Remove',
+      backdrop: true
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const { error } = await supabase.from('sub_services').delete().eq('id', id);
       if (error) throw error;
       setSubServicesList(prev => prev.filter(s => s.id !== id));
-      addToast('Deleted', 'Sub-service deleted.', 'success');
+      Swal.fire({
+        title: 'Removed!',
+        text: 'Sub-service has been deleted.',
+        icon: 'success',
+        confirmButtonColor: '#0f766e',
+        backdrop: true
+      });
     } catch (err) {
-      addToast('Error', 'Unable to delete sub-service.', 'error');
+      Swal.fire('Error', 'Unable to delete sub-service.', 'error');
     }
   };
 
@@ -441,29 +592,57 @@ const AdminDashboard = () => {
       addToast('Validation Error', 'Code and discount amount are required.', 'error');
       return;
     }
+
+    const result = await Swal.fire({
+      title: editingPromoId ? 'Update Promo Code?' : 'Create Promo Code?',
+      text: editingPromoId ? 'Are you sure you want to update this promo code?' : 'Are you sure you want to create this new promo code?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0f766e',
+      cancelButtonColor: '#cbd5e1',
+      confirmButtonText: editingPromoId ? 'Yes, Update' : 'Yes, Create',
+      backdrop: true
+    });
+
+    if (!result.isConfirmed) return;
+
     setPromoSaving(true);
     try {
       const payload = {
         code: promoForm.code.trim().toUpperCase(),
         discount_amount: parseFloat(promoForm.discount_amount),
         discount_type: promoForm.discount_type,
-        is_active: promoForm.is_active
+        is_active: promoForm.is_active,
+        is_auto_apply: promoForm.is_auto_apply
       };
 
       if (editingPromoId) {
         const { error } = await supabase.from('promo_codes').update(payload).eq('id', editingPromoId);
         if (error) throw error;
         setPromoCodes(prev => prev.map(p => p.id === editingPromoId ? { ...p, ...payload } : p));
-        addToast('Promo Updated', 'Promo code updated successfully.', 'success');
+        Swal.fire({
+          title: 'Promo Updated!',
+          text: 'Promo code updated successfully.',
+          icon: 'success',
+          confirmButtonColor: '#0f766e',
+          backdrop: true
+        });
       } else {
         const { data, error } = await supabase.from('promo_codes').insert(payload).select().single();
         if (error) throw error;
         setPromoCodes(prev => [data, ...prev]);
-        addToast('Promo Created', 'New promo code added.', 'success');
+        Swal.fire({
+          title: 'Promo Created!',
+          text: 'New promo code added.',
+          icon: 'success',
+          confirmButtonColor: '#0f766e',
+          backdrop: true
+        });
       }
       setShowPromoModal(false);
     } catch (err) {
-      addToast('Error', 'Unable to save promo code. It might already exist.', 'error');
+      console.error('Save Promo Error:', err);
+      Swal.fire('Error', 'Unable to save promo code. It might already exist.', 'error');
     } finally {
       setPromoSaving(false);
     }
@@ -472,10 +651,10 @@ const AdminDashboard = () => {
   const openPromoModal = (promo = null) => {
     if (promo) {
       setEditingPromoId(promo.id);
-      setPromoForm({ code: promo.code, discount_amount: promo.discount_amount, discount_type: promo.discount_type, is_active: promo.is_active });
+      setPromoForm({ code: promo.code, discount_amount: promo.discount_amount, discount_type: promo.discount_type, is_active: promo.is_active, is_auto_apply: promo.is_auto_apply || false });
     } else {
       setEditingPromoId(null);
-      setPromoForm({ code: '', discount_amount: '', discount_type: 'percentage', is_active: true });
+      setPromoForm({ code: '', discount_amount: '', discount_type: 'percentage', is_active: true, is_auto_apply: false });
     }
     setShowPromoModal(true);
   };
@@ -485,7 +664,7 @@ const AdminDashboard = () => {
     customers: customers.length,
     bookings: bookings.length,
     pending: bookings.filter(b => b.status === 'pending').length,
-    confirmed: bookings.filter(b => b.status === 'confirmed').length,
+    accepted: bookings.filter(b => b.status === 'confirmed').length,
     completed: bookings.filter(b => b.status === 'completed').length,
     cancelled: bookings.filter(b => b.status === 'cancelled').length,
     services: services.length,
@@ -748,10 +927,11 @@ const AdminDashboard = () => {
                             <th>Service</th>
                             <th>Amount</th>
                             <th>Status</th>
+                            <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {bookings.slice(0, 6).map(b => (
+                          {bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').slice(0, 5).map(b => (
                             <tr key={b.id}>
                               <td>
                                 <div className="adm-cell-main">{b.customer_name || '—'}</div>
@@ -760,6 +940,14 @@ const AdminDashboard = () => {
                               <td><div className="adm-cell-main">{b.services?.title || 'Unknown'}</div></td>
                               <td><div className="adm-cell-amount">₹{b.amount}</div></td>
                               <td><StatusBadge status={b.status} /></td>
+                              <td>
+                                <select className="adm-select" value={b.status} onChange={e => updateBookingStatus(b.id, e.target.value, e.target)}>
+                                  <option value="pending">Pending</option>
+                                  <option value="confirmed">Accepted</option>
+                                  <option value="completed">Completed</option>
+                                  <option value="cancelled">Cancelled</option>
+                                </select>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -807,7 +995,7 @@ const AdminDashboard = () => {
                   </div>
                   <div className="adm-status-bars">
                     {[
-                      { label: 'Confirmed', count: stats.confirmed, color: 'var(--adm-blue)', total: stats.bookings },
+                      { label: 'Accepted', count: stats.accepted, color: 'var(--adm-blue)', total: stats.bookings },
                       { label: 'Pending',   count: stats.pending,   color: 'var(--adm-amber)', total: stats.bookings },
                       { label: 'Completed', count: stats.completed, color: 'var(--adm-green)', total: stats.bookings },
                       { label: 'Cancelled', count: stats.cancelled, color: 'var(--adm-red)', total: stats.bookings },
@@ -843,6 +1031,28 @@ const AdminDashboard = () => {
                 <button className="adm-btn adm-btn--outline" onClick={fetchData}><RefreshCw size={14} /> Refresh</button>
               </div>
 
+              {/* Booking Filters */}
+              <div className="adm-tabs" style={{ marginBottom: '1.5rem' }}>
+                <button 
+                  className={`adm-tab ${bookingFilter === 'active' ? 'active' : ''}`}
+                  onClick={() => setBookingFilter('active')}
+                >
+                  Active Bookings (Pending/Accepted)
+                </button>
+                <button 
+                  className={`adm-tab ${bookingFilter === 'past' ? 'active' : ''}`}
+                  onClick={() => setBookingFilter('past')}
+                >
+                  Past Bookings (Completed/Cancelled)
+                </button>
+                <button 
+                  className={`adm-tab ${bookingFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setBookingFilter('all')}
+                >
+                  All Bookings
+                </button>
+              </div>
+
               <div className="adm-card">
                 {loading ? <TableSkeleton rows={8} cols={5} /> : bookings.length === 0 ? (
                   <EmptyState icon={CalendarCheck} title="No bookings found" sub="Bookings will appear here when customers make service requests." />
@@ -861,7 +1071,14 @@ const AdminDashboard = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {(searchQuery ? filteredBookings : bookings).map(b => (
+                        {(searchQuery ? filteredBookings : bookings)
+                          .filter(b => {
+                            if (bookingFilter === 'all') return true;
+                            if (bookingFilter === 'active') return b.status === 'pending' || b.status === 'confirmed';
+                            if (bookingFilter === 'past') return b.status === 'completed' || b.status === 'cancelled';
+                            return true;
+                          })
+                          .map(b => (
                           <tr key={b.id}>
                             <td>
                               <div className="adm-cell-id">#{b.id.substring(0, 8)}</div>
@@ -888,9 +1105,13 @@ const AdminDashboard = () => {
                             </td>
                             <td><StatusBadge status={b.status} /></td>
                             <td>
-                              <select className="adm-select" value={b.status} onChange={e => updateBookingStatus(b.id, e.target.value)}>
+                              <select
+                                className="adm-select"
+                                value={b.status}
+                                onChange={e => updateBookingStatus(b.id, e.target.value, e.target)}
+                              >
                                 <option value="pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
+                                <option value="confirmed">Accepted</option>
                                 <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>
                               </select>
@@ -1045,6 +1266,17 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
+              <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 8px', fontSize: '1rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Tag size={16} color="var(--brand-primary)" /> Promo Code Guidelines
+                </h3>
+                <ul style={{ margin: 0, paddingLeft: '20px', color: '#475569', fontSize: '0.9rem', lineHeight: '1.6' }}>
+                  <li><strong>Standard Coupons:</strong> Users must manually enter these codes at checkout. Create memorable codes (e.g., <code style={{background: '#e2e8f0', padding: '2px 4px', borderRadius: '4px'}}>FESTIVAL50</code>).</li>
+                  <li><strong>Auto Apply (Global Discount):</strong> These are applied automatically to everyone's cart without them needing to enter a code.</li>
+                  <li><strong>Multiple Auto-Apply Coupons:</strong> If you have multiple "Auto Apply" coupons active at the same time, the system will automatically evaluate the cart and <strong>apply the one that gives the highest discount</strong> to the user.</li>
+                </ul>
+              </div>
+
               <div className="adm-card">
                 {loading ? <TableSkeleton rows={4} cols={4} /> : promoCodes.length === 0 ? (
                   <EmptyState icon={Tag} title="No promo codes yet" sub="Create your first discount code to offer savings to your customers." />
@@ -1071,6 +1303,7 @@ const AdminDashboard = () => {
                             </td>
                             <td>
                               {p.is_active ? <span className="adm-badge adm-badge--confirmed">Active</span> : <span className="adm-badge adm-badge--cancelled">Inactive</span>}
+                              {p.is_auto_apply && <span className="adm-badge adm-badge--pending" style={{ marginLeft: '8px' }}>Auto Apply</span>}
                             </td>
                             <td><span className="adm-cell-sub">{new Date(p.created_at).toLocaleDateString('en-IN')}</span></td>
                             <td>
@@ -1301,6 +1534,16 @@ const AdminDashboard = () => {
                       onChange={e => setPromoForm(prev => ({ ...prev, is_active: e.target.checked }))}
                     />
                     Active (can be used by customers)
+                  </label>
+                </div>
+                <div>
+                  <label className="adm-detail-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--brand-primary)', fontWeight: 600 }}>
+                    <input
+                      type="checkbox"
+                      checked={promoForm.is_auto_apply}
+                      onChange={e => setPromoForm(prev => ({ ...prev, is_auto_apply: e.target.checked }))}
+                    />
+                    Apply automatically to all users (Global Discount)
                   </label>
                 </div>
                 <button type="submit" className="adm-btn adm-btn--primary" style={{ marginTop: '10px', justifyContent: 'center' }} disabled={promoSaving}>

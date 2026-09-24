@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 const CartContext = createContext();
 
@@ -49,8 +50,30 @@ export const CartProvider = ({ children }) => {
     }));
   };
 
+  const [globalDiscounts, setGlobalDiscounts] = useState([]);
+  const [appliedPromo, setAppliedPromo] = useState(null);
+
+  useEffect(() => {
+    const fetchGlobalDiscounts = async () => {
+      try {
+        const { data, error } = await supabase.from('promo_codes')
+          .select('*')
+          .eq('is_auto_apply', true)
+          .eq('is_active', true);
+        
+        if (!error && data) {
+          setGlobalDiscounts(data);
+        }
+      } catch (err) {
+        console.error('Error fetching global discounts:', err);
+      }
+    };
+    fetchGlobalDiscounts();
+  }, []);
+
   const clearCart = () => {
     setCart({ items: [] });
+    setAppliedPromo(null);
   };
 
   const toggleCart = () => {
@@ -58,6 +81,52 @@ export const CartProvider = ({ children }) => {
   };
 
   const cartTotal = cart.items.reduce((total, item) => total + Number(item.price || 0), 0);
+  
+  // Calculate Discount
+  let bestGlobalDiscount = null;
+  let maxGlobalDiscountAmount = 0;
+
+  if (globalDiscounts.length > 0) {
+    if (cartTotal > 0) {
+      globalDiscounts.forEach(discount => {
+        let amount = 0;
+        if (discount.discount_type === 'percentage') {
+          amount = (cartTotal * discount.discount_amount) / 100;
+        } else {
+          amount = discount.discount_amount;
+        }
+        
+        if (amount > cartTotal) amount = cartTotal;
+
+        if (amount > maxGlobalDiscountAmount) {
+          maxGlobalDiscountAmount = amount;
+          bestGlobalDiscount = discount;
+        }
+      });
+      if (!bestGlobalDiscount) bestGlobalDiscount = globalDiscounts[0];
+    } else {
+      bestGlobalDiscount = globalDiscounts[0];
+    }
+  }
+
+  let discountAmount = 0;
+  let activeDiscount = appliedPromo || bestGlobalDiscount;
+
+  if (activeDiscount && cartTotal > 0) {
+    if (activeDiscount.discount_type === 'percentage') {
+      discountAmount = (cartTotal * activeDiscount.discount_amount) / 100;
+    } else {
+      discountAmount = activeDiscount.discount_amount;
+    }
+    // Cap discount at cart total
+    if (discountAmount > cartTotal) {
+      discountAmount = cartTotal;
+    }
+  }
+
+  const subtotalAfterDiscount = cartTotal - discountAmount;
+
+  const grandTotal = subtotalAfterDiscount;
 
   return (
     <CartContext.Provider value={{ 
@@ -65,7 +134,13 @@ export const CartProvider = ({ children }) => {
       addToCart, 
       removeFromCart, 
       clearCart, 
-      cartTotal, 
+      cartTotal,
+      discountAmount,
+      activeDiscount,
+      appliedPromo,
+      setAppliedPromo,
+      globalDiscount: bestGlobalDiscount,
+      grandTotal,
       isCartOpen, 
       setIsCartOpen, 
       toggleCart 

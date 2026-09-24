@@ -202,24 +202,118 @@
 }
 
 /* ============================================================
-   RESPONSIVE DESIGN
+   RESPONSIVE DESIGN — SERVICE PAGES
    ============================================================ */
-@media (max-width: 992px) {
+
+/* ── Tablet (max 1024px) ── */
+@media (max-width: 1024px) {
+  .service-hero { padding: 3rem 0 2.5rem; }
   .service-hero-inner {
     grid-template-columns: 1fr;
     text-align: center;
+    gap: 2rem;
   }
-  
   .service-hero-badge { margin: 0 auto 1.5rem; }
   .service-hero-actions { justify-content: center; }
-  .content-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .content-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .service-hero-img { height: 320px; }
 }
 
+/* ── Mobile (max 768px) ── */
 @media (max-width: 768px) {
-  .service-hero { padding: 3rem 0; }
-  .service-hero-title { font-size: 2rem; }
-  .service-hero-img { height: 250px; }
-  .pricing-wrapper { padding: 1.5rem; }
+  /* Hero */
+  .service-hero { padding: 2rem 0 1.5rem; }
+  .service-hero-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  .service-hero-badge { margin: 0 auto 1rem; font-size: 0.8rem; }
+  .service-hero-title { font-size: clamp(1.4rem, 6vw, 2rem) !important; }
+  .service-hero-desc { font-size: 0.9rem !important; margin-bottom: 1.5rem; }
+  .service-hero-actions {
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .service-hero-actions .btn-primary,
+  .service-hero-actions .btn-secondary,
+  .service-hero-actions a {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    max-width: 320px;
+  }
+  .service-hero-img { height: 220px; object-fit: cover; }
+  .service-hero-img-wrap { border-radius: 8px; }
+
+  /* Content */
+  .content-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem;
+  }
+  .service-content { padding: 2rem 0; }
+  .content-text h2 { font-size: 1.3rem !important; margin-bottom: 1rem; }
+  .content-text p { font-size: 0.9rem !important; }
+
+  /* Pricing section */
+  .pricing-section { padding: 2rem 0; }
+  .pricing-wrapper {
+    padding: 1.25rem 1rem;
+    border-radius: 8px;
+    margin: 0 0.5rem;
+  }
+  .pricing-wrapper h3 { font-size: 1.2rem !important; }
+  .pricing-subtitle { font-size: 0.85rem !important; }
+  .pricing-cta { padding-top: 1rem; }
+
+  /* Pricing table horizontal scroll */
+  .pricing-table-modern {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pricing-table-modern th,
+  .pricing-table-modern td { padding: 0.75rem 0.5rem; font-size: 0.85rem; }
+
+  /* Check items */
+  .service-check-item {
+    padding: 0.85rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* ServiceCartBlock */
+  .service-cart-block {
+    padding: 1.25rem 1rem !important;
+    border-radius: 10px !important;
+    margin-top: 1.5rem !important;
+  }
+  .service-cart-block h3 { font-size: 1rem !important; }
+  .service-cart-block .btn-primary,
+  .service-cart-block .btn-secondary {
+    font-size: 0.9rem !important;
+    padding: 0.85rem !important;
+  }
+}
+
+/* ── Small Mobile (max 480px) ── */
+@media (max-width: 480px) {
+  .service-hero { padding: 1.5rem 0 1rem; }
+  .service-hero-title { font-size: 1.3rem !important; }
+  .service-hero-img { height: 180px; }
+  .pricing-wrapper { padding: 1rem 0.85rem; margin: 0; border-radius: 6px; }
+  .content-text h2 { font-size: 1.2rem !important; }
+  .service-check-item { font-size: 0.85rem !important; padding: 0.75rem !important; }
+  .pricing-section { padding: 1.5rem 0; }
+}
+
+/* ── Tiny Mobile (max 380px) ── */
+@media (max-width: 380px) {
+  .service-hero-title { font-size: 1.2rem !important; }
+  .service-hero-desc { font-size: 0.82rem !important; }
+  .service-hero-img { height: 160px; }
+  .pricing-wrapper h3 { font-size: 1rem !important; }
 }
 
 /* ============================================================
@@ -233,7 +327,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
-  padding: 1rem 1.25rem !important; /* override inline padding */
+  padding: 1rem 1.25rem !important;
   color: var(--navy-dark) !important;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -249,3 +343,4 @@
 .service-check-item svg {
   color: var(--primary) !important;
 }
+

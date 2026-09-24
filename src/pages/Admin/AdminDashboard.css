@@ -960,3 +960,19 @@
   .adm-welcome-title { font-size: 1.2rem; }
   .adm-quick-actions { flex-direction: column; }
 }
+
+
+/* SweetAlert Blur Backdrop */
+div:where(.swal2-container) div:where(.swal2-backdrop-show) {
+  backdrop-filter: blur(4px);
+}
+
+/* -- Booking Tabs -- */
+.adm-tabs { display: flex; gap: 0.75rem; border-bottom: 1px solid var(--adm-border); padding-bottom: 0.25rem; }
+.adm-tab { padding: 0.6rem 1.25rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--adm-text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s var(--adm-ease); border-radius: var(--adm-radius) var(--adm-radius) 0 0; }
+.adm-tab:hover { color: var(--adm-blue); background: var(--adm-blue-light); }
+.adm-tab.active { color: var(--adm-blue); border-bottom-color: var(--adm-blue); background: var(--adm-blue-light); }
+
+/* -- Fix SweetAlert z-index -- */
+.swal2-container { z-index: 100000 !important; }
+

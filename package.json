@@ -12,11 +12,14 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
     "framer-motion": "^13.2.0",
+    "html2pdf.js": "^0.14.0",
     "lucide-react": "^1.43.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-helmet": "^6.1.0",
-    "react-router-dom": "^7.18.3"
+    "react-router-dom": "^7.18.3",
+    "sweetalert2": "^11.26.25",
+    "sweetalert2-react-content": "^5.1.2"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

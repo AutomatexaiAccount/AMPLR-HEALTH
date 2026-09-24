@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import {
   User, History, Users, LogOut, ChevronRight,
   Edit, Plus, CheckCircle, Home, ArrowLeft, X,
-  Trash2, AlertCircle, Loader2
+  Trash2, AlertCircle, Loader2, Lock
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './CustomerProfile.css';
@@ -83,11 +83,21 @@ const CustomerProfile = () => {
   /* ── Add/Edit Family Member modal state ── */
   const [showFamilyModal, setShowFamilyModal] = useState(false);
   const [editingFamilyMemberId, setEditingFamilyMemberId] = useState(null);
-  const [familyForm, setFamilyForm] = useState({ name: '', relationship: '', age: '', gender: '' });
+  const [familyForm, setFamilyForm] = useState({ 
+    name: '', relationship: '', age: '', gender: '', 
+    phone: '', email: '', location: '', area: '', city: '', pincode: '' 
+  });
   const [familyFormErrors, setFamilyFormErrors] = useState({});
   const [familySaving, setFamilySaving] = useState(false);
   const [familyFormError, setFamilyFormError] = useState('');
 
+  /* ── Password Change state ── */
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   /* ── Delete confirmation state ── */
   const [deleteTarget, setDeleteTarget] = useState(null); // member id
 
@@ -270,6 +280,64 @@ const CustomerProfile = () => {
   };
 
   /* ─────────────────────────────────────────────────
+     UPDATE PASSWORD
+  ───────────────────────────────────────────────── */
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      setPasswordError('Please fill in all password fields.');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('New passwords do not match.');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+
+    try {
+      // Re-authenticate to verify current password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        setPasswordError('Incorrect current password.');
+        setIsUpdatingPassword(false);
+        return;
+      }
+
+      // Update password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) {
+        setPasswordError(updateError.message);
+      } else {
+        setPasswordSuccess('Password updated successfully!');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+        setToast({ message: 'Password updated successfully!', type: 'success' });
+      }
+    } catch (err) {
+      console.error('Password update error:', err);
+      setPasswordError('An unexpected error occurred.');
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
+  /* ─────────────────────────────────────────────────
      ADD / EDIT FAMILY MEMBER
   ───────────────────────────────────────────────── */
   const openFamilyModal = (member = null) => {
@@ -280,11 +348,17 @@ const CustomerProfile = () => {
         name: member.name || '',
         relationship: member.relationship || '',
         age: member.age || '',
-        gender: member.gender || ''
+        gender: member.gender || '',
+        phone: member.phone || '',
+        email: member.email || '',
+        location: member.location || '',
+        area: member.area || '',
+        city: member.city || '',
+        pincode: member.pincode || ''
       });
     } else {
       setEditingFamilyMemberId(null);
-      setFamilyForm({ name: '', relationship: '', age: '', gender: '' });
+      setFamilyForm({ name: '', relationship: '', age: '', gender: '', phone: '', email: '', location: '', area: '', city: '', pincode: '' });
     }
     setFamilyFormErrors({});
     setFamilyFormError('');
@@ -334,7 +408,13 @@ const CustomerProfile = () => {
         name: familyForm.name.trim(),
         relationship: familyForm.relationship,
         age: familyForm.age ? parseInt(familyForm.age, 10) : null,
-        gender: familyForm.gender || null
+        gender: familyForm.gender || null,
+        phone: familyForm.phone || null,
+        email: familyForm.email || null,
+        location: familyForm.location || null,
+        area: familyForm.area || null,
+        city: familyForm.city || null,
+        pincode: familyForm.pincode || null
       };
 
       if (editingFamilyMemberId) {
@@ -662,6 +742,84 @@ const CustomerProfile = () => {
                     </select>
                   </div>
                 </div>
+                
+                <h4 style={{ margin: '20px 0 10px', fontSize: '0.9rem', color: '#0f172a' }}>Contact & Address Details (Optional)</h4>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="family-phone" className="form-label">Phone Number</label>
+                    <input
+                      id="family-phone"
+                      type="tel"
+                      className="form-input"
+                      value={familyForm.phone}
+                      onChange={e => setFamilyForm(prev => ({ ...prev, phone: e.target.value }))}
+                      placeholder="e.g. +91 9876543210"
+                      disabled={familySaving}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="family-email" className="form-label">Email Address</label>
+                    <input
+                      id="family-email"
+                      type="email"
+                      className="form-input"
+                      value={familyForm.email}
+                      onChange={e => setFamilyForm(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="e.g. name@example.com"
+                      disabled={familySaving}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="family-location" className="form-label">Location (House No, Street, Landmark)</label>
+                  <input
+                    id="family-location"
+                    type="text"
+                    className="form-input"
+                    value={familyForm.location}
+                    onChange={e => setFamilyForm(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder="e.g. Flat 401, Galaxy Apts"
+                    disabled={familySaving}
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="family-area" className="form-label">Area / Locality</label>
+                    <input
+                      id="family-area"
+                      type="text"
+                      className="form-input"
+                      value={familyForm.area}
+                      onChange={e => setFamilyForm(prev => ({ ...prev, area: e.target.value }))}
+                      disabled={familySaving}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="family-city" className="form-label">City</label>
+                    <input
+                      id="family-city"
+                      type="text"
+                      className="form-input"
+                      value={familyForm.city}
+                      onChange={e => setFamilyForm(prev => ({ ...prev, city: e.target.value }))}
+                      disabled={familySaving}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="family-pincode" className="form-label">Pincode</label>
+                    <input
+                      id="family-pincode"
+                      type="text"
+                      className="form-input"
+                      value={familyForm.pincode}
+                      onChange={e => setFamilyForm(prev => ({ ...prev, pincode: e.target.value }))}
+                      disabled={familySaving}
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="modal-footer">
@@ -868,6 +1026,89 @@ const CustomerProfile = () => {
                     </span>
                   </div>
                 </div>
+              </div>
+
+              {/* SECURITY & PASSWORD CARD */}
+              <div className="info-card" style={{ marginTop: '24px' }}>
+                <div className="info-card-header" style={{ marginBottom: '16px' }}>
+                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                    <Lock size={16} color="#854d0e" /> Security & Password
+                  </h4>
+                </div>
+                
+                {passwordError && (
+                  <div className="form-alert form-alert--error" style={{ marginBottom: '16px' }}>
+                    <AlertCircle size={15} />
+                    <span>{passwordError}</span>
+                  </div>
+                )}
+                {passwordSuccess && (
+                  <div className="form-alert form-alert--success" style={{ marginBottom: '16px' }}>
+                    <CheckCircle size={15} />
+                    <span>{passwordSuccess}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleUpdatePassword}>
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', marginBottom: '6px' }}>Current Password</label>
+                    <input 
+                      type="password" 
+                      className="form-input" 
+                      placeholder="Enter current password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      style={{ background: '#fff' }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', marginBottom: '6px' }}>New Password</label>
+                    <input 
+                      type="password" 
+                      className="form-input" 
+                      placeholder="At least 6 characters"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      style={{ background: '#fff' }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.05em', marginBottom: '6px' }}>Confirm New Password</label>
+                    <input 
+                      type="password" 
+                      className="form-input" 
+                      placeholder="Re-enter new password"
+                      value={confirmNewPassword}
+                      onChange={(e) => setConfirmNewPassword(e.target.value)}
+                      style={{ background: '#fff' }}
+                    />
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                    <button 
+                      type="submit" 
+                      className="btn-primary" 
+                      disabled={isUpdatingPassword}
+                      style={{ padding: '0.7rem 1.5rem', fontWeight: '600', flex: 1, justifyContent: 'center' }}
+                    >
+                      {isUpdatingPassword ? 'UPDATING...' : 'UPDATE PASSWORD'}
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn-secondary"
+                      onClick={() => {
+                        setCurrentPassword('');
+                        setNewPassword('');
+                        setConfirmNewPassword('');
+                        setPasswordError('');
+                        setPasswordSuccess('');
+                      }}
+                      style={{ padding: '0.7rem 1.5rem', fontWeight: '600', flex: 1, justifyContent: 'center' }}
+                    >
+                      CANCEL
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
