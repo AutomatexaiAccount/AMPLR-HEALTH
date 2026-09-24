@@ -27,7 +27,7 @@ const CustomerLogin = () => {
     try {
       if (isSignUp) {
         // Sign Up Flow
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -39,6 +39,12 @@ const CustomerLogin = () => {
         });
 
         if (signUpError) throw signUpError;
+        
+        // Supabase returns an empty identities array if the email is already registered (and email enumeration protection is on)
+        if (data?.user?.identities?.length === 0) {
+          throw new Error('This email ID is already registered with us, please try with another email ID');
+        }
+
         setSuccess("You have successfully registered! To activate your account, please verify your email address using the link sent to your email. If it's not in your inbox, please check your spam folder, activate it, and then you can log in.");
         setIsSignUp(false); // Switch to login after successful signup
         
@@ -62,7 +68,7 @@ const CustomerLogin = () => {
       }
     } catch (err) {
       if (err.message === 'User already registered') {
-        setError('This email is already registered with us. Please use another email address or sign in.');
+        setError('This email ID is already registered with us, please try with another email ID');
       } else {
         setError(err.message || 'Authentication failed. Please try again.');
       }
