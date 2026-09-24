@@ -3,31 +3,29 @@
 .auth-page-wrapper {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
   background-color: #f1f5f9;
-  padding: 2rem;
+  padding: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .auth-container {
   display: flex;
   width: 100%;
-  max-width: 1100px;
-  min-height: 650px;
+  max-width: none;
+  min-height: 100vh;
   background: white;
-  border-radius: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  border-radius: 0;
+  box-shadow: none;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: none;
 }
 
 /* Left Presentation Side */
 .auth-presentation {
   flex: 1.2;
   position: relative;
-  background: linear-gradient(135deg, var(--navy-dark) 0%, #1e293b 100%);
-  color: white;
+  background: #000000;
+  color: #ffffff;
   padding: 4rem;
   display: flex;
   flex-direction: column;
@@ -41,8 +39,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(circle at 20% 150%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
-                    radial-gradient(circle at 80% -20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+  background-image: radial-gradient(circle at 20% 150%, rgba(220, 38, 38, 0.2) 0%, transparent 50%),
+                    radial-gradient(circle at 80% -20%, rgba(59, 130, 246, 0.2) 0%, transparent 50%);
   z-index: 1;
 }
 
@@ -55,16 +53,18 @@
 }
 
 .auth-brand-logo {
-  display: inline-block;
-  margin-bottom: 4rem;
+  display: block;
+  margin: 0 auto 2.5rem auto;
+  text-align: center;
 }
 
 .auth-brand-logo img {
-  height: 52px;
+  height: 85px;
   background: white;
-  padding: 6px;
-  border-radius: 12px;
+  padding: 8px;
+  border-radius: 16px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: inline-block;
 }
 
 .presentation-text h1 {
@@ -73,6 +73,7 @@
   line-height: 1.1;
   margin-bottom: 1.5rem;
   letter-spacing: -1px;
+  color: #ffffff !important;
 }
 
 .text-gradient {
@@ -84,7 +85,7 @@
 .presentation-text p {
   font-size: 1.15rem;
   line-height: 1.6;
-  color: #cbd5e1;
+  color: #f8fafc !important;
   max-width: 90%;
   margin-bottom: 3rem;
 }
@@ -99,20 +100,20 @@
 .auth-badge {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   padding: 1rem 1.5rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   font-size: 1.05rem;
   font-weight: 500;
-  color: #f8fafc;
+  color: #ffffff !important;
   transition: transform 0.3s ease, background 0.3s ease;
 }
 
 .auth-badge:hover {
   transform: translateX(10px);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .badge-icon {
@@ -208,11 +209,13 @@
   transform: translateY(-50%);
   color: #94a3b8;
   transition: color 0.3s ease;
+  z-index: 10;
 }
 
 .form-input {
   width: 100%;
-  padding: 1.1rem 1.25rem 1.1rem 3.25rem;
+  box-sizing: border-box !important;
+  padding: 1.1rem 1.25rem 1.1rem 3.25rem !important;
   border: 2px solid #e2e8f0;
   border-radius: 14px;
   font-size: 1rem;
@@ -325,36 +328,44 @@
 
 @media (max-width: 868px) {
   .auth-page-wrapper {
-    padding: 1rem;
-    align-items: flex-start;
+    padding: 0;
+    align-items: stretch;
+    background-color: #ffffff;
   }
   
   .auth-container {
     flex-direction: column;
-    border-radius: 16px;
-    min-height: auto;
+    border-radius: 0;
+    min-height: 100vh;
   }
   
   .auth-presentation {
-    padding: 2.5rem 1.5rem;
+    padding: 2.5rem 1.5rem 3rem 1.5rem;
     flex: none;
+    border-radius: 0 0 30px 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 10;
   }
   
   .presentation-text h1 {
     font-size: 2.2rem;
+    text-align: center;
   }
   
   .presentation-text p {
     font-size: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 0;
+    text-align: center;
   }
   
   .auth-brand-logo {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
   }
   
   .auth-brand-logo img {
-    height: 40px;
+    height: 60px;
   }
   
   .presentation-badges {
@@ -363,9 +374,17 @@
   
   .auth-form-section {
     padding: 2.5rem 1.5rem;
+    align-items: flex-start;
+    background: #ffffff;
+    flex: 1;
   }
   
   .form-header h2 {
     font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .form-header p {
+    text-align: center;
   }
 }

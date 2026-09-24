@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Mail, Lock, User, ShieldCheck, HeartPulse, Stethoscope, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, ShieldCheck, HeartPulse, Stethoscope, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import './CustomerLogin.css';
 
 const CustomerLogin = () => {
@@ -12,6 +12,7 @@ const CustomerLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,6 +66,27 @@ const CustomerLogin = () => {
       } else {
         setError(err.message || 'Authentication failed. Please try again.');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address first to reset your password.");
+      return;
+    }
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setSuccess("Password reset link has been sent to your email.");
+    } catch (err) {
+      setError(err.message || "Failed to send reset link.");
     } finally {
       setLoading(false);
     }
@@ -160,19 +182,38 @@ const CustomerLogin = () => {
               </div>
 
               <div className="input-field-wrapper">
-                <label htmlFor="password">Password</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label htmlFor="password" style={{ marginBottom: 0 }}>Password</label>
+                  {!isSignUp && (
+                    <button 
+                      type="button" 
+                      onClick={handleForgotPassword}
+                      style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer', padding: 0 }}
+                    >
+                      Forgot Password?
+                    </button>
+                  )}
+                </div>
                 <div className="input-group">
                   <Lock size={18} className="input-icon" />
                   <input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     className="form-input"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
+                    style={{ paddingRight: '45px' }}
                   />
+                  <button 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: 0 }}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 

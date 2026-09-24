@@ -124,9 +124,6 @@ const AdminLogin = () => {
         <div className="admin-right-content">
           
           <div className="login-header">
-            <div className="shield-icon-wrapper">
-              <Shield size={24} color="#0f172a" />
-            </div>
             <h2>Welcome Back</h2>
             <p>Please enter your credentials to access the dashboard.</p>
           </div>
@@ -143,6 +140,7 @@ const AdminLogin = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@amplrhealth.com"
                   required
+                  style={{ paddingLeft: '2.75rem' }}
                 />
               </div>
             </div>
