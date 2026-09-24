@@ -98,6 +98,12 @@ const CustomerProfile = () => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
+  /* ── Bookings state ── */
+  const [bookings, setBookings] = useState([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState('');
+
   /* ── Delete confirmation state ── */
   const [deleteTarget, setDeleteTarget] = useState(null); // member id
 
@@ -160,11 +166,39 @@ const CustomerProfile = () => {
     setFamilyLoading(false);
   }, [user]);
 
+  /* ── Fetch bookings when History tab is active ── */
+  const fetchBookings = useCallback(async () => {
+    if (!user) return;
+    setBookingsLoading(true);
+    setBookingsError('');
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*, services(title), family_members(name, relationship)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Bookings fetch error:', error);
+        setBookingsError('Unable to load service history. Please try again.');
+      } else {
+        setBookings(data || []);
+      }
+    } catch (err) {
+      console.error('Unexpected error fetching bookings:', err);
+      setBookingsError('Something went wrong. Please try again.');
+    }
+    setBookingsLoading(false);
+  }, [user]);
+
   useEffect(() => {
     if (activeTab === 'family' && user) {
       fetchFamilyMembers();
     }
-  }, [activeTab, user, fetchFamilyMembers]);
+    if (activeTab === 'history' && user) {
+      fetchBookings();
+    }
+  }, [activeTab, user, fetchFamilyMembers, fetchBookings]);
 
   /* ── Logout ── */
   const handleLogout = async () => {
@@ -1119,24 +1153,81 @@ const CustomerProfile = () => {
               <h2 className="profile-section-title">
                 <History size={18} aria-hidden="true" /> Service History
               </h2>
-              <div className="history-list">
-                <div className="empty-state">
-                  <div className="empty-icon-wrap">
-                    <History size={28} aria-hidden="true" />
-                  </div>
-                  <h3>No service history yet</h3>
-                  <p>
-                    Book a service with AMPLR Health and your appointments will appear here.
-                  </p>
-                  <button
-                    onClick={() => navigate('/')}
-                    className="btn-primary mt-3"
-                    style={{ borderRadius: '8px', padding: '0.65rem 1.5rem', fontSize: '0.92rem' }}
-                  >
-                    <Home size={15} /> Explore Services
-                  </button>
+              
+              {bookingsLoading ? (
+                <div className="profile-loading" style={{ minHeight: '200px' }}>
+                  <Loader2 size={24} className="spinner" />
+                  <span>Loading history…</span>
                 </div>
-              </div>
+              ) : bookingsError ? (
+                <div className="form-alert form-alert--error">
+                  <AlertCircle size={15} />
+                  <span>{bookingsError}</span>
+                </div>
+              ) : bookings.length > 0 ? (
+                <div className="history-list">
+                  {bookings.map(booking => (
+                    <div className="info-card" key={booking.id} style={{ marginBottom: '1rem', padding: '1.25rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                        <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a' }}>
+                          {booking.services?.title || 'Unknown Service'}
+                        </h4>
+                        <span style={{
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          padding: '3px 8px',
+                          borderRadius: '12px',
+                          backgroundColor: booking.status === 'Completed' ? '#dcfce7' : booking.status === 'Cancelled' ? '#fee2e2' : '#fef3c7',
+                          color: booking.status === 'Completed' ? '#16a34a' : booking.status === 'Cancelled' ? '#dc2626' : '#d97706'
+                        }}>
+                          {booking.status}
+                        </span>
+                      </div>
+                      <div className="info-row" style={{ padding: '4px 0' }}>
+                        <span className="info-label">Booked For</span>
+                        <span className="info-value">
+                          {booking.family_members 
+                            ? `${booking.family_members.name} (${booking.family_members.relationship})` 
+                            : 'Self'}
+                        </span>
+                      </div>
+                      <div className="info-row" style={{ padding: '4px 0' }}>
+                        <span className="info-label">Date</span>
+                        <span className="info-value">
+                          {new Date(booking.created_at).toLocaleDateString('en-IN', {
+                            day: 'numeric', month: 'short', year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                      <div className="info-row" style={{ padding: '4px 0', borderBottom: 'none' }}>
+                        <span className="info-label">Amount</span>
+                        <span className="info-value" style={{ fontWeight: 600 }}>
+                          ₹{booking.amount}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="history-list">
+                  <div className="empty-state">
+                    <div className="empty-icon-wrap">
+                      <History size={28} aria-hidden="true" />
+                    </div>
+                    <h3>No service history yet</h3>
+                    <p>
+                      Book a service with AMPLR Health and your appointments will appear here.
+                    </p>
+                    <button
+                      onClick={() => navigate('/')}
+                      className="btn-primary mt-3"
+                      style={{ borderRadius: '8px', padding: '0.65rem 1.5rem', fontSize: '0.92rem' }}
+                    >
+                      <Home size={15} /> Explore Services
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
