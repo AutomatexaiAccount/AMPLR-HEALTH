@@ -6,15 +6,13 @@ import DynamicFormModal from '../components/DynamicFormModal';
 
 const partnerForms = [
   { name: "Partner Ambulance", formKey: "ambulance" },
-  { name: "Partner Care Taker", formKey: "ambulance" },
+  { name: "Partner Care Taker", formKey: "caretaker" },
   { name: "Partner Doctor Consultation", formKey: "doctor" },
   { name: "Partner ECG at Home", formKey: "ecg" },
   { name: "Partner Hospital/Clinic Tie-up", formKey: "hospital" },
   { name: "Partner Lab Sample Collection", formKey: "lab_technician" },
   { name: "Partner Nursing Service", formKey: "nursing" },
-  { name: "Partner Physiotherapy", formKey: "physiotherapy" },
-  { name: "Telugu Customer Form", formKey: "customer_telugu" },
-  { name: "English Customer Form", formKey: "customer_english" },
+  { name: "Partner Physiotherapy", formKey: "physiotherapy" }
 ];
 
 const BecomePartner = () => {
@@ -68,7 +66,7 @@ const BecomePartner = () => {
             {partnerForms.map((form, index) => (
               <button 
                 key={index} 
-                onClick={() => setActiveFormKey(form.formKey)}
+                onClick={() => form.link ? window.open(form.link, "_blank") : setActiveFormKey(form.formKey)}
                 style={{ 
                   background: '#f8fafc', 
                   padding: '1.5rem', 

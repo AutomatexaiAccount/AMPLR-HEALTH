@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate 
 import { 
   HeartPulse, Menu, X, PhoneCall, MessageCircle, Phone, Mail, MapPin, ShieldCheck, ChevronRight, Clock, Calendar, Ambulance, Stethoscope, Activity, Search, User, LogOut
 } from 'lucide-react';
+import WhatsAppIcon from './components/WhatsAppIcon';
 import { supabase } from './lib/supabase';
 import Home from './pages/Home';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -18,6 +19,7 @@ import DoctorConsultation from './pages/services/DoctorConsultation';
 import AmbulanceServices from './pages/services/AmbulanceServices';
 import HospitalAssistance from './pages/services/HospitalAssistance';
 import BecomePartner from './pages/BecomePartner';
+import BookAService from './pages/BookAService';
 import ContactUs from './pages/ContactUs';
 import WhyAmplr from './pages/WhyAmplr';
 import Offers from './pages/Offers';
@@ -182,7 +184,7 @@ const BookingModal = ({ isOpen, onClose, redirectUrl }) => {
             </div>
           </div>
           <button type="submit" className="booking-modal-submit">
-            <MessageCircle size={18} />
+            <WhatsAppIcon size={18} />
             Continue to WhatsApp
           </button>
         </form>
@@ -386,12 +388,6 @@ function AppContent() {
                 </Link>
               )}
               <span className="divider" aria-hidden="true" style={{ color: 'var(--border-strong)' }}>|</span>
-
-              <a href="#" onClick={openBookingModal} className="btn-primary-nav" style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}>
-                <MessageCircle size={14} aria-hidden="true" />
-                <span>WhatsApp</span>
-              </a>
-              <span className="divider" aria-hidden="true" style={{ color: 'var(--border-strong)' }}>|</span>
               <a href="mailto:amplrhealth@gmail.com" className="top-link">
                 <Mail size={13} /> <span className="top-link-text">amplrhealth@gmail.com</span>
               </a>
@@ -554,14 +550,6 @@ function AppContent() {
                 >
                   <Search size={18} />
                 </button>
-                <a
-                  href="#"
-                  onClick={openBookingModal}
-                  className="mobile-icon-btn wa-btn"
-                  aria-label="Book on WhatsApp"
-                >
-                  <MessageCircle size={18} aria-hidden="true" />
-                </a>
                 <button
                   className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
                   onClick={mobileMenuOpen ? closeMenu : openMenu}
@@ -834,9 +822,7 @@ function AppContent() {
                   )}
                 </div>
 
-                <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); openBookingModal(); }} className="mobile-link">
-                  <span>Book a Service</span><ChevronRight size={16} />
-                </a>
+
                 <Link to="/partner" onClick={closeMenu} className="mobile-link">
                   <span>Become a Partner</span><ChevronRight size={16} />
                 </Link>
@@ -856,12 +842,7 @@ function AppContent() {
                 )}
               </nav>
 
-              {/* CTA buttons */}
-              <div className="mobile-drawer-cta">
-                <a href="#" onClick={(e) => { e.preventDefault(); closeMenu(); openBookingModal(); }} className="btn-primary full-width">
-                  <MessageCircle size={18} /> Book Instant on WhatsApp
-                </a>
-              </div>
+
             </div>
           </div>
         </header>
@@ -888,6 +869,7 @@ function AppContent() {
           <Route path="/services/ambulance-services" element={<AmbulanceServices />} />
           <Route path="/services/hospital-assistance" element={<HospitalAssistance />} />
           <Route path="/partner" element={<BecomePartner />} />
+          <Route path="/book-a-service" element={<BookAService />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/why-amplr" element={<WhyAmplr />} />
           
@@ -926,64 +908,83 @@ function AppContent() {
           <div className="container">
             <div className="footer-top-grid">
               {/* Brand Col */}
-              <div className="footer-col-brand">
-                <h3 className="footer-brand-title" style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--navy-dark)' }}>AMPLR HEALTH SERVICES</h3>
-                <p className="footer-brand-tagline" style={{ fontStyle: 'italic', marginBottom: '1rem', color: 'var(--brand-primary)' }}>
+              <div className="footer-col footer-box">
+                <h3 className="footer-brand-title" style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.25rem', color: 'var(--navy-dark)' }}>AMPLR HEALTH SERVICES</h3>
+                <p className="footer-brand-tagline" style={{ fontStyle: 'italic', marginBottom: '1rem', color: '#e11d48' /* Red accent matching the design */ }}>
                   Brings Hospital Care to Your Home
                 </p>
-                <p className="footer-brand-services" style={{ fontSize: '0.9rem', lineHeight: '1.6', color: 'var(--slate-dark)' }}>
-                  Home Healthcare | Lab Sample Collection | Nursing | Caregiver | Physiotherapy | ECG at Home | Doctor Virtual Consultation | Ambulance
-                </p>
+                <div className="footer-services-grid">
+                  <ul className="footer-link-list">
+                    <li><Link to="/services/lab-blood-collection">Lab Sample Collection</Link></li>
+                    <li><Link to="/services/nursing-services">Nursing</Link></li>
+                    <li><Link to="/services/caregiver-caretaker">Caretaker/Caregiver</Link></li>
+                    <li><Link to="/services/physiotherapy">Physiotherapy</Link></li>
+                  </ul>
+                  <ul className="footer-link-list">
+                    <li><Link to="/services/ecg-at-home">ECG at Home</Link></li>
+                    <li><Link to="/services/doctor-consultation">Doctor Virtual Consultation</Link></li>
+                    <li><Link to="/services/ambulance-services">Ambulance</Link></li>
+                    <li><Link to="/services/hospital-assistance">Hospital Assistance</Link></li>
+                  </ul>
+                </div>
               </div>
 
               {/* Quick Links Col */}
-              <div className="footer-col">
+              <div className="footer-col footer-box">
                 <h4 className="footer-heading">Quick Links</h4>
-                <ul className="footer-link-list">
-                  <li><Link to="/"><ChevronRight size={14} /> Home</Link></li>
-                  <li><Link to="/#about"><ChevronRight size={14} /> About Us</Link></li>
-                  <li><Link to="/why-amplr"><ChevronRight size={14} /> Why AMPLR?</Link></li>
-                  <li><Link to="/#services"><ChevronRight size={14} /> Services</Link></li>
-                  <li><Link to="/#how-it-works"><ChevronRight size={14} /> How It Works</Link></li>
-                  <li><Link to="/partner"><ChevronRight size={14} /> Partner With Us</Link></li>
-                  <li><Link to="/contact"><ChevronRight size={14} /> Contact Us</Link></li>
-                  <li><Link to="/privacy"><ChevronRight size={14} /> Privacy Policy</Link></li>
-                  <li><Link to="/terms"><ChevronRight size={14} /> Terms & Conditions</Link></li>
-                </ul>
+                <div className="footer-services-grid">
+                  <ul className="footer-link-list">
+                    <li><Link to="/">Home</Link></li>
+                    <li><Link to="/#about">About Us</Link></li>
+                    <li><Link to="/why-amplr">Why AMPLR?</Link></li>
+                    <li><Link to="/#services">Services</Link></li>
+                  </ul>
+                  <ul className="footer-link-list">
+                    <li><Link to="/#how-it-works">How It Works</Link></li>
+                    <li><Link to="/book-a-service">Book a Service</Link></li>
+                    <li><Link to="/partner">Partner With Us</Link></li>
+                    <li><Link to="/contact">Contact Us</Link></li>
+                  </ul>
+                </div>
               </div>
 
               {/* Support Col */}
-              <div className="footer-col">
+              <div className="footer-col footer-box">
                 <h4 className="footer-heading">Support</h4>
                 <ul className="footer-link-list">
-                  <li><a href="#" onClick={openBookingModal}><ChevronRight size={14} /> WhatsApp</a></li>
-                  <li><Link to="/contact"><ChevronRight size={14} /> Customer Support</Link></li>
-                  <li><a href={`tel:${phoneCallNumber}`}><ChevronRight size={14} /> Emergency Assistance</a></li>
-                  <li><Link to="/contact"><ChevronRight size={14} /> Service Availability</Link></li>
+                  <li><a href="#" onClick={openBookingModal}>WhatsApp</a></li>
+                  <li><Link to="/contact">Customer Support</Link></li>
+                  <li><a href={`tel:${phoneCallNumber}`}>Emergency Assistance</a></li>
+                  <li><Link to="/contact">Service Availability</Link></li>
                 </ul>
               </div>
 
               {/* Legal Col */}
-              <div className="footer-col">
+              <div className="footer-col footer-box">
                 <h4 className="footer-heading">Legal</h4>
                 <ul className="footer-link-list">
-                  <li><Link to="/privacy"><ChevronRight size={14} /> Privacy Policy</Link></li>
-                  <li><Link to="/terms"><ChevronRight size={14} /> Terms & Conditions</Link></li>
-                  <li><Link to="/cancellation-refund"><ChevronRight size={14} /> Cancellation & Refund Policy</Link></li>
-                  <li><Link to="/disclaimer"><ChevronRight size={14} /> Healthcare Disclaimer</Link></li>
+                  <li><Link to="/privacy">Privacy Policy</Link></li>
+                  <li><Link to="/terms">Terms & Conditions</Link></li>
+                  <li><Link to="/cancellation-refund">Cancellation & Refund Policy</Link></li>
+                  <li><Link to="/disclaimer">Healthcare Disclaimer</Link></li>
                 </ul>
               </div>
             </div>
 
             <div className="footer-disclaimer-section" style={{ marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid var(--border-subtle)', textAlign: 'justify' }}>
-              <p style={{ fontSize: '0.85rem', color: 'var(--slate-medium)', lineHeight: '1.6' }}>
+              <p className="footer-disclaimer-text" style={{ color: 'var(--slate-medium)', lineHeight: '1.6' }}>
                 <strong style={{ color: 'var(--navy-dark)' }}>Important Healthcare Disclaimer</strong> AMPLR HEALTH SERVICES facilitates and coordinates healthcare services through healthcare professionals and service providers. Service availability, clinical suitability, pricing and outcomes may vary depending on the service, patient requirement, location and assigned service provider. AMPLR HEALTH SERVICES does not replace emergency medical care. In an emergency, please contact the appropriate emergency medical services or visit the nearest hospital.
               </p>
             </div>
 
             <div className="footer-bottom-bar">
-              <div className="footer-bottom-inner" style={{ justifyContent: 'center' }}>
+              <div className="footer-bottom-inner" style={{ justifyContent: 'center', flexDirection: 'column' }}>
                 <p>&copy; AMPLR HEALTH SERVICES. All Rights Reserved.</p>
+                <p style={{ marginTop: '0.5rem' }}>
+                  <a href="mailto:amplrhealth@gmail.com" style={{ color: 'var(--navy-muted)', textDecoration: 'none' }}>
+                    amplrhealth@gmail.com
+                  </a>
+                </p>
               </div>
             </div>
           </div>
@@ -997,7 +998,7 @@ function AppContent() {
             <span>Call: 7997888448</span>
           </a>
           <a href="#" onClick={openBookingModal} className="bottom-bar-btn whatsapp">
-            <MessageCircle size={18} />
+            <WhatsAppIcon size={18} />
             <span>WhatsApp Us</span>
           </a>
           <Link to="/services/ambulance-services" className="bottom-bar-btn ambulance">
@@ -1023,3 +1024,4 @@ function App() {
 }
 
 export default App;
+

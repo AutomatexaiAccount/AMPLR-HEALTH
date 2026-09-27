@@ -27,6 +27,28 @@ export const partnerFormsData = {
       { name: "declaration", label: "DECLARATION & CONSENT", type: "checkbox", options: ["I confirm that the information provided is true and accurate..."], required: true }
     ]
   },
+  "caretaker": {
+    title: "AMPLR Health – Caretaker / Caregiver Registration Form",
+    description: "Join with AMPLR Health as a Caretaker/Caregiver and provide professional care at patients' homes. Please submit your basic personal, qualification, experience, and service-area details.",
+    fields: [
+      { name: "providerName", label: "FULL NAME", type: "text", required: true },
+      { name: "dob", label: "DATE OF BIRTH", type: "date", required: true },
+      { name: "gender", label: "GENDER", type: "radio", options: ["Male", "Female"], required: true },
+      { name: "mobile", label: "CONTACT NUMBER / WHATSAPP NUMBER", type: "tel", required: true },
+      { name: "email", label: "E MAIL ID", type: "email", required: false },
+      { name: "state", label: "STATE", type: "text", required: true },
+      { name: "district", label: "DISTRICT", type: "text", required: true },
+      { name: "city", label: "CITY / TOWN", type: "text", required: true },
+      { name: "address", label: "FULL ADDRESS", type: "textarea", required: true },
+      { name: "qualification", label: "HIGHEST QUALIFICATION / TRAINING", type: "text", required: true },
+      { name: "experience", label: "EXPERIENCE IN YEARS", type: "radio", options: ["Fresher", "1 to 3 years", "3 to 5 years", "5 to 8 years", "More than 8 years"], required: true },
+      { name: "caregiverServices", label: "CARETAKER SERVICES YOU CAN PROVIDE", type: "checkbox", options: ["Elderly Care", "Patient Care", "Baby Care / Nanny", "Post Surgery Care", "Bedridden Patient Care", "Other"], required: true },
+      { name: "preferredTimings", label: "PREFERRED TIMINGS / SHIFTS", type: "checkbox", options: ["12 Hours Day Shift", "12 Hours Night Shift", "24 Hours Shift", "Live-in Care", "On Call"], required: true },
+      { name: "serviceAreas", label: "PREFERRED SERVICE AREAS (Example: Kurnool, Nandyal, Anantapur)", type: "text", required: true },
+      { name: "docsInfo1", label: "REQUIRED DOCUMENTS", type: "document_notice", text: "Please prepare to share: Qualification/Training Certificate (if any), Govt Address Proof (Aadhar), and Passport Photo.", required: false },
+      { name: "declaration", label: "DECLARATION & CONSENT", type: "checkbox", options: ["I confirm that the information provided by me is true and accurate..."], required: true }
+    ]
+  },
   "doctor": {
     title: "AMPLR Health – Doctor Registration Form",
     description: "Join with AMPLR Health as a Doctor and provide convenient, professional healthcare consultations to patients. Please submit your basic qualification, medical registration, specialization, experience, and consultation details.",

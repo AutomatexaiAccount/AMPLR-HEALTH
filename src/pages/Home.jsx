@@ -1,3 +1,4 @@
+import WhatsAppIcon from '../components/WhatsAppIcon';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
@@ -67,8 +68,8 @@ const Home = () => {
             </p>
 
             <div className="hero-buttons">
-              <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-primary hero-btn-main" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-booking-modal', { detail: { redirect: waLink } })); }}>
-                <MessageCircle size={20} />
+              <a href={waLink} target="_blank" rel="noopener noreferrer" className="btn-whatsapp hero-btn-main" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', borderRadius: '8px' }} onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('open-booking-modal', { detail: { redirect: waLink } })); }}>
+                <WhatsAppIcon size={20} />
                 <span>Book on WhatsApp</span>
               </a>
               <a href={`tel:${phoneCallNumber}`} className="btn-secondary hero-btn-sub">
@@ -266,7 +267,7 @@ const Home = () => {
             </div>
 
             <div className="why-card">
-              <div className="why-icon"><MessageCircle size={32} /></div>
+              <div className="why-icon"><WhatsAppIcon size={32} /></div>
               <h4>Easy Booking</h4>
               <p>Book through WhatsApp or our online service request system.</p>
             </div>
