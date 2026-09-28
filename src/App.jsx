@@ -206,6 +206,7 @@ function AppContent() {
   const hideFooter = hideHeaderFooter;
 
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -244,6 +245,30 @@ function AppContent() {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Fetch user profile when user changes
+  useEffect(() => {
+    if (user) {
+      const fetchProfile = async () => {
+        const { data } = await supabase.from('users').select('avatar_url, full_name').eq('id', user.id).single();
+        if (data) setUserProfile(data);
+      };
+      fetchProfile();
+    } else {
+      setUserProfile(null);
+    }
+  }, [user]);
+
+  // Listen for custom profile update events (e.g. from CustomerProfile.jsx)
+  useEffect(() => {
+    const handleProfileUpdate = (e) => {
+      if (e.detail) {
+        setUserProfile(prev => ({ ...prev, ...e.detail }));
+      }
+    };
+    window.addEventListener('profile-updated', handleProfileUpdate);
+    return () => window.removeEventListener('profile-updated', handleProfileUpdate);
+  }, []);
 
   // Listen for booking modal events from other components
   useEffect(() => {
@@ -376,7 +401,12 @@ function AppContent() {
               {user ? (
                 <>
                   <Link to="/profile" className="top-link" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-                    <User size={13} /> <span className="top-link-text">My Profile</span>
+                    {userProfile?.avatar_url ? (
+                      <div style={{ width: 22, height: 22, borderRadius: '50%', backgroundImage: `url(${userProfile.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center', marginRight: '2px', border: '1px solid var(--border-subtle)' }} />
+                    ) : (
+                      <User size={14} />
+                    )}
+                    <span className="top-link-text">My Profile</span>
                   </Link>
                   <a href="#" onClick={handleLogout} className="top-link" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--accent-red)' }}>
                     <LogOut size={13} /> <span className="top-link-text">Logout</span>
@@ -527,10 +557,21 @@ function AppContent() {
                   <Link
                     to="/profile"
                     className="mobile-icon-btn profile-btn"
-                    style={{ background: 'var(--surface)', border: '1px solid var(--border-subtle)', color: 'var(--navy-dark)' }}
+                    style={{ 
+                      background: 'var(--surface)', 
+                      border: '1px solid var(--border-subtle)', 
+                      color: 'var(--navy-dark)',
+                      padding: userProfile?.avatar_url ? 0 : undefined,
+                      overflow: 'hidden',
+                      borderRadius: userProfile?.avatar_url ? '50%' : undefined
+                    }}
                     aria-label="My Profile"
                   >
-                    <User size={18} />
+                    {userProfile?.avatar_url ? (
+                      <div style={{ width: '100%', height: '100%', backgroundImage: `url(${userProfile.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+                    ) : (
+                      <User size={18} />
+                    )}
                   </Link>
                 ) : (
                   <Link

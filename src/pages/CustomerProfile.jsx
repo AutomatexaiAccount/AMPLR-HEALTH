@@ -257,6 +257,10 @@ const CustomerProfile = () => {
 
       // Update local state
       setPublicUser(prev => ({ ...prev, avatar_url: finalUrl }));
+      
+      // Dispatch event so App.jsx can update the navbar instantly
+      window.dispatchEvent(new CustomEvent('profile-updated', { detail: { avatar_url: finalUrl } }));
+      
       showToast('Profile picture updated!', 'success');
 
     } catch (error) {
