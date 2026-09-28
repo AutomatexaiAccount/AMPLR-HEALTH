@@ -1325,8 +1325,11 @@ const AdminDashboard = () => {
                           <tr key={c.id} className="adm-row-click" onClick={() => openCustomerDetail(c)}>
                             <td>
                               <div className="adm-customer-cell">
-                                <div className="adm-customer-avatar">
-                                  {c.full_name ? c.full_name.charAt(0).toUpperCase() : 'A'}
+                                <div 
+                                  className="adm-customer-avatar"
+                                  style={{ backgroundImage: c.avatar_url ? `url(${c.avatar_url})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}
+                                >
+                                  {!c.avatar_url && (c.full_name ? c.full_name.charAt(0).toUpperCase() : 'A')}
                                 </div>
                                 <div>
                                   <div className="adm-cell-main">{c.full_name || 'Anonymous'}</div>
@@ -1441,8 +1444,11 @@ const AdminDashboard = () => {
 
             {/* Profile card */}
             <div className="adm-drawer-profile">
-              <div className="adm-drawer-avatar">
-                {selectedCustomer.full_name ? selectedCustomer.full_name.charAt(0).toUpperCase() : 'A'}
+              <div 
+                className="adm-drawer-avatar"
+                style={{ backgroundImage: selectedCustomer.avatar_url ? `url(${selectedCustomer.avatar_url})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}
+              >
+                {!selectedCustomer.avatar_url && (selectedCustomer.full_name ? selectedCustomer.full_name.charAt(0).toUpperCase() : 'A')}
               </div>
               <div className="adm-drawer-profile-info">
                 <h4 className="adm-drawer-name">{selectedCustomer.full_name || 'Anonymous User'}</h4>

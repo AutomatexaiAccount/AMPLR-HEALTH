@@ -121,6 +121,30 @@
   letter-spacing: -1px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-edit-overlay, .avatar-uploading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.profile-avatar:hover .avatar-edit-overlay {
+  opacity: 1;
+}
+
+.avatar-uploading-overlay {
+  opacity: 1;
 }
 
 .profile-verified-badge {

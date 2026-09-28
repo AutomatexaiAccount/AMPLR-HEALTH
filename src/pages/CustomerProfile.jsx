@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   User, History, Users, LogOut, ChevronRight,
   Edit, Plus, CheckCircle, Home, ArrowLeft, X,
-  Trash2, AlertCircle, Loader2, Lock
+  Trash2, AlertCircle, Loader2, Lock, Camera
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import imageCompression from 'browser-image-compression';
 import './CustomerProfile.css';
 
 /* ── Helper: generate initials from a name or email ── */
@@ -63,6 +64,8 @@ const CustomerProfile = () => {
   const [user, setUser] = useState(null);
   const [publicUser, setPublicUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
   /* ── Family members state ── */
@@ -75,7 +78,7 @@ const CustomerProfile = () => {
 
   /* ── Edit Profile modal state ── */
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editForm, setEditForm] = useState({ fullName: '', phone: '', landmark: '', location: '', pincode: '' });
+  const [editForm, setEditForm] = useState({ fullName: '', phone: '', landmark: '', location: '', pincode: '', gender: '' });
   const [editErrors, setEditErrors] = useState({});
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
@@ -207,6 +210,67 @@ const CustomerProfile = () => {
   };
 
   /* ─────────────────────────────────────────────────
+     AVATAR UPLOAD
+  ───────────────────────────────────────────────── */
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    try {
+      setUploadingAvatar(true);
+      
+      // Compress the image
+      const options = {
+        maxSizeMB: 0.25, // Compress to max 250KB
+        maxWidthOrHeight: 800,
+        useWebWorker: true
+      };
+      
+      const compressedFile = await imageCompression(file, options);
+      
+      // Use the user's ID as the file name so it overwrites the old photo
+      const fileExt = compressedFile.name.split('.').pop();
+      const fileName = `${user.id}-avatar.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      // Upload to Supabase Storage (upsert: true replaces the existing file)
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, compressedFile, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL and add a random timestamp to prevent browser caching
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+        
+      const finalUrl = `${publicUrl}?v=${new Date().getTime()}`;
+
+      // Update the user's record in the database
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ avatar_url: finalUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      setPublicUser(prev => ({ ...prev, avatar_url: finalUrl }));
+      showToast('Profile picture updated!', 'success');
+
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      showToast('Failed to upload avatar. Please try again.', 'error');
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  /* ─────────────────────────────────────────────────
      EDIT PROFILE
   ───────────────────────────────────────────────── */
   const openEditModal = () => {
@@ -215,7 +279,8 @@ const CustomerProfile = () => {
       phone: user?.phone || '',
       landmark: publicUser?.landmark || '',
       location: publicUser?.location || '',
-      pincode: publicUser?.pincode || ''
+      pincode: publicUser?.pincode || '',
+      gender: publicUser?.gender || ''
     });
     setEditErrors({});
     setEditError('');
@@ -280,7 +345,8 @@ const CustomerProfile = () => {
           phone: editForm.phone.trim() || null,
           landmark: editForm.landmark.trim(),
           location: editForm.location.trim(),
-          pincode: editForm.pincode.trim()
+          pincode: editForm.pincode.trim(),
+          gender: editForm.gender || null
         })
         .eq('id', freshUser.id);
         
@@ -290,7 +356,8 @@ const CustomerProfile = () => {
           phone: editForm.phone.trim() || null,
           landmark: editForm.landmark.trim(),
           location: editForm.location.trim(),
-          pincode: editForm.pincode.trim()
+          pincode: editForm.pincode.trim(),
+          gender: editForm.gender || null
         }));
         // Also update user.phone if we want to reflect it locally on the auth object
         if (data.user) {
@@ -548,6 +615,18 @@ const CustomerProfile = () => {
   const displayName = user?.user_metadata?.full_name || 'AMPLR User';
   const initials = getInitials(user?.user_metadata?.full_name, user?.email);
   const isVerified = !!user?.email_confirmed_at;
+  
+  // Default Avatar Logic based on Gender
+  const getDefaultAvatar = () => {
+    if (publicUser?.gender?.toLowerCase() === 'male') {
+      return 'https://api.dicebear.com/7.x/adventurer/svg?seed=Felix&backgroundColor=e2e8f0';
+    } else if (publicUser?.gender?.toLowerCase() === 'female') {
+      return 'https://api.dicebear.com/7.x/adventurer/svg?seed=Mia&backgroundColor=e2e8f0';
+    }
+    return null;
+  };
+  
+  const displayAvatar = publicUser?.avatar_url || getDefaultAvatar();
 
   return (
     <div className="customer-profile-page">
@@ -624,6 +703,22 @@ const CustomerProfile = () => {
                     autoComplete="tel"
                   />
                   {editErrors.phone && <span className="form-error">{editErrors.phone}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="edit-gender" className="form-label">Gender</label>
+                  <select
+                    id="edit-gender"
+                    className="form-input"
+                    value={editForm.gender}
+                    onChange={e => setEditForm(prev => ({ ...prev, gender: e.target.value }))}
+                    disabled={editSaving}
+                  >
+                    <option value="">Select Gender</option>
+                    {GENDER_OPTIONS.map(g => (
+                      <option key={g} value={g}>{g}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group">
                   <label htmlFor="edit-location" className="form-label">Location (City / Area)</label>
@@ -887,9 +982,33 @@ const CustomerProfile = () => {
           {/* Identity Card */}
           <div className="profile-identity-card">
             <div className="profile-avatar-wrap">
-              <div className="profile-avatar" aria-label={`Avatar for ${displayName}`}>
-                {initials}
+              <div 
+                className="profile-avatar" 
+                aria-label={`Avatar for ${displayName}`}
+                onClick={() => fileInputRef.current?.click()}
+                style={{ cursor: 'pointer', backgroundImage: displayAvatar ? `url(${displayAvatar})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}
+              >
+                {!displayAvatar && initials}
+                
+                {uploadingAvatar && (
+                  <div className="avatar-uploading-overlay">
+                    <Loader2 className="spinner" size={24} color="#fff" />
+                  </div>
+                )}
+                
+                {!uploadingAvatar && (
+                  <div className="avatar-edit-overlay">
+                    <Camera size={20} color="#fff" />
+                  </div>
+                )}
               </div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleAvatarUpload} 
+                accept="image/jpeg, image/png, image/webp" 
+                style={{ display: 'none' }} 
+              />
               {isVerified && (
                 <div className="profile-verified-badge" title="Email verified">
                   <CheckCircle size={13} color="#ffffff" strokeWidth={2.5} />
@@ -904,6 +1023,10 @@ const CustomerProfile = () => {
                   <CheckCircle size={11} strokeWidth={2.5} /> Verified Account
                 </span>
               )}
+              <div style={{ marginTop: '0.75rem', fontSize: '0.82rem', color: 'rgba(255, 255, 255, 0.75)', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                <AlertCircle size={14} style={{ marginTop: '2px', flexShrink: 0 }} />
+                <span>Upload a zoomed-in, face-centered photo. Please do not upload inappropriate or explicit photos.</span>
+              </div>
             </div>
           </div>
 
@@ -921,8 +1044,12 @@ const CustomerProfile = () => {
 
           {/* Compact user card */}
           <div className="profile-user-card">
-            <div className="sidebar-avatar" aria-hidden="true">
-              {initials}
+            <div 
+              className="sidebar-avatar" 
+              aria-hidden="true" 
+              style={{ backgroundImage: displayAvatar ? `url(${displayAvatar})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+              {!displayAvatar && initials}
             </div>
             <div className="profile-user-info">
               <h3>{displayName}</h3>
