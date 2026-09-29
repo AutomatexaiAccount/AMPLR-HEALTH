@@ -102,9 +102,12 @@ const CustomerLogin = () => {
       // Ensure the phone number has the country code (assuming India +91 for now)
       const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`;
       
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
-      });
+      const payload = { phone: formattedPhone };
+      if (isSignUp && fullName) {
+        payload.options = { data: { full_name: fullName } };
+      }
+
+      const { error } = await supabase.auth.signInWithOtp(payload);
 
       if (error) throw error;
 
@@ -200,33 +203,51 @@ const CustomerLogin = () => {
               </p>
             </div>
 
-            {/* Login Method Toggle */}
-            {!isSignUp && (
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                <button 
-                  onClick={() => { setLoginMethod('phone'); setError(''); setSuccess(''); setShowOtpInput(false); }}
-                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: loginMethod === 'phone' ? '#ecfdf5' : '#fff', color: loginMethod === 'phone' ? '#059669' : '#64748b', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
-                >
-                  <Phone size={16} /> Mobile OTP
-                </button>
-                <button 
-                  onClick={() => { setLoginMethod('email'); setError(''); setSuccess(''); }}
-                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: loginMethod === 'email' ? '#eff6ff' : '#fff', color: loginMethod === 'email' ? '#2563eb' : '#64748b', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
-                >
-                  <Mail size={16} /> Email & Password
-                </button>
-              </div>
-            )}
+            {/* Login/Signup Method Toggle */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+              <button 
+                type="button"
+                onClick={() => { setLoginMethod('phone'); setError(''); setSuccess(''); setShowOtpInput(false); }}
+                style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: loginMethod === 'phone' ? '#ecfdf5' : '#fff', color: loginMethod === 'phone' ? '#059669' : '#64748b', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+              >
+                <Phone size={16} /> Mobile OTP
+              </button>
+              <button 
+                type="button"
+                onClick={() => { setLoginMethod('email'); setError(''); setSuccess(''); }}
+                style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: loginMethod === 'email' ? '#eff6ff' : '#fff', color: loginMethod === 'email' ? '#2563eb' : '#64748b', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+              >
+                <Mail size={16} /> Email & Password
+              </button>
+            </div>
 
             {error && <div className="auth-alert error-alert">{error}</div>}
             {success && <div className="auth-alert success-alert">{success}</div>}
 
             {/* ===================================== */}
-            {/* PHONE OTP LOGIN FORM */}
+            {/* PHONE OTP FORM (LOGIN/SIGNUP) */}
             {/* ===================================== */}
-            {!isSignUp && loginMethod === 'phone' && (
+            {loginMethod === 'phone' && (
               <form onSubmit={showOtpInput ? handleVerifyOtp : handleSendOtp} className="auth-form">
                 
+                {isSignUp && !showOtpInput && (
+                  <div className="input-field-wrapper" style={{ marginBottom: '15px' }}>
+                    <label htmlFor="phoneFullName">Full Name</label>
+                    <div className="input-group">
+                      <User size={18} className="input-icon" />
+                      <input
+                        id="phoneFullName"
+                        type="text"
+                        className="form-input"
+                        placeholder="John Doe"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        required={isSignUp}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div className="input-field-wrapper">
                   <label htmlFor="phone">Mobile Number</label>
                   <div className="input-group">
@@ -290,7 +311,7 @@ const CustomerLogin = () => {
             {/* ===================================== */}
             {/* EMAIL LOGIN / SIGNUP FORM */}
             {/* ===================================== */}
-            {(isSignUp || (!isSignUp && loginMethod === 'email')) && (
+            {loginMethod === 'email' && (
               <form onSubmit={handleEmailAuth} className="auth-form">
                 
                 {isSignUp && (
