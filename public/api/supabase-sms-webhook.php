@@ -34,15 +34,20 @@ $text = urlencode($message);
 // Construct the Innuvis API URL
 $url = "http://sms.innuvissolutions.com/api/mt/SendSMS?user={$user}&password={$password}&senderid={$senderid}&channel=Trans&DCS=0&flashsms=0&number={$formatted_phone}&text={$text}&route={$route}&Peid={$peid}&DLTTemplateId={$templateid}";
 
-// Send the HTTP Request to the SMS Gateway
-$response = file_get_contents($url);
+// Send the HTTP Request to the SMS Gateway using cURL
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_TIMEOUT, 5); // 5 second timeout
+$response = curl_exec($ch);
+curl_close($ch);
 
 // Return success to Supabase so it knows the SMS was sent
-if ($response) {
+if ($response !== false) {
     http_response_code(200);
     echo json_encode(["success" => true, "gateway_response" => json_decode($response)]);
 } else {
     http_response_code(500);
-    echo json_encode(["error" => "Failed to connect to SMS Gateway"]);
+    echo json_encode(["error" => "Failed to connect to SMS Gateway via cURL"]);
 }
 ?>
