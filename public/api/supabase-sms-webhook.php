@@ -19,7 +19,7 @@ $formatted_phone = str_replace('+', '', $phone);
 // ⚠️ INNUVIS CREDENTIALS (Updated) ⚠️
 // ==========================================
 $user = "AMPLR";        
-$password = "Paas@123";    
+$password = "YOUR_PASSWORD";    
 $senderid = "AMPLRH";   
 $route = "2";       
 $peid = "1701179031390575777";            
