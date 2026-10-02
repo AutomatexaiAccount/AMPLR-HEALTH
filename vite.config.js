@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
                   const data = JSON.parse(body);
                   const fetchFn = globalThis.fetch;
                   
-                  const response = await fetchFn('https://sandbox.cashfree.com/pg/orders', {
+                  const response = await fetchFn('https://api.cashfree.com/pg/orders', {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',

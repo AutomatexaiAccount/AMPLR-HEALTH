@@ -168,7 +168,7 @@ const CartDrawer = () => {
       }
 
       // 2. Initialise Cashfree JS SDK (CDN v3)
-      const cashfree = window.Cashfree({ mode: 'sandbox' });
+      const cashfree = window.Cashfree({ mode: 'production' });
 
       if (mobile) {
         // ── MOBILE: full-page redirect (_self) ──────────────────────────────
