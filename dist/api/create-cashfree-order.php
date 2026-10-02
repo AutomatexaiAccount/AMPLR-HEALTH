@@ -55,7 +55,7 @@ $data = [
     ]
 ];
 
-$ch = curl_init('https://sandbox.cashfree.com/pg/orders');
+$ch = curl_init('https://api.cashfree.com/pg/orders');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));

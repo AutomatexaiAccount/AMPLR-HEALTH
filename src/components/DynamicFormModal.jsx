@@ -74,7 +74,7 @@ const DynamicFormModal = ({ isOpen, onClose, formKey }) => {
       MySwal.fire({
         icon: 'success',
         title: 'Application Submitted!',
-        html: '<p>Thank you. Our team will review your application and contact you soon.</p><p style="margin-top: 15px; color: var(--primary); font-weight: 500;">Please send your relevant documents (ID proof, certificates, etc.) via WhatsApp to <b>7997888448</b> or email to <b>amplrhealth@gmail.com</b> for verification.</p>',
+        html: '<p>Thank you. Our team will review your application and contact you soon.</p><p style="margin-top: 15px; color: var(--primary); font-weight: 500;">Please send your relevant documents (ID proof, certificates, etc.) via WhatsApp to <b>7997888448</b> or email to <b><a href="mailto:amplrhealth@gmail.com?subject=Document%20Submission&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0APlease%20find%20my%20documents%20attached." style="color: inherit; text-decoration: underline;">amplrhealth@gmail.com</a></b> for verification.</p>',
         confirmButtonColor: 'var(--primary)'
       });
       
@@ -187,7 +187,7 @@ const DynamicFormModal = ({ isOpen, onClose, formKey }) => {
                 <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '8px', border: '1px solid #bae6fd', marginBottom: '0.5rem' }}>
                   <p style={{ margin: 0, color: '#0369a1', fontSize: '0.95rem' }}>{field.text}</p>
                   <p style={{ margin: '8px 0 0', color: '#0c4a6e', fontSize: '0.9rem', fontWeight: 600 }}>
-                    Please email these documents to <a href="mailto:amplrhealth@gmail.com" style={{color: 'var(--primary)'}}>amplrhealth@gmail.com</a> or WhatsApp to <a href="https://wa.me/917997888448" target="_blank" style={{color: 'var(--primary)'}}>7997888448</a> after submitting this form.
+                    Please email these documents to <a href="mailto:amplrhealth@gmail.com?subject=Document%20Submission&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0APlease%20find%20my%20documents%20attached." style={{color: 'var(--primary)'}}>amplrhealth@gmail.com</a> or WhatsApp to <a href="https://wa.me/917997888448" target="_blank" style={{color: 'var(--primary)'}}>7997888448</a> after submitting this form.
                   </p>
                 </div>
               )}

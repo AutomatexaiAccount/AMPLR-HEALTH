@@ -138,7 +138,7 @@ const AdminLogin = () => {
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@amplrhealth.com"
+                  placeholder="amplrhealth@gmail.com"
                   required
                   style={{ paddingLeft: '2.75rem' }}
                 />

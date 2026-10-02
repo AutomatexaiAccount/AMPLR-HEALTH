@@ -20,10 +20,10 @@
   --slate-dark: #334155;   /* alias → --navy-light */
 
   /* ── BACKGROUNDS ── */
-  --bg-main: #f8fafc;          /* Main page canvas */
-  --bg-alt: #f1f5f9;           /* Alternate section bg */
-  --surface: #ffffff;          /* Cards, modals, panels */
-  --surface-light: #f8fafc;    /* alias → --bg-main (fixes undefined fallback) */
+  --bg-main: transparent;      /* Transparent so the animated body background shows through */
+  --bg-alt: rgba(241, 245, 249, 0.4); /* Semi-transparent alternate section bg */
+  --surface: rgba(255, 255, 255, 0.85); /* Slightly translucent cards/panels */
+  --surface-light: transparent; /* alias → --bg-main (fixes undefined fallback) */
 
   /* ── SEMANTIC STATUS COLORS ── */
   --success: #16a34a;
@@ -56,14 +56,36 @@ html, body {
   overflow-x: clip;
   width: 100%;
   max-width: 100%;
-  background-color: var(--bg-main);
   color: var(--navy-light);
   line-height: 1.6;
+  /* Ensure html/body never create a new stacking context that clips fixed children */
+  transform: none !important;
+  
+  /* Premium Animated Aurora Background */
+  background: linear-gradient(-45deg, #f8fafc, #e0f2fe, #f3e8ff, #f8fafc, #dcfce7);
+  background-size: 300% 300%;
+  animation: premiumBgPan 25s ease-in-out infinite;
+  background-attachment: fixed; /* Keeps the animation stable while scrolling */
+}
+
+@keyframes premiumBgPan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 img {
   max-width: 100%;
   height: auto;
+}
+
+/* ── HEADER HEIGHT TOKEN ──
+   Update this single value if the header height ever changes.
+   top-bar (~40px) + navbar (~110px with new logo size)
+   On mobile the header is not fixed so this only applies ≥ 1200px.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  --header-height-desktop: 150px;
 }
 
 .app {
@@ -76,6 +98,14 @@ img {
 @media (min-width: 769px) {
   .app {
     padding-bottom: 0;
+  }
+}
+
+/* ── DESKTOP: compensate for fixed header ── */
+@media (min-width: 1200px) {
+  .app {
+    /* Push all page content below the fixed header. */
+    padding-top: var(--header-height-desktop);
   }
 }
 
@@ -114,20 +144,18 @@ a {
 }
 
 .section {
-  padding: clamp(3rem, 5vw, 5rem) 0;
+  padding: 3rem 0;
 }
 
 /* ============================================================
-   TOP BAR — LIGHT THEME
+   TOP BAR — DARK THEME
    ============================================================ */
 .top-bar {
-  background: linear-gradient(90deg, rgba(193, 18, 31, 0.04) 0%, rgba(6, 182, 212, 0.06) 50%, rgba(15, 23, 42, 0.04) 100%);
-  color: var(--navy-dark);
+  background: #020617; /* Very dark navy/black for top bar */
+  color: #f8fafc;
   font-size: 0.82rem;
   padding: 0.6rem 0;
-  border-top: 4px solid;
-  border-image: linear-gradient(to right, #c1121f, #06b6d4, #0f172a) 1;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   z-index: 1002;
 }
@@ -147,7 +175,7 @@ a {
 }
 
 .top-bar-left a {
-  color: var(--primary);
+  color: #38bdf8;
   font-weight: 600;
 }
 
@@ -179,28 +207,58 @@ a {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  color: var(--navy-muted);
+  color: #cbd5e1;
   font-size: 0.8rem;
   transition: color 0.2s ease;
 }
 
 .top-link:hover {
-  color: var(--primary);
+  color: #38bdf8;
 }
 
 .top-bar .divider {
-  color: var(--border-strong);
+  color: rgba(255, 255, 255, 0.2);
 }
 
 /* ============================================================
    MAIN NAVBAR (SOLID, NO GLASSMORPHISM)
    ============================================================ */
+
+/* ── BASE (mobile / tablet): use sticky so it works naturally
+      within the normal document flow. ── */
 .header-sticky-wrapper {
   position: sticky;
   top: 0;
   z-index: 1005;
   width: 100%;
-  background: var(--surface);
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #064e3b 100%);
+  backdrop-filter: blur(10px);
+  /* Crisp shadow so content scrolling underneath is clearly separated */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(to right, #c1121f, #7e22ce, #10b981) 1;
+}
+
+/* ── DESKTOP (≥1200px): switch to fixed.
+      'position: fixed' is relative to the viewport — it is NEVER
+      affected by parent overflow, overflow-x: clip, transforms,
+      will-change or position: relative on any ancestor.
+      This is the permanent production-safe solution. ── */
+@media (min-width: 1200px) {
+  .header-sticky-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    /* Sit above every page element, hero images, modals etc. */
+    z-index: 9000;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #064e3b 100%);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border-bottom: 2px solid transparent;
+    border-image: linear-gradient(to right, #c1121f, #7e22ce, #10b981) 1;
+  }
 }
 
 .navbar-wrapper {
@@ -208,9 +266,9 @@ a {
 }
 
 .navbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: none;
   padding: 0.85rem 0;
 }
 
@@ -230,9 +288,12 @@ a {
 }
 
 .brand-logo-img {
-  height: 72px;
+  height: 84px; /* Increased from 72px */
   width: auto;
   object-fit: contain;
+  background: white;
+  padding: 4px;
+  border-radius: 8px;
 }
 
 /* ── DESKTOP NAV LINKS ── */
@@ -248,16 +309,17 @@ a {
 .nav-item-link {
   font-weight: 500;
   font-size: 0.9rem;
-  color: var(--navy-medium);
+  color: #f1f5f9;
   white-space: nowrap;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease;
   text-decoration: none;
 }
 
 .nav-item-link:hover {
-  color: var(--primary);
+  color: #38bdf8;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* ── DROPDOWN ── */
@@ -272,27 +334,28 @@ a {
   gap: 4px;
   font-weight: 500;
   font-size: 0.9rem;
-  color: var(--navy-medium);
+  color: #f1f5f9;
   white-space: nowrap;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease;
   user-select: none;
 }
 
 .nav-chevron {
   transition: transform 0.2s ease;
   flex-shrink: 0;
-  color: var(--navy-muted);
+  color: #cbd5e1;
 }
 
 .nav-dropdown:hover .nav-dropdown-trigger {
-  color: var(--primary);
+  color: #38bdf8;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .nav-dropdown:hover .nav-chevron {
-  color: var(--primary);
+  color: #38bdf8;
 }
 
 .nav-dropdown-content {
@@ -306,7 +369,7 @@ a {
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-subtle);
   overflow: hidden;
-  z-index: 200;
+  z-index: 9100;
   padding: 0.5rem 0;
   margin-top: 4px; /* subtle gap */
 }
@@ -481,26 +544,28 @@ a {
 .mobile-drawer-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.4);
+  background: var(--bg-main); /* Solid background to completely hide the page */
   z-index: 1002;
+  overscroll-behavior: none; /* Prevent scrolling the body */
 }
 
 /* ── MOBILE DRAWER ── */
 .mobile-drawer {
   position: fixed;
   top: 0;
-  right: 0;
-  width: min(340px, 90vw);
-  height: 100vh;
-  background: var(--surface);
+  left: 0; /* Open from left */
+  width: 100%; /* Full screen width */
+  height: 100dvh; /* Dynamic viewport height to prevent mobile scroll issues */
+  background: #ffffff; /* Solid white to hide background content */
   z-index: 1003;
   display: flex;
   flex-direction: column;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
-  border-radius: 24px 0 0 24px;
-  transform: translateX(100%);
+  box-shadow: none; /* No shadow needed for fullscreen */
+  border-radius: 0; /* No rounded corners for fullscreen */
+  transform: translateX(-100%); /* Start offscreen to the left */
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   overflow: hidden;
+  overscroll-behavior: none; /* Prevent scroll chaining */
 }
 
 .mobile-drawer.open {
@@ -514,7 +579,7 @@ a {
   padding: 1.5rem 1rem 1rem;
   border-bottom: none;
   flex-shrink: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,250,252,0.8) 100%);
+  background: #ffffff;
   min-height: 80px;
   position: relative;
 }
@@ -764,15 +829,27 @@ a {
    HERO BANNER SECTION
    ============================================================ */
 .hero-banner {
-  min-height: calc(100vh - 135px); /* Accounts for top-bar and navbar height */
+  min-height: auto;
   display: flex;
   align-items: center;
-  background: var(--bg-main); /* solid light background, no strong gradient */
+  background: var(--bg-main);
   color: var(--navy-light);
   position: relative;
   overflow: hidden;
-  padding: 2rem 0;
+  padding: 2rem 0 1.5rem;
   border-bottom: 1px solid var(--border-subtle);
+}
+
+@media (min-width: 1200px) {
+  .hero-banner {
+    padding: 2.5rem 0 2rem;
+  }
+
+  .section,
+  .section-light,
+  .section-soft {
+    padding: 2.5rem 0;
+  }
 }
 
 .hero-container {
@@ -848,7 +925,7 @@ a {
 .hero-description {
   font-size: 1.1rem;
   color: var(--navy-light);
-  margin-bottom: 2.25rem;
+  margin-bottom: 1.5rem;
   line-height: 1.7;
 }
 
@@ -857,7 +934,7 @@ a {
   gap: 1rem;
   flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 /* Hero Metrics */
@@ -906,7 +983,7 @@ a {
   align-self: flex-start;
   position: relative;
   width: 100%;
-  padding-top: 1rem;
+  padding-top: 0;
 }
 
 .hero-image {
@@ -916,12 +993,12 @@ a {
   box-shadow: var(--shadow-lg);
   object-fit: cover;
   animation: float 6s ease-in-out infinite;
-  max-height: 500px;
+  max-height: 420px;
 }
 
 @keyframes float {
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-15px); }
+  50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
 }
 
@@ -941,19 +1018,19 @@ a {
    SECTION STYLES
    ============================================================ */
 .section-light {
-  padding: 5rem 0;
+  padding: 2.5rem 0;
   background: var(--surface);
 }
 
 .section-soft {
-  padding: 5rem 0;
+  padding: 2.5rem 0;
   background: var(--bg-main);
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .section-header-left {
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .section-header-left h2 {
@@ -988,10 +1065,11 @@ a {
    ============================================================ */
 .vision-mission-card {
   background: var(--surface);
-  padding: 2.5rem;
+  padding: 1.75rem;
   border-radius: 12px;
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-sm);
+  align-self: flex-start;
 }
 
 .vision-mission-card h3 {
@@ -1043,7 +1121,8 @@ a {
 .about-vision-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
+  align-items: flex-start;
 }
 
 @media (max-width: 768px) {
@@ -1061,7 +1140,7 @@ a {
 
 .step-card {
   background: var(--surface);
-  padding: 1.75rem;
+  padding: 1.25rem 1.5rem;
   border-radius: 12px;
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-sm);
@@ -1211,7 +1290,7 @@ a {
 }
 
 .why-card {
-  padding: 1.75rem;
+  padding: 1.25rem 1.5rem;
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   background: var(--surface);
@@ -1637,9 +1716,14 @@ img, video, iframe, svg { max-width: 100%; }
   .hero-metrics { grid-template-columns: 1fr !important; gap: 0.75rem; width: 100%; }
   .hero-image { max-height: 240px; width: 100%; object-fit: cover; border-radius: 10px; }
   
-  /* Header tweaks for mobile */
-  .header-sticky-wrapper { padding: 4px !important; }
-  .brand-logo-img { height: 48px !important; }
+  /* Header tweaks for mobile — keep sticky on mobile, no fixed */
+  .header-sticky-wrapper {
+    padding: 4px !important;
+    /* Ensure mobile is never accidentally set to fixed */
+    position: sticky !important;
+    top: 0 !important;
+  }
+  .brand-logo-img { height: 60px !important; } /* Increased from 48px */
   .navbar-wrapper { min-height: auto !important; }
 
   /* Bottom bar tweaks for mobile */
@@ -1698,7 +1782,7 @@ img, video, iframe, svg { max-width: 100%; }
   .hero-title { font-size: 1.3rem !important; }
   h2 { font-size: 1.1rem !important; }
   p, li { font-size: 0.875rem !important; }
-  .brand-logo-img { height: 44px; }
+  .brand-logo-img { height: 52px; } /* Increased from 44px */
   .btn-primary, .btn-secondary { font-size: 0.85rem; padding: 0.65rem 1rem; }
 }
 

@@ -96,7 +96,7 @@ const PrivacyPolicy = () => {
 
           <h3 style={{ fontSize: '1.2rem', color: '#0f172a', marginTop: '2rem', marginBottom: '1rem' }}>10. Contact Us</h3>
           <p style={{ marginBottom: '0.2rem' }}>AMPLR HEALTH SERVICES</p>
-          <p style={{ marginBottom: '0.2rem' }}>Email: <a href="mailto:amplrhealth@gmail.com" style={{ color: 'var(--primary)' }}>amplrhealth@gmail.com</a></p>
+          <p style={{ marginBottom: '0.2rem' }}>Email: <a href="mailto:amplrhealth@gmail.com?subject=Inquiry%20from%20AMPLR%20Health%20Website&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0AI%20would%20like%20to%20inquire%20about:%20" style={{ color: 'var(--primary)' }}>amplrhealth@gmail.com</a></p>
           <p style={{ marginBottom: '1.5rem' }}>Phone: <a href="tel:7997888448" style={{ color: 'var(--primary)' }}>7997888448</a></p>
           <p style={{ marginBottom: '1rem' }}>For privacy-related questions or complaints, please contact us using the above details.</p>
         </div>

@@ -356,11 +356,6 @@ function AppContent() {
         {/* ── STICKY HEADER WRAPPER ── */}
         {!hideHeaderFooter && (
         <div className="header-sticky-wrapper">
-          {globalDiscount && (
-            <div style={{ background: '#fef08a', color: '#854d0e', textAlign: 'center', padding: '8px', fontSize: '0.9rem', fontWeight: '600' }}>
-              🎉 Special Offer: {globalDiscount.discount_type === 'percentage' ? `${globalDiscount.discount_amount}%` : `₹${globalDiscount.discount_amount}`} Off! Automatically applied at checkout.
-            </div>
-          )}
           {/* ── TOP BAR ── */}
           <div className="top-bar">
           <div className="container top-bar-inner">
@@ -418,7 +413,7 @@ function AppContent() {
                 </Link>
               )}
               <span className="divider" aria-hidden="true" style={{ color: 'var(--border-strong)' }}>|</span>
-              <a href="mailto:amplrhealth@gmail.com" className="top-link">
+              <a href="mailto:amplrhealth@gmail.com?subject=Inquiry%20from%20AMPLR%20Health%20Website&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0AI%20would%20like%20to%20inquire%20about:%20" className="top-link">
                 <Mail size={13} /> <span className="top-link-text">amplrhealth@gmail.com</span>
               </a>
             </div>
@@ -439,7 +434,7 @@ function AppContent() {
               <div className="nav-links" role="menubar">
 
                 <Link to="/" className="nav-item-link">Home</Link>
-                <Link to="/offers" className="nav-item-link" style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>Offers</Link>
+                <Link to="/offers" className="nav-item-link" style={{ color: '#fbbf24', fontWeight: 600 }}>Offers</Link>
 
                 <div className="nav-dropdown" role="menuitem">
                   <span className="nav-dropdown-trigger">
@@ -1022,7 +1017,7 @@ function AppContent() {
               <div className="footer-bottom-inner" style={{ justifyContent: 'center', flexDirection: 'column' }}>
                 <p>&copy; AMPLR HEALTH SERVICES. All Rights Reserved.</p>
                 <p style={{ marginTop: '0.5rem' }}>
-                  <a href="mailto:amplrhealth@gmail.com" style={{ color: 'var(--navy-muted)', textDecoration: 'none' }}>
+                  <a href="mailto:amplrhealth@gmail.com?subject=Inquiry%20from%20AMPLR%20Health%20Website&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0AI%20would%20like%20to%20inquire%20about:%20" style={{ color: 'var(--navy-muted)', textDecoration: 'none' }}>
                     amplrhealth@gmail.com
                   </a>
                 </p>

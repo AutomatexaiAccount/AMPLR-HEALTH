@@ -67,7 +67,7 @@ const CancellationRefund = () => {
           <p style={{ marginBottom: '1.5rem' }}>For cancellation, refund, or rescheduling assistance, please contact:</p>
           <p style={{ marginBottom: '0.2rem', fontWeight: 'bold' }}>AMPLR HEALTH</p>
           <p style={{ marginBottom: '0.2rem' }}>Phone: <a href="tel:7997888448" style={{ color: 'var(--primary)' }}>7997888448</a></p>
-          <p style={{ marginBottom: '1rem' }}>Email: <a href="mailto:amplrhealth@gmail.com" style={{ color: 'var(--primary)' }}>amplrhealth@gmail.com</a></p>
+          <p style={{ marginBottom: '1rem' }}>Email: <a href="mailto:amplrhealth@gmail.com?subject=Inquiry%20from%20AMPLR%20Health%20Website&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0AI%20would%20like%20to%20inquire%20about:%20" style={{ color: 'var(--primary)' }}>amplrhealth@gmail.com</a></p>
         </div>
       </div>
     </div>

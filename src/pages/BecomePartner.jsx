@@ -221,7 +221,7 @@ const BecomePartner = () => {
               Call 7997888448
             </a>
           </div>
-          <p style={{ marginTop: '2rem', fontSize: '1.1rem' }}>Email: <a href="mailto:amplrhealth@gmail.com" style={{ color: 'white', textDecoration: 'underline' }}>amplrhealth@gmail.com</a></p>
+          <p style={{ marginTop: '2rem', fontSize: '1.1rem' }}>Email: <a href="mailto:amplrhealth@gmail.com?subject=Partner%20Inquiry&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0AI%20would%20like%20to%20partner%20with%20you." style={{ color: 'white', textDecoration: 'underline' }}>amplrhealth@gmail.com</a></p>
         </div>
       </section>
 

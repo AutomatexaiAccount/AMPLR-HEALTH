@@ -70,7 +70,7 @@ const ServiceCartBlock = ({ searchTitle }) => {
       border: '1px solid #e2e8f0',
       boxShadow: '0 4px 24px rgba(15,23,42,0.08)',
       overflow: 'hidden',
-      marginTop: '2rem',
+      marginTop: '1rem',
     }}>
       {/* Header Strip */}
       <div style={{
