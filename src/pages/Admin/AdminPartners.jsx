@@ -97,62 +97,134 @@ const AdminPartners = () => {
     }
   };
 
-  const sendWhatsAppMessage = (app) => {
+  const sendWhatsAppMessage = (app, initialPassword = '') => {
     const phone = app.mobile_number;
     const formattedPhone = phone.replace(/\D/g, ''); // strip non-digits
     const finalPhone = formattedPhone.length === 10 ? `91${formattedPhone}` : formattedPhone;
     
     const partnerIdText = app.partner_id ? `\n\n🪪 Your Partner ID: *${app.partner_id}*` : '';
+    const emailText = app.email_address ? `\n📧 Login Email: *${app.email_address}*` : '';
+    const passText = initialPassword ? `\n🔑 Initial Password: *${initialPassword}*` : '';
+    
     const message = encodeURIComponent(
-      `Hello ${app.full_name},\n\n🎉 Welcome to the AMPLR HEALTH family!${partnerIdText}\n\nYour application has been approved. Please visit the link below to create your password and access your Partner Dashboard:\n\n👉 www.amplrhealth.com/partner-portal\n\nRegards,\nAMPLR HEALTH Team`
+      `Hello ${app.full_name},\n\n🎉 Welcome to the AMPLR HEALTH family!${partnerIdText}${emailText}${passText}\n\nYour application has been approved and your account is active. Please visit the link below to access your Partner Dashboard:\n\n👉 www.amplrhealth.com/partner-login\n\n(Note: You can change your password anytime after logging in from your Partner Profile.)\n\nRegards,\nAMPLR HEALTH Team`
     );
     window.open(`https://wa.me/${finalPhone}?text=${message}`, '_blank');
   };
 
-  const handleApprove = (app) => {
-    MySwal.fire({
-      title: 'Document Verification',
-      text: 'Have you completed the document verification for this partner?',
-      icon: 'question',
+  const handleApprove = async (app) => {
+    const existingEmail = app.email_address || app.form_data?.email || app.form_data?.emailAddress || '';
+    
+    const { value: formValues } = await MySwal.fire({
+      title: 'Approve & Create Partner Account',
+      html:
+        `<div style="text-align:left; font-size:0.95rem;">` +
+        `<p style="margin-bottom:12px; color:#475569;">Create login credentials for <strong>${app.full_name}</strong>:</p>` +
+        `<label style="display:block;margin-bottom:4px;font-weight:600;color:#0f172a;">Partner Email Address *</label>` +
+        `<input id="swal-email" type="email" class="swal2-input" placeholder="Enter partner email" value="${existingEmail}" style="margin:0 0 15px 0;width:100%;box-sizing:border-box;">` +
+        `<label style="display:block;margin-bottom:4px;font-weight:600;color:#0f172a;">Initial Password *</label>` +
+        `<input id="swal-pass" type="text" class="swal2-input" placeholder="e.g. Partner@123" value="Partner@123" style="margin:0 0 15px 0;width:100%;box-sizing:border-box;">` +
+        `<p style="font-size:0.8rem;color:#64748b;margin:0;">The partner can change this password after logging in.</p>` +
+        `</div>`,
+      focusConfirm: false,
       showCancelButton: true,
-      confirmButtonText: 'Yes, Verify & Approve',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#10b981'
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        // Generate unique Partner ID if not already assigned
-        let partnerId = app.partner_id;
-        if (!partnerId) {
-          partnerId = await generatePartnerId(app.form_type);
-          // Save partner_id to the database
-          await supabase
-            .from('partner_applications')
-            .update({ partner_id: partnerId })
-            .eq('id', app.id);
-          // Update local state with the new partner_id
-          setApplications(prev =>
-            prev.map(a => a.id === app.id ? { ...a, partner_id: partnerId } : a)
-          );
-          app = { ...app, partner_id: partnerId };
+      confirmButtonText: 'Approve & Create Account',
+      confirmButtonColor: '#10b981',
+      preConfirm: () => {
+        const emailVal = document.getElementById('swal-email').value.trim();
+        const passVal = document.getElementById('swal-pass').value.trim();
+        if (!emailVal) {
+          Swal.showValidationMessage('Please enter a valid email address');
+          return false;
         }
-
-        updateStatus(app.id, 'Approved', false);
-        
-        MySwal.fire({
-          title: `Partner Approved! 🎉`,
-          html: `<p>Partner ID assigned: <strong style="color:#10b981;font-size:1.1rem">${partnerId}</strong></p><p style="margin-top:8px">Do you want to notify the partner via WhatsApp now?</p>`,
-          icon: 'success',
-          showCancelButton: true,
-          confirmButtonText: 'Yes, Send WhatsApp',
-          cancelButtonText: 'Maybe Later',
-          confirmButtonColor: '#25D366'
-        }).then((waResult) => {
-          if (waResult.isConfirmed) {
-            sendWhatsAppMessage(app);
-          }
-        });
+        if (!passVal || passVal.length < 6) {
+          Swal.showValidationMessage('Password must be at least 6 characters');
+          return false;
+        }
+        return { email: emailVal, password: passVal };
       }
     });
+
+    if (!formValues) return;
+
+    try {
+      MySwal.fire({
+        title: 'Creating Account...',
+        text: 'Generating Partner ID & creating account in Supabase.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      // 1. Generate unique Partner ID if not assigned
+      let partnerId = app.partner_id;
+      if (!partnerId) {
+        partnerId = await generatePartnerId(app.form_type);
+      }
+
+      // 2. Create User in Supabase Auth via signUp
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: formValues.email,
+        password: formValues.password,
+        options: {
+          data: { full_name: app.full_name, role: 'partner' }
+        }
+      });
+
+      let userId = signUpData?.user?.id || app.user_id;
+
+      if (signUpError && !signUpError.message?.toLowerCase().includes('already registered')) {
+        console.warn("Sign up warning:", signUpError.message);
+      }
+
+      // 3. Update partner_applications record in Supabase
+      const updatePayload = {
+        status: 'Approved',
+        partner_id: partnerId,
+        email_address: formValues.email
+      };
+      if (userId) updatePayload.user_id = userId;
+
+      const { error: updateError } = await supabase
+        .from('partner_applications')
+        .update(updatePayload)
+        .eq('id', app.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      const updatedApp = { 
+        ...app, 
+        status: 'Approved', 
+        partner_id: partnerId, 
+        email_address: formValues.email, 
+        user_id: userId 
+      };
+
+      setApplications(prev => prev.map(a => a.id === app.id ? updatedApp : a));
+
+      MySwal.fire({
+        title: `Partner Approved! 🎉`,
+        html: 
+          `<p style="margin-bottom:6px">Partner ID: <strong style="color:#10b981;font-size:1.1rem">${partnerId}</strong></p>` +
+          `<p style="margin-bottom:6px">Email: <strong>${formValues.email}</strong></p>` +
+          `<p style="margin-bottom:12px">Password: <strong>${formValues.password}</strong></p>` +
+          `<p style="padding:10px;background:#f0fdf4;border-radius:8px;color:#166534;font-size:0.9rem">` +
+          `✅ Account created! Send login credentials to partner via WhatsApp now.</p>`,
+        icon: 'success',
+        showCancelButton: true,
+        confirmButtonText: 'Send WhatsApp Credentials',
+        cancelButtonText: 'Done',
+        confirmButtonColor: '#25D366'
+      }).then((waResult) => {
+        if (waResult.isConfirmed) {
+          sendWhatsAppMessage(updatedApp, formValues.password);
+        }
+      });
+
+    } catch (err) {
+      console.error("Error approving partner:", err);
+      MySwal.fire('Error', err.message || 'Failed to approve partner', 'error');
+    }
   };
 
   const viewDetails = (app) => {

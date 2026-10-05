@@ -22,11 +22,34 @@ const PartnerPortal = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // Partner Profile State
-  const [partnerProfile, setPartnerProfile] = useState(null);
+  // Password Change State for Logged in Partner
+  const [newPassword, setNewPassword] = useState('');
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [passStatus, setPassStatus] = useState({ msg: '', type: '' });
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 6) {
+      setPassStatus({ msg: 'Password must be at least 6 characters long.', type: 'error' });
+      return;
+    }
+    setUpdatingPassword(true);
+    setPassStatus({ msg: '', type: '' });
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setPassStatus({ msg: 'Password updated successfully! Please use this new password for your next login.', type: 'success' });
+      setNewPassword('');
+    } catch (err) {
+      setPassStatus({ msg: err.message || 'Failed to update password.', type: 'error' });
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
 
   // Form State
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(''); // Email or Mobile for setup
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState(''); // Only for setup
 
@@ -82,15 +105,17 @@ const PartnerPortal = () => {
 
     try {
       if (isLogin) {
-        // Login Flow
+        // Login Flow (via Email)
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
+          email: email.trim(),
           password
         });
         if (signInError) throw signInError;
       } else {
-        // Setup Flow
-        // 1. Verify email exists in partner_applications and is Approved by Admin
+        // Setup Flow (via Approved Email or Approved Mobile Number)
+        const inputVal = email.trim().toLowerCase();
+        const inputDigits = inputVal.replace(/\D/g, ''); // Extract numeric digits for mobile match
+
         const { data: apps, error: appError } = await supabase
           .from('partner_applications')
           .select('*')
@@ -98,24 +123,35 @@ const PartnerPortal = () => {
 
         if (appError) throw appError;
 
-        const targetEmail = email.toLowerCase().trim();
+        // Search for an approved application matching Email OR Mobile Number
         const appData = apps?.find(app => {
           const mainEmail = (app.email_address || '').toLowerCase().trim();
           const formEmail = (app.form_data?.email || app.form_data?.emailAddress || app.form_data?.email_address || '').toLowerCase().trim();
-          return mainEmail === targetEmail || formEmail === targetEmail;
+          const appPhone = (app.mobile_number || '').replace(/\D/g, '');
+          const formPhone = (app.form_data?.mobile || app.form_data?.phone || '').replace(/\D/g, '');
+          
+          const matchEmail = (mainEmail && mainEmail === inputVal) || (formEmail && formEmail === inputVal);
+          const matchPhone = inputDigits.length >= 8 && ((appPhone && appPhone.endsWith(inputDigits.slice(-10))) || (formPhone && formPhone.endsWith(inputDigits.slice(-10))));
+          
+          return matchEmail || matchPhone;
         });
 
         if (!appData) {
-          throw new Error('This email address has not been approved by AMPLR Admin. Only approved partners can set up an account.');
+          throw new Error('This Email Address / Mobile Number has not been approved by AMPLR Admin. Only approved partners can set up an account.');
         }
 
         if (appData.user_id) {
           throw new Error('An account has already been set up for this approved partner. Please log in.');
         }
 
-        // 2. Sign up the user
+        // Determine user email for Supabase Auth account creation
+        const authEmail = inputVal.includes('@') 
+          ? inputVal 
+          : (appData.email_address || appData.form_data?.email || `${appData.mobile_number.replace(/\D/g, '')}@partner.amplrhealth.com`);
+
+        // Sign up the user in Supabase Auth
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
+          email: authEmail,
           password,
           options: {
             data: { full_name: fullName || appData.full_name, role: 'partner' }
@@ -125,13 +161,13 @@ const PartnerPortal = () => {
         if (signUpError) throw signUpError;
 
         if (signUpData?.user) {
-          // 3. Link the user to the partner_application
+          // Link user to the partner_application record
           await supabase
             .from('partner_applications')
-            .update({ user_id: signUpData.user.id })
+            .update({ user_id: signUpData.user.id, email_address: authEmail })
             .eq('id', appData.id);
 
-          setSuccess('Account created successfully! You are now logged in.');
+          setSuccess(`Account created successfully for ${appData.full_name}! You are now logged in.`);
         }
       }
     } catch (err) {
@@ -143,12 +179,12 @@ const PartnerPortal = () => {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      setError("Please enter your approved email address first to reset your password.");
+      setError("Please enter your email address first to reset your password.");
       return;
     }
     setAuthLoading(true); setError(''); setSuccess('');
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
@@ -231,13 +267,81 @@ const PartnerPortal = () => {
               <div className="card-body">
                 <ul className="info-list">
                   <li><strong>Status:</strong> <span className="status-badge approved">{partnerProfile.status}</span></li>
-                  <li><strong>Email:</strong> {partnerProfile.email_address}</li>
+                  <li><strong>Email:</strong> {partnerProfile.email_address || 'N/A'}</li>
                   <li><strong>Mobile:</strong> {partnerProfile.mobile_number}</li>
                   <li><strong>Experience:</strong> {partnerProfile.years_of_experience || 'N/A'}</li>
-                  <li><strong>City:</strong> {partnerProfile.city}</li>
+                  <li><strong>City:</strong> {partnerProfile.city || 'N/A'}</li>
                   <li><strong>Approval Date:</strong> {partnerProfile.updated_at ? new Date(partnerProfile.updated_at).toLocaleDateString() : 'N/A'}</li>
                 </ul>
               </div>
+            </div>
+          </div>
+
+          {/* ── SECURITY & PASSWORD UPDATE SECTION ── */}
+          <div className="partner-card security-card" style={{ marginTop: '2rem' }}>
+            <div className="card-header">
+              <h3><Lock size={20} /> Security & Account Settings</h3>
+            </div>
+            <div className="card-body">
+              <p style={{ fontSize: '0.95rem', color: '#64748b', marginBottom: '1.25rem' }}>
+                Update your login password to keep your partner account secure.
+              </p>
+              
+              <form onSubmit={handleUpdatePassword} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1, minWidth: '240px' }}>
+                  <label htmlFor="partner-new-password" style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#0f172a', marginBottom: '0.4rem' }}>
+                    New Password *
+                  </label>
+                  <div className="input-group" style={{ position: 'relative' }}>
+                    <Lock size={16} className="input-icon" />
+                    <input 
+                      id="partner-new-password"
+                      type={showNewPass ? "text" : "password"} 
+                      className="form-input" 
+                      placeholder="Enter new password (min 6 chars)" 
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowNewPass(!showNewPass)}
+                      style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: 0 }}
+                      aria-label={showNewPass ? "Hide password" : "Show password"}
+                    >
+                      {showNewPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  className="partner-btn primary" 
+                  disabled={updatingPassword}
+                  style={{ width: 'auto', height: '48px', padding: '0 24px', margin: 0 }}
+                >
+                  {updatingPassword ? (
+                    <>
+                      <Loader2 size={16} className="spinner" />
+                      <span>Updating...</span>
+                    </>
+                  ) : (
+                    <span>Update Password</span>
+                  )}
+                </button>
+              </form>
+
+              {passStatus.msg && (
+                <div 
+                  className={`auth-alert ${passStatus.type === 'error' ? 'error-alert' : 'success-alert'}`} 
+                  style={{ marginTop: '1.25rem', marginBottom: 0 }}
+                >
+                  {passStatus.type === 'error' ? <AlertCircle size={16} /> : <CheckCircle size={16} />}
+                  <span>{passStatus.msg}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -245,7 +349,7 @@ const PartnerPortal = () => {
     );
   }
 
-  // If Not Logged In (Exact Match to Customer Login Layout)
+  // If Not Logged In
   return (
     <div className="auth-page-wrapper">
       <div className="auth-container">
@@ -317,14 +421,16 @@ const PartnerPortal = () => {
               )}
               
               <div className="input-field-wrapper">
-                <label htmlFor="partner-email">Approved Email Address</label>
+                <label htmlFor="partner-email">
+                  {isLogin ? 'Approved Email Address' : 'Approved Email Address or Mobile Number *'}
+                </label>
                 <div className="input-group">
                   <Mail size={18} className="input-icon" />
                   <input 
                     id="partner-email"
-                    type="email" 
+                    type="text" 
                     className="form-input"
-                    placeholder="you@example.com" 
+                    placeholder={isLogin ? "you@example.com" : "Enter your approved email or mobile number"} 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
