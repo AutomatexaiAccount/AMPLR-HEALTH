@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Search, Eye, CheckCircle, XCircle, Clock, X } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, Clock, X, MessageCircle } from 'lucide-react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
@@ -61,7 +61,17 @@ const AdminPartners = () => {
     }
   };
 
-  const handleApprove = (id) => {
+  const sendWhatsAppMessage = (app) => {
+    const phone = app.mobile_number;
+    const formattedPhone = phone.replace(/\D/g, ''); // strip non-digits
+    const finalPhone = formattedPhone.length === 10 ? `91${formattedPhone}` : formattedPhone;
+    
+    const serviceName = app.form_type ? app.form_type.replace('_', ' ') : 'our services';
+    const message = encodeURIComponent(`Hello ${app.full_name},\n\nYour application to partner with AMPLR HEALTH for ${serviceName} has been successfully approved! Welcome aboard.\n\nRegards,\nAMPLR HEALTH Team`);
+    window.open(`https://wa.me/${finalPhone}?text=${message}`, '_blank');
+  };
+
+  const handleApprove = (app) => {
     MySwal.fire({
       title: 'Document Verification',
       text: 'Have you completed the document verification for this partner?',
@@ -72,7 +82,21 @@ const AdminPartners = () => {
       confirmButtonColor: '#10b981'
     }).then((result) => {
       if (result.isConfirmed) {
-        updateStatus(id, 'Approved');
+        updateStatus(app.id, 'Approved');
+        
+        MySwal.fire({
+          title: 'Partner Approved',
+          text: 'Do you want to notify the partner via WhatsApp now?',
+          icon: 'success',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, Send WhatsApp',
+          cancelButtonText: 'Maybe Later',
+          confirmButtonColor: '#25D366'
+        }).then((waResult) => {
+          if (waResult.isConfirmed) {
+            sendWhatsAppMessage(app);
+          }
+        });
       }
     });
   };
@@ -211,22 +235,37 @@ const AdminPartners = () => {
                       >
                         <Eye size={16} />
                       </button>
-                      <button 
-                        onClick={() => handleApprove(app.id)}
-                        className="adm-btn adm-btn--outline" 
-                        title="Approve (Verify Documents)"
-                        style={{ padding: '0.4rem', color: '#10b981', borderColor: '#10b981' }}
-                      >
-                        <CheckCircle size={16} />
-                      </button>
-                      <button 
-                        onClick={() => updateStatus(app.id, 'Rejected')}
-                        className="adm-btn adm-btn--outline" 
-                        title="Reject"
-                        style={{ padding: '0.4rem', color: '#ef4444', borderColor: '#ef4444' }}
-                      >
-                        <XCircle size={16} />
-                      </button>
+                      
+                      {app.status === 'Approved' ? (
+                        <button 
+                          onClick={() => sendWhatsAppMessage(app)}
+                          className="adm-btn adm-btn--outline" 
+                          title="Send WhatsApp"
+                          style={{ padding: '0.4rem', color: '#25D366', borderColor: '#25D366' }}
+                        >
+                          <MessageCircle size={16} />
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => handleApprove(app)}
+                          className="adm-btn adm-btn--outline" 
+                          title="Approve (Verify Documents)"
+                          style={{ padding: '0.4rem', color: '#10b981', borderColor: '#10b981' }}
+                        >
+                          <CheckCircle size={16} />
+                        </button>
+                      )}
+
+                      {app.status !== 'Rejected' && (
+                        <button 
+                          onClick={() => updateStatus(app.id, 'Rejected')}
+                          className="adm-btn adm-btn--outline" 
+                          title="Reject"
+                          style={{ padding: '0.4rem', color: '#ef4444', borderColor: '#ef4444' }}
+                        >
+                          <XCircle size={16} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

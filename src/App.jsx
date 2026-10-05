@@ -348,13 +348,14 @@ function AppContent() {
   return (
     <>
       <ScrollToHash />
-      <div className="app">
+      <div className={`app ${hideHeaderFooter ? 'no-header-padding' : ''}`}>
 
         {/* Cart Drawer */}
         <CartDrawer />
 
         {/* ── STICKY HEADER WRAPPER ── */}
         {!hideHeaderFooter && (
+        <>
         <div className="header-sticky-wrapper">
           {/* ── TOP BAR ── */}
           <div className="top-bar">
@@ -628,6 +629,8 @@ function AppContent() {
               </div>
             )}
           </nav>
+        </header>
+        </div>
 
           {/* ── MOBILE OVERLAY ── */}
           {mobileMenuOpen && (
@@ -881,8 +884,8 @@ function AppContent() {
 
             </div>
           </div>
-        </header>
-        </div>
+
+        </>
         )}
 
             <Routes>

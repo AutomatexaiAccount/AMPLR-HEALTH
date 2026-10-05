@@ -107,6 +107,10 @@ img {
     /* Push all page content below the fixed header. */
     padding-top: var(--header-height-desktop);
   }
+  
+  .app.no-header-padding {
+    padding-top: 0;
+  }
 }
 
 /* Typography Hierarchy */
@@ -1623,6 +1627,7 @@ a {
   background: var(--surface);
   color: var(--navy-dark);
   outline: none;
+  text-align: left !important;
 }
 
 .form-group input:focus, .form-group select:focus {

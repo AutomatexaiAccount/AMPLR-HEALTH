@@ -7,7 +7,8 @@ import {
   Edit2, Save, X, Heart, TrendingUp, Handshake,
   Phone, Mail, Calendar, RefreshCw, AlertCircle,
   ChevronRight, Loader2, Eye, User, Menu, ArrowRight,
-  Zap, FileText, UserPlus, Settings, ShieldCheck, Tag, Plus, Trash2, Download, Upload
+  Zap, FileText, UserPlus, Settings, ShieldCheck, Tag, Plus, Trash2, Download, Upload,
+  Briefcase
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import AdminPartners from './AdminPartners';
@@ -151,6 +152,103 @@ const getGreeting = () => {
   return 'Good evening';
 };
 
+/* ─── Advanced Filters ─── */
+const AdvancedFilters = ({ filters, setFilters, services, filterStats }) => {
+  const [expanded, setExpanded] = useState(true);
+  const isActive = filters.fromDate || filters.toDate || filters.serviceId || filters.status;
+
+  const handleDateChange = (field, value) => {
+    if (value) {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+      
+      if (selectedDate > today) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Invalid Date Selection',
+          text: `You cannot select a future date (${selectedDate.toLocaleDateString()}).`,
+          confirmButtonColor: '#2563eb',
+          confirmButtonText: 'Okay'
+        });
+        return; // Prevent setting future date
+      }
+    }
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div className={`adm-advanced-filters ${expanded ? 'expanded' : 'collapsed'}`}>
+      <div className="adm-filters-header" onClick={() => setExpanded(!expanded)}>
+        <div className="adm-filters-title-group">
+          <h3 className="adm-filters-title">
+            <Search size={16} className={isActive ? 'adm-text-blue' : ''} /> 
+            Advanced Filters
+            {isActive && <span className="adm-filter-active-dot"></span>}
+          </h3>
+          <p className="adm-filters-subtitle">Click to {expanded ? 'collapse' : 'expand'} options</p>
+        </div>
+        <div className="adm-filters-header-actions" onClick={e => e.stopPropagation()}>
+          {isActive && (
+            <button className="adm-btn adm-btn--ghost adm-btn--sm" onClick={() => setFilters({fromDate:'', toDate:'', serviceId:'', status:''})}>
+              Clear Filters
+            </button>
+          )}
+          <button className="adm-btn-icon adm-btn-icon--sm" onClick={() => setExpanded(!expanded)}>
+            <ChevronRight size={16} className={`adm-filter-chevron ${expanded ? 'rotate' : ''}`} />
+          </button>
+        </div>
+      </div>
+      
+      <div className={`adm-filters-body ${expanded ? 'show' : ''}`}>
+        <div className="adm-filters-grid">
+          <div className="adm-filter-item">
+            <label>From Date</label>
+            <input type="date" className="adm-input adm-input-btn" value={filters.fromDate} onChange={e => handleDateChange('fromDate', e.target.value)} />
+          </div>
+          <div className="adm-filter-item">
+            <label>To Date</label>
+            <input type="date" className="adm-input adm-input-btn" value={filters.toDate} onChange={e => handleDateChange('toDate', e.target.value)} />
+          </div>
+          <div className="adm-filter-item">
+            <label>Service</label>
+            <select className="adm-select adm-input-btn" value={filters.serviceId} onChange={e => setFilters({...filters, serviceId: e.target.value})}>
+              <option value="">All Services</option>
+              {services.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+            </select>
+          </div>
+        </div>
+        
+        <div className="adm-filter-hint">
+          <span className="adm-filter-hint-icon">💡</span>
+          <span className="adm-filter-hint-text">To view bookings for a <strong>single specific date</strong>, simply select that same date in both the "From Date" and "To Date" fields.</span>
+        </div>
+        
+        <div className="adm-filter-summary">
+          <div className="adm-filter-stat-box">
+            <div className="adm-stat-icon-sm blue"><CalendarCheck size={18} /></div>
+            <div className="adm-filter-stat-text">
+              <span className="adm-filter-stat-label">Filtered Bookings</span>
+              <span className="adm-filter-stat-val">
+                {filterStats.totalBookings}
+              </span>
+            </div>
+          </div>
+          <div className="adm-filter-stat-box">
+            <div className="adm-stat-icon-sm green"><TrendingUp size={18} /></div>
+            <div className="adm-filter-stat-text">
+              <span className="adm-filter-stat-label">Total Collection</span>
+              <span className="adm-filter-stat-val">
+                ₹{filterStats.totalCollection.toLocaleString('en-IN')}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ═══════════════════════════════════════════════
    MAIN ADMIN DASHBOARD
 ═══════════════════════════════════════════════ */
@@ -161,6 +259,7 @@ const AdminDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [partnersProfileList, setPartnersProfileList] = useState([]);
   const [adminUser, setAdminUser] = useState(null);
   const [familyMembersCount, setFamilyMembersCount] = useState(0);
   const [promoCodes, setPromoCodes] = useState([]);
@@ -185,6 +284,10 @@ const AdminDashboard = () => {
   const [customerData, setCustomerData] = useState({ family: [], bookings: [] });
   const [customerTab, setCustomerTab] = useState('overview');
 
+  // Partner detail drawer
+  const [selectedPartner, setSelectedPartner] = useState(null);
+  const [partnerTab, setPartnerTab] = useState('overview');
+
   // Promo Code editing
   const [showPromoModal, setShowPromoModal] = useState(false);
   const [editingPromoId, setEditingPromoId] = useState(null);
@@ -203,6 +306,12 @@ const AdminDashboard = () => {
   // Search and Filter
   const [searchQuery, setSearchQuery] = useState('');
   const [bookingFilter, setBookingFilter] = useState('active');
+  const [globalFilter, setGlobalFilter] = useState({
+    fromDate: '',
+    toDate: '',
+    serviceId: '',
+    status: ''
+  });
 
   const navigate = useNavigate();
   const notifRef = useRef(null);
@@ -255,14 +364,15 @@ const AdminDashboard = () => {
     setLoading(true);
     setFetchError(null);
     try {
-      const [bkRes, svRes, cuRes, fmRes, pcRes] = await Promise.all([
+      const [bkRes, svRes, cuRes, fmRes, pcRes, ppRes] = await Promise.all([
         supabase.from('bookings')
           .select('*, services(title, price), users(full_name, phone), family_members(name, relationship)')
           .order('created_at', { ascending: false }),
         supabase.from('services').select('*').order('category', { ascending: true }),
         supabase.from('users').select('*').eq('role', 'user').order('created_at', { ascending: false }),
         supabase.from('family_members').select('id', { count: 'exact' }),
-        supabase.from('promo_codes').select('*').order('created_at', { ascending: false })
+        supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
+        supabase.from('partner_applications').select('*').eq('status', 'Approved').order('created_at', { ascending: false })
       ]);
 
       if (bkRes.error) throw bkRes.error;
@@ -278,6 +388,7 @@ const AdminDashboard = () => {
       setBookings(bkRes.data || []);
       setServices(svRes.data || []);
       setCustomers(cuRes.data || []);
+      setPartnersProfileList(ppRes?.data || []);
       setFamilyMembersCount(fmRes.data?.length || 0);
     } catch (err) {
       console.error('fetchData error:', err);
@@ -671,6 +782,11 @@ const AdminDashboard = () => {
     }
   };
 
+  const openPartnerDetail = (partner) => {
+    setSelectedPartner(partner);
+    setPartnerTab('overview');
+  };
+
   const handleSavePromo = async (e) => {
     e.preventDefault();
     if (!promoForm.code.trim() || !promoForm.discount_amount) {
@@ -766,16 +882,56 @@ const AdminDashboard = () => {
     );
   }, [customers, searchQuery]);
 
-  const filteredBookings = useMemo(() => {
-    if (!searchQuery) return bookings;
+  const filteredPartners = useMemo(() => {
+    if (!searchQuery) return partnersProfileList;
     const q = searchQuery.toLowerCase();
-    return bookings.filter(b =>
+    return partnersProfileList.filter(p =>
+      (p.full_name || '').toLowerCase().includes(q) ||
+      (p.email_address || '').toLowerCase().includes(q) ||
+      (p.mobile_number || '').toLowerCase().includes(q)
+    );
+  }, [partnersProfileList, searchQuery]);
+
+  const advancedFilteredBookings = useMemo(() => {
+    let result = bookings;
+    if (globalFilter.fromDate) {
+      const from = new Date(globalFilter.fromDate);
+      from.setHours(0, 0, 0, 0);
+      result = result.filter(b => new Date(b.created_at) >= from);
+    }
+    if (globalFilter.toDate) {
+      const to = new Date(globalFilter.toDate);
+      to.setHours(23, 59, 59, 999);
+      result = result.filter(b => new Date(b.created_at) <= to);
+    }
+    if (globalFilter.serviceId) {
+      result = result.filter(b => b.service_id === globalFilter.serviceId);
+    }
+    if (globalFilter.status) {
+      result = result.filter(b => b.status === globalFilter.status);
+    }
+    return result;
+  }, [bookings, globalFilter]);
+
+  const filterStats = useMemo(() => {
+    const totalBookings = advancedFilteredBookings.length;
+    const totalCollection = advancedFilteredBookings.reduce((sum, b) => {
+      const amt = parseFloat(b.amount) || 0;
+      return sum + amt;
+    }, 0);
+    return { totalBookings, totalCollection };
+  }, [advancedFilteredBookings]);
+
+  const filteredBookings = useMemo(() => {
+    if (!searchQuery) return advancedFilteredBookings;
+    const q = searchQuery.toLowerCase();
+    return advancedFilteredBookings.filter(b =>
       (b.customer_name || '').toLowerCase().includes(q) ||
       (b.services?.title || '').toLowerCase().includes(q)
     );
-  }, [bookings, searchQuery]);
+  }, [advancedFilteredBookings, searchQuery]);
 
-  const tabTitle = { dashboard: 'Dashboard', bookings: 'Bookings', customers: 'Customers', services: 'Services', promocodes: 'Promo Codes' }[activeTab] || 'Dashboard';
+  const tabTitle = { dashboard: 'Dashboard', bookings: 'Bookings', customers: 'Customers Profile', partnersProfile: 'Partners Profile', services: 'Services', promocodes: 'Promo Codes', partners: 'Partner Applications' }[activeTab] || 'Dashboard';
 
   /* ─── Nav items ─── */
   const navItems = [
@@ -783,7 +939,8 @@ const AdminDashboard = () => {
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { section: 'MANAGEMENT' },
     { id: 'bookings', icon: CalendarCheck, label: 'Bookings', badge: stats.pending || null },
-    { id: 'customers', icon: Users, label: 'Customers' },
+    { id: 'customers', icon: Users, label: 'Customers Profile' },
+    { id: 'partnersProfile', icon: Briefcase, label: 'Partners Profile' },
     { id: 'services', icon: Activity, label: 'Services' },
     { id: 'promocodes', icon: Tag, label: 'Promo Codes' },
     { id: 'partners', icon: Handshake, label: 'Partners' },
@@ -951,6 +1108,8 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
+              <AdvancedFilters filters={globalFilter} setFilters={setGlobalFilter} services={services} filterStats={filterStats} />
+
               {/* Stats */}
               {loading ? <CardSkeleton count={6} /> : (
                 <div className="adm-stats-grid">
@@ -1017,7 +1176,7 @@ const AdminDashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').slice(0, 5).map(b => (
+                          {advancedFilteredBookings.filter(b => b.status === 'pending' || b.status === 'confirmed').slice(0, 5).map(b => (
                             <tr key={b.id}>
                               <td>
                                 <div className="adm-cell-main">{b.customer_name || '—'}</div>
@@ -1121,6 +1280,8 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
+              <AdvancedFilters filters={globalFilter} setFilters={setGlobalFilter} services={services} filterStats={filterStats} />
+
               {/* Booking Filters */}
               <div className="adm-tabs" style={{ marginBottom: '1.5rem' }}>
                 <button 
@@ -1161,7 +1322,7 @@ const AdminDashboard = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {(searchQuery ? filteredBookings : bookings)
+                        {(searchQuery ? filteredBookings : advancedFilteredBookings)
                           .filter(b => {
                             if (bookingFilter === 'all') return true;
                             if (bookingFilter === 'active') return b.status === 'pending' || b.status === 'confirmed';
@@ -1340,6 +1501,66 @@ const AdminDashboard = () => {
                             <td><span className="adm-cell-sub">{c.phone || '—'}</span></td>
                             <td><span className="adm-cell-sub">{c.email || '—'}</span></td>
                             <td><span className="adm-cell-sub">{new Date(c.created_at).toLocaleDateString('en-IN')}</span></td>
+                            <td><Eye size={15} className="adm-row-eye" /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ══ PARTNERS PROFILE ══ */}
+          {activeTab === 'partnersProfile' && !fetchError && (
+            <div className="adm-page">
+              <div className="adm-page-header">
+                <div>
+                  <h1 className="adm-page-title">Partners Profile</h1>
+                  <p className="adm-page-sub">Click any partner to view their full profile.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button className="adm-btn adm-btn--outline" onClick={() => exportToCSV(partnersProfileList, 'partners_backup.csv')} title="Export backup"><Download size={14} /></button>
+                  <button className="adm-btn adm-btn--outline" onClick={fetchData}><RefreshCw size={14} /> Refresh</button>
+                </div>
+              </div>
+
+              <div className="adm-card">
+                {loading ? <TableSkeleton rows={6} cols={4} /> : partnersProfileList.length === 0 ? (
+                  <EmptyState icon={Briefcase} title="No partners yet" sub="Approved partners will appear here." />
+                ) : (
+                  <div className="adm-table-wrap">
+                    <table className="adm-table">
+                      <thead>
+                        <tr>
+                          <th>Partner</th>
+                          <th>Phone</th>
+                          <th>Email</th>
+                          <th>Joined</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredPartners.map(p => (
+                          <tr key={p.id} className="adm-row-click" onClick={() => openPartnerDetail(p)}>
+                            <td>
+                              <div className="adm-customer-cell">
+                                <div 
+                                  className="adm-customer-avatar"
+                                  style={{ background: 'var(--adm-blue)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+                                >
+                                  {p.full_name ? p.full_name.charAt(0).toUpperCase() : 'P'}
+                                </div>
+                                <div>
+                                  <div className="adm-cell-main">{p.full_name || 'Anonymous'}</div>
+                                  <div className="adm-cell-sub" style={{textTransform: 'capitalize'}}>{p.form_type?.replace('_', ' ') || 'Service Partner'}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td><span className="adm-cell-sub">{p.mobile_number || '—'}</span></td>
+                            <td><span className="adm-cell-sub">{p.email_address || '—'}</span></td>
+                            <td><span className="adm-cell-sub">{new Date(p.created_at).toLocaleDateString('en-IN')}</span></td>
                             <td><Eye size={15} className="adm-row-eye" /></td>
                           </tr>
                         ))}
@@ -1579,6 +1800,110 @@ const AdminDashboard = () => {
                     </div>
                   )}
                 </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ PARTNER DETAIL DRAWER ═══ */}
+      {selectedPartner && (
+        <div className="adm-drawer-backdrop" onClick={() => setSelectedPartner(null)}>
+          <div className="adm-drawer" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="adm-drawer-header">
+              <h3>Partner Profile</h3>
+              <button className="adm-drawer-close" onClick={() => setSelectedPartner(null)} aria-label="Close">
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Profile card */}
+            <div className="adm-drawer-profile">
+              <div 
+                className="adm-drawer-avatar"
+                style={{ background: 'var(--adm-blue)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+              >
+                {selectedPartner.full_name ? selectedPartner.full_name.charAt(0).toUpperCase() : 'P'}
+              </div>
+              <div className="adm-drawer-profile-info">
+                <h4 className="adm-drawer-name">{selectedPartner.full_name || 'Anonymous Partner'}</h4>
+                <div className="adm-drawer-meta-chips">
+                  {selectedPartner.mobile_number && (
+                    <span className="adm-meta-chip"><Phone size={12} />{selectedPartner.mobile_number}</span>
+                  )}
+                  {selectedPartner.email_address && (
+                    <span className="adm-meta-chip"><Mail size={12} />{selectedPartner.email_address}</span>
+                  )}
+                  <span className="adm-meta-chip">
+                    <Calendar size={12} />
+                    Joined {new Date(selectedPartner.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="adm-drawer-tabs">
+              {['overview', 'services'].map(t => (
+                <button
+                  key={t}
+                  className={`adm-drawer-tab ${partnerTab === t ? 'adm-drawer-tab--active' : ''}`}
+                  onClick={() => setPartnerTab(t)}
+                >
+                  {t === 'overview' && <User size={14} />}
+                  {t === 'services' && <Activity size={14} />}
+                  <span>{t.charAt(0).toUpperCase() + t.slice(1)}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Content */}
+            <div className="adm-drawer-content">
+              {/* Overview */}
+              {partnerTab === 'overview' && (
+                <div className="adm-drawer-section">
+                  <div className="adm-detail-grid">
+                    <div className="adm-detail-item">
+                      <span className="adm-detail-label">Full Name</span>
+                      <span className="adm-detail-value">{selectedPartner.full_name || '—'}</span>
+                    </div>
+                    <div className="adm-detail-item">
+                      <span className="adm-detail-label">Email</span>
+                      <span className="adm-detail-value">{selectedPartner.email_address || '—'}</span>
+                    </div>
+                    <div className="adm-detail-item">
+                      <span className="adm-detail-label">Phone</span>
+                      <span className="adm-detail-value">{selectedPartner.mobile_number || '—'}</span>
+                    </div>
+                    <div className="adm-detail-item">
+                      <span className="adm-detail-label">Status</span>
+                      <span className="adm-detail-value" style={{ textTransform: 'capitalize' }}>{selectedPartner.status || 'Pending'}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Services */}
+              {partnerTab === 'services' && (
+                <div className="adm-drawer-section">
+                  <div className="adm-detail-list">
+                    <div className="adm-detail-list-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#0f172a' }}>Services Provided</div>
+                        <div style={{ fontSize: '0.82rem', color: '#64748b', textTransform: 'capitalize' }}>
+                          Category: {selectedPartner.form_type?.replace('_', ' ')}
+                        </div>
+                      </div>
+                      <div style={{ background: '#e0f2fe', color: '#0284c7', padding: '4px 12px', borderRadius: '12px', fontWeight: 'bold' }}>
+                        Total: 0
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'center', padding: '2rem 0', color: '#64748b', fontSize: '0.85rem' }}>
+                    * Integration with booking fulfillment is coming soon.
+                  </div>
+                </div>
               )}
             </div>
           </div>

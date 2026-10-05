@@ -457,6 +457,7 @@ const CartDrawer = () => {
                       <label>Who is this booking for?</label>
                       <select 
                         className="form-input" 
+                        style={{ textAlign: 'left', paddingLeft: '14px' }}
                         value={bookingFor}
                         onChange={(e) => {
                           const val = e.target.value;
@@ -509,18 +510,20 @@ const CartDrawer = () => {
                       <input 
                         type="text" 
                         className="form-input"
+                        style={{ textAlign: 'left', paddingLeft: '14px' }}
                         value={formData.name} 
                         onChange={e => setFormData({...formData, name: e.target.value})} 
                         required 
                         disabled={isSubmitting}
                       />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div className="form-row-2">
                       <div className="form-group">
                         <label>Phone Number *</label>
                         <input 
                           type="tel" 
                           className="form-input"
+                          style={{ textAlign: 'left', paddingLeft: '14px' }}
                           value={formData.phone} 
                           onChange={e => setFormData({...formData, phone: e.target.value})} 
                           required 
@@ -532,6 +535,7 @@ const CartDrawer = () => {
                         <input 
                           type="email" 
                           className="form-input"
+                          style={{ textAlign: 'left', paddingLeft: '14px' }}
                           value={formData.email} 
                           onChange={e => setFormData({...formData, email: e.target.value})} 
                           disabled={isSubmitting}
@@ -543,6 +547,7 @@ const CartDrawer = () => {
                       <input 
                         type="text" 
                         className="form-input"
+                        style={{ textAlign: 'left', paddingLeft: '14px' }}
                         value={formData.location} 
                         onChange={e => setFormData({...formData, location: e.target.value})} 
                         required 
@@ -550,12 +555,13 @@ const CartDrawer = () => {
                         placeholder="e.g. Flat 401, Galaxy Apts, Near Mall"
                       />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                    <div className="form-row-3">
                       <div className="form-group">
                         <label>Area / Locality *</label>
                         <input 
                           type="text" 
                           className="form-input"
+                          style={{ textAlign: 'left', paddingLeft: '14px' }}
                           value={formData.area} 
                           onChange={e => setFormData({...formData, area: e.target.value})} 
                           required 
@@ -567,6 +573,7 @@ const CartDrawer = () => {
                         <input 
                           type="text" 
                           className="form-input"
+                          style={{ textAlign: 'left', paddingLeft: '14px' }}
                           value={formData.city} 
                           onChange={e => setFormData({...formData, city: e.target.value})} 
                           required 
@@ -578,6 +585,7 @@ const CartDrawer = () => {
                         <input 
                           type="text" 
                           className="form-input"
+                          style={{ textAlign: 'left', paddingLeft: '14px' }}
                           value={formData.pincode} 
                           onChange={e => setFormData({...formData, pincode: e.target.value})} 
                           required 
@@ -599,31 +607,28 @@ const CartDrawer = () => {
                 Proceed to Checkout <ChevronRight size={18} />
               </button>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button 
-                    className="btn-secondary" 
-                    onClick={() => setIsCheckingOut(false)} 
-                    style={{ flex: 1, padding: '0.9rem', borderRadius: '10px' }}
+              <div className="checkout-footer-actions">
+                <div className="checkout-footer-row">
+                  <button
+                    className="btn-back"
+                    onClick={() => setIsCheckingOut(false)}
                     disabled={isSubmitting}
                   >
                     Back
                   </button>
-                  <button 
+                  <button
                     type="submit"
                     form="cart-checkout-form"
-                    className="cart-drawer-checkout-btn" 
-                    style={{ flex: 2 }}
+                    className="btn-confirm"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? <><Loader2 size={18} className="spinner" /> Booking...</> : 'Confirm Booking'}
                   </button>
                 </div>
-                <button 
+                <button
                   type="button"
                   onClick={handleSkipPayment}
-                  className="btn-secondary" 
-                  style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', fontSize: '0.9rem', opacity: 0.8 }}
+                  className="btn-skip-payment"
                   disabled={isSubmitting}
                 >
                   Skip Payment (Test Mode)
