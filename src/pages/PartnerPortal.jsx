@@ -21,6 +21,7 @@ const PartnerPortal = () => {
   const [authLoading, setAuthLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [partnerProfile, setPartnerProfile] = useState(null);
   
   // Password Change State for Logged in Partner
   const [newPassword, setNewPassword] = useState('');
@@ -110,7 +111,12 @@ const PartnerPortal = () => {
           email: email.trim(),
           password
         });
-        if (signInError) throw signInError;
+        if (signInError) {
+          if (signInError.message.toLowerCase().includes("invalid login")) {
+            throw new Error("Invalid login credentials. (Note: If your account was just created, please check your email and click the verification link first!)");
+          }
+          throw signInError;
+        }
       } else {
         // Setup Flow (via Approved Email or Approved Mobile Number)
         const inputVal = email.trim().toLowerCase();

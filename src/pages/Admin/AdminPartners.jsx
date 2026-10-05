@@ -107,7 +107,7 @@ const AdminPartners = () => {
     const passText = initialPassword ? `\n🔑 Initial Password: *${initialPassword}*` : '';
     
     const message = encodeURIComponent(
-      `Hello ${app.full_name},\n\n🎉 Welcome to the AMPLR HEALTH family!${partnerIdText}${emailText}${passText}\n\nYour application has been approved and your account is active. Please visit the link below to access your Partner Dashboard:\n\n👉 www.amplrhealth.com/partner-login\n\n(Note: You can change your password anytime after logging in from your Partner Profile.)\n\nRegards,\nAMPLR HEALTH Team`
+      `Hello ${app.full_name},\n\n🎉 Welcome to the AMPLR HEALTH family!${partnerIdText}${emailText}${passText}\n\nYour application has been approved and your account has been created.\n\n⚠️ *IMPORTANT ACTION REQUIRED:*\nWe have sent a verification link to your email address (${app.email_address}). Please click that link to activate your account first.\n\nAfter verifying your email, you can log in to your Partner Dashboard here:\n👉 www.amplrhealth.com/partner-login\n\n(Note: You can change your password anytime after logging in from your Partner Profile.)\n\nRegards,\nAMPLR HEALTH Team`
     );
     window.open(`https://wa.me/${finalPhone}?text=${message}`, '_blank');
   };
@@ -121,7 +121,7 @@ const AdminPartners = () => {
         `<div style="text-align:left; font-size:0.95rem;">` +
         `<p style="margin-bottom:12px; color:#475569;">Create login credentials for <strong>${app.full_name}</strong>:</p>` +
         `<label style="display:block;margin-bottom:4px;font-weight:600;color:#0f172a;">Partner Email Address *</label>` +
-        `<input id="swal-email" type="email" class="swal2-input" placeholder="Enter partner email" value="${existingEmail}" style="margin:0 0 15px 0;width:100%;box-sizing:border-box;">` +
+        `<input id="swal-email" type="email" class="swal2-input" value="${existingEmail}" readonly style="margin:0 0 15px 0;width:100%;box-sizing:border-box;background-color:#f1f5f9;color:#64748b;cursor:not-allowed;border-color:#cbd5e1;">` +
         `<label style="display:block;margin-bottom:4px;font-weight:600;color:#0f172a;">Initial Password *</label>` +
         `<input id="swal-pass" type="text" class="swal2-input" placeholder="e.g. Partner@123" value="Partner@123" style="margin:0 0 15px 0;width:100%;box-sizing:border-box;">` +
         `<p style="font-size:0.8rem;color:#64748b;margin:0;">The partner can change this password after logging in.</p>` +
@@ -208,8 +208,10 @@ const AdminPartners = () => {
           `<p style="margin-bottom:6px">Partner ID: <strong style="color:#10b981;font-size:1.1rem">${partnerId}</strong></p>` +
           `<p style="margin-bottom:6px">Email: <strong>${formValues.email}</strong></p>` +
           `<p style="margin-bottom:12px">Password: <strong>${formValues.password}</strong></p>` +
-          `<p style="padding:10px;background:#f0fdf4;border-radius:8px;color:#166534;font-size:0.9rem">` +
-          `✅ Account created! Send login credentials to partner via WhatsApp now.</p>`,
+          `<p style="padding:10px;background:#fffbeb;border-radius:8px;color:#b45309;font-size:0.9rem">` +
+          `⚠️ <strong>Email Verification Required!</strong> Supabase has sent a verification link to their email. They MUST click it before they can log in.</p>` +
+          `<p style="padding:10px;background:#f0fdf4;border-radius:8px;color:#166534;font-size:0.9rem;margin-top:10px;">` +
+          `✅ Account created! Send login credentials & instructions via WhatsApp now.</p>`,
         icon: 'success',
         showCancelButton: true,
         confirmButtonText: 'Send WhatsApp Credentials',

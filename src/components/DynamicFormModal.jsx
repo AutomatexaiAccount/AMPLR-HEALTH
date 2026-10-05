@@ -15,13 +15,24 @@ const DynamicFormModal = ({ isOpen, onClose, formKey }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      // Load saved data when modal opens
+      if (formKey) {
+        const savedData = localStorage.getItem(`partnerForm_${formKey}`);
+        if (savedData) {
+          try {
+            setFormData(JSON.parse(savedData));
+          } catch (e) {
+            setFormData({});
+          }
+        }
+      }
     } else {
       document.body.style.overflow = 'auto';
     }
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [isOpen]);
+  }, [isOpen, formKey]);
 
   if (!isOpen || !formKey || !partnerFormsData[formKey]) return null;
 
@@ -29,23 +40,28 @@ const DynamicFormModal = ({ isOpen, onClose, formKey }) => {
 
   const handleInputChange = (e, field) => {
     const { name, value, type, checked } = e.target;
+    let newFormData = { ...formData };
     
     if (type === 'checkbox') {
       if (field.options && field.options.length > 1) {
         // Multi-select checkbox
-        const currentVals = formData[name] || [];
+        const currentVals = newFormData[name] || [];
         if (checked) {
-          setFormData({ ...formData, [name]: [...currentVals, value] });
+          newFormData[name] = [...currentVals, value];
         } else {
-          setFormData({ ...formData, [name]: currentVals.filter(v => v !== value) });
+          newFormData[name] = currentVals.filter(v => v !== value);
         }
       } else {
         // Single boolean checkbox (like declaration)
-        setFormData({ ...formData, [name]: checked });
+        newFormData[name] = checked;
       }
     } else {
-      setFormData({ ...formData, [name]: value });
+      newFormData[name] = value;
     }
+    
+    setFormData(newFormData);
+    // Save to localStorage immediately
+    localStorage.setItem(`partnerForm_${formKey}`, JSON.stringify(newFormData));
   };
 
   const handleSubmit = async (e) => {
@@ -82,6 +98,7 @@ const DynamicFormModal = ({ isOpen, onClose, formKey }) => {
       });
       
       setFormData({});
+      localStorage.removeItem(`partnerForm_${formKey}`);
       onClose();
       
     } catch (error) {
