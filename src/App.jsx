@@ -27,6 +27,7 @@ import AdminLogin from './pages/Admin/AdminLogin';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import CustomerLogin from './pages/CustomerLogin';
 import CustomerProfile from './pages/CustomerProfile';
+import PartnerPortal from './pages/PartnerPortal';
 import Verified from './pages/Verified';
 import ResetPassword from './pages/ResetPassword';
 import { CartProvider, useCart } from './context/CartContext';
@@ -201,8 +202,9 @@ function AppContent() {
   const isVerifiedRoute = location.pathname === '/verified';
   const isProfileRoute = location.pathname === '/profile';
   const isResetPasswordRoute = location.pathname === '/reset-password';
+  const isPartnerPortalRoute = location.pathname.startsWith('/partner-portal') || location.pathname.startsWith('/partner-setup') || location.pathname.startsWith('/partner-login');
   
-  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute || isVerifiedRoute || isProfileRoute || isResetPasswordRoute;
+  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute || isVerifiedRoute || isProfileRoute || isResetPasswordRoute || isPartnerPortalRoute;
   const hideFooter = hideHeaderFooter;
 
   const [user, setUser] = useState(null);
@@ -823,10 +825,10 @@ function AppContent() {
                     <span>Quick Links</span>
                     <ChevronRight
                       size={16}
-                      className={`mobile-nav-chevron ${specialisedExpanded ? 'rotated' : ''}`}
+                      className={`mobile-nav-chevron ${quickLinksExpanded ? 'rotated' : ''}`}
                     />
                   </button>
-                  {specialisedExpanded && (
+                  {quickLinksExpanded && (
                     <div className="mobile-nav-sub">
                       <Link to="/" onClick={closeMenu}>Home</Link>
                       <Link to="/#about" onClick={closeMenu}>About us</Link>
@@ -908,6 +910,9 @@ function AppContent() {
           <Route path="/services/ambulance-services" element={<AmbulanceServices />} />
           <Route path="/services/hospital-assistance" element={<HospitalAssistance />} />
           <Route path="/partner" element={<BecomePartner />} />
+          <Route path="/partner-portal" element={<PartnerPortal />} />
+          <Route path="/partner-setup" element={<PartnerPortal />} />
+          <Route path="/partner-login" element={<PartnerPortal />} />
           <Route path="/book-a-service" element={<BookAService />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/why-amplr" element={<WhyAmplr />} />

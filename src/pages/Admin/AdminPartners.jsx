@@ -1,10 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Search, Eye, CheckCircle, XCircle, Clock, X, MessageCircle } from 'lucide-react';
+import { Search, Eye, CheckCircle, XCircle, Clock, X, MessageCircle, ShieldCheck } from 'lucide-react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
+
+/* ─── Partner ID Service Code Map ─── */
+const SERVICE_CODE_MAP = {
+  ambulance:        'AMB',
+  doctor:           'DOC',
+  ecg:              'ECG',
+  hospital:         'HOS',
+  lab_technician:   'LAB',
+  nursing:          'NUR',
+  physiotherapy:    'PHY',
+  caregiver:        'CGR',
+  customer_english: 'CST',
+  customer_telugu:  'CST',
+};
+
+/* ─── Generate a unique Partner ID ─── */
+const generatePartnerId = async (formType) => {
+  const code = SERVICE_CODE_MAP[formType] || 'PAR';
+  let attempts = 0;
+  while (attempts < 10) {
+    const num = Math.floor(1000 + Math.random() * 9000); // 4-digit random
+    const candidate = `${code}-${num}`;
+    // Check if this ID already exists
+    const { data } = await supabase
+      .from('partner_applications')
+      .select('id')
+      .eq('partner_id', candidate)
+      .maybeSingle();
+    if (!data) return candidate; // unique!
+    attempts++;
+  }
+  // Fallback: timestamp-based
+  return `${code}-${Date.now().toString().slice(-4)}`;
+};
 
 const AdminPartners = () => {
   const [applications, setApplications] = useState([]);
@@ -34,7 +68,7 @@ const AdminPartners = () => {
     }
   };
 
-  const updateStatus = async (id, newStatus) => {
+  const updateStatus = async (id, newStatus, showToast = true) => {
     try {
       const { error } = await supabase
         .from('partner_applications')
@@ -47,14 +81,16 @@ const AdminPartners = () => {
         app.id === id ? { ...app, status: newStatus } : app
       ));
 
-      MySwal.fire({
-        icon: 'success',
-        title: 'Status Updated',
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000
-      });
+      if (showToast) {
+        MySwal.fire({
+          icon: 'success',
+          title: 'Status Updated',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000
+        });
+      }
     } catch (err) {
       console.error("Error updating status:", err);
       MySwal.fire('Error', 'Failed to update status', 'error');
@@ -66,8 +102,10 @@ const AdminPartners = () => {
     const formattedPhone = phone.replace(/\D/g, ''); // strip non-digits
     const finalPhone = formattedPhone.length === 10 ? `91${formattedPhone}` : formattedPhone;
     
-    const serviceName = app.form_type ? app.form_type.replace('_', ' ') : 'our services';
-    const message = encodeURIComponent(`Hello ${app.full_name},\n\nYour application to partner with AMPLR HEALTH for ${serviceName} has been successfully approved! Welcome aboard.\n\nRegards,\nAMPLR HEALTH Team`);
+    const partnerIdText = app.partner_id ? `\n\n🪪 Your Partner ID: *${app.partner_id}*` : '';
+    const message = encodeURIComponent(
+      `Hello ${app.full_name},\n\n🎉 Welcome to the AMPLR HEALTH family!${partnerIdText}\n\nYour application has been approved. Please visit the link below to create your password and access your Partner Dashboard:\n\n👉 www.amplrhealth.com/partner-portal\n\nRegards,\nAMPLR HEALTH Team`
+    );
     window.open(`https://wa.me/${finalPhone}?text=${message}`, '_blank');
   };
 
@@ -80,13 +118,29 @@ const AdminPartners = () => {
       confirmButtonText: 'Yes, Verify & Approve',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#10b981'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        updateStatus(app.id, 'Approved');
+        // Generate unique Partner ID if not already assigned
+        let partnerId = app.partner_id;
+        if (!partnerId) {
+          partnerId = await generatePartnerId(app.form_type);
+          // Save partner_id to the database
+          await supabase
+            .from('partner_applications')
+            .update({ partner_id: partnerId })
+            .eq('id', app.id);
+          // Update local state with the new partner_id
+          setApplications(prev =>
+            prev.map(a => a.id === app.id ? { ...a, partner_id: partnerId } : a)
+          );
+          app = { ...app, partner_id: partnerId };
+        }
+
+        updateStatus(app.id, 'Approved', false);
         
         MySwal.fire({
-          title: 'Partner Approved',
-          text: 'Do you want to notify the partner via WhatsApp now?',
+          title: `Partner Approved! 🎉`,
+          html: `<p>Partner ID assigned: <strong style="color:#10b981;font-size:1.1rem">${partnerId}</strong></p><p style="margin-top:8px">Do you want to notify the partner via WhatsApp now?</p>`,
           icon: 'success',
           showCancelButton: true,
           confirmButtonText: 'Yes, Send WhatsApp',
@@ -103,6 +157,45 @@ const AdminPartners = () => {
 
   const viewDetails = (app) => {
     setSelectedApp(app);
+  };
+
+  const handleGenerateId = async (app) => {
+    const result = await MySwal.fire({
+      title: 'Generate Partner ID?',
+      html: `<p>This will assign a new unique Partner ID to <strong>${app.full_name}</strong>.</p>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Generate!',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#10b981'
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      const partnerId = await generatePartnerId(app.form_type);
+      const { error } = await supabase
+        .from('partner_applications')
+        .update({ partner_id: partnerId })
+        .eq('id', app.id);
+      if (error) throw error;
+
+      // Update local state
+      setApplications(prev =>
+        prev.map(a => a.id === app.id ? { ...a, partner_id: partnerId } : a)
+      );
+      // Also update selectedApp if it's open
+      setSelectedApp(prev => prev && prev.id === app.id ? { ...prev, partner_id: partnerId } : prev);
+
+      MySwal.fire({
+        title: 'Partner ID Assigned! 🎉',
+        html: `<p>Partner ID: <strong style="color:#10b981;font-size:1.2rem;letter-spacing:2px">${partnerId}</strong></p>`,
+        icon: 'success',
+        confirmButtonColor: '#10b981'
+      });
+    } catch (err) {
+      console.error('Generate ID error:', err);
+      MySwal.fire('Error', 'Failed to generate Partner ID. Please run the SQL command in Supabase first.', 'error');
+    }
   };
 
   const filteredApps = applications.filter(app => {
@@ -206,6 +299,7 @@ const AdminPartners = () => {
               <th>Applicant Name</th>
               <th>Phone Number</th>
               <th>Application Type</th>
+              <th>Partner ID</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -213,7 +307,7 @@ const AdminPartners = () => {
           <tbody>
             {filteredApps.length === 0 ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
                   No applications found.
                 </td>
               </tr>
@@ -224,6 +318,15 @@ const AdminPartners = () => {
                   <td style={{ fontWeight: 500 }}>{app.full_name}</td>
                   <td>{app.mobile_number}</td>
                   <td style={{ textTransform: 'capitalize' }}>{app.form_type.replace('_', ' ')}</td>
+                  <td>
+                    {app.partner_id ? (
+                      <span style={{ background: '#ecfdf5', color: '#059669', padding: '3px 10px', borderRadius: '20px', fontWeight: 700, fontSize: '0.82rem', letterSpacing: '0.5px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <ShieldCheck size={12} />{app.partner_id}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>—</span>
+                    )}
+                  </td>
                   <td>{getStatusBadge(app.status)}</td>
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -237,14 +340,27 @@ const AdminPartners = () => {
                       </button>
                       
                       {app.status === 'Approved' ? (
-                        <button 
-                          onClick={() => sendWhatsAppMessage(app)}
-                          className="adm-btn adm-btn--outline" 
-                          title="Send WhatsApp"
-                          style={{ padding: '0.4rem', color: '#25D366', borderColor: '#25D366' }}
-                        >
-                          <MessageCircle size={16} />
-                        </button>
+                        <>
+                          {/* Show Generate ID button only if no partner_id yet */}
+                          {!app.partner_id && (
+                            <button
+                              onClick={() => handleGenerateId(app)}
+                              className="adm-btn adm-btn--outline"
+                              title="Generate Partner ID"
+                              style={{ padding: '0.4rem 0.6rem', color: '#7c3aed', borderColor: '#7c3aed', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '3px' }}
+                            >
+                              <ShieldCheck size={14} /> ID
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => sendWhatsAppMessage(app)}
+                            className="adm-btn adm-btn--outline" 
+                            title="Send WhatsApp"
+                            style={{ padding: '0.4rem', color: '#25D366', borderColor: '#25D366' }}
+                          >
+                            <MessageCircle size={16} />
+                          </button>
+                        </>
                       ) : (
                         <button 
                           onClick={() => handleApprove(app)}
@@ -286,10 +402,15 @@ const AdminPartners = () => {
               </button>
             </div>
             <div className="adm-drawer-content" style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '15px' }}>
+              <div style={{ marginBottom: '15px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <span className="adm-badge adm-badge--pending" style={{ padding: '4px 12px', fontSize: '0.85rem' }}>
                   Type: {selectedApp.form_type}
                 </span>
+                {selectedApp.partner_id && (
+                  <span style={{ background: '#ecfdf5', color: '#059669', padding: '4px 14px', borderRadius: '20px', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.5px', display: 'inline-flex', alignItems: 'center', gap: '5px', border: '1px solid #a7f3d0' }}>
+                    <ShieldCheck size={13} /> Partner ID: {selectedApp.partner_id}
+                  </span>
+                )}
               </div>
               
               {Object.entries(selectedApp.form_data).map(([key, value]) => (

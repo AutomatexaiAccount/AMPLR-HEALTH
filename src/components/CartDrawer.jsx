@@ -138,6 +138,17 @@ const CartDrawer = () => {
     }
     if (isSubmitting) return; // prevent double-click
 
+    // Double-check profile is complete (location, landmark, pincode)
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (currentUser) {
+      const { data: profile } = await supabase.from('users').select('location, landmark, pincode').eq('id', currentUser.id).single();
+      const missing = !profile?.location?.trim() || !profile?.landmark?.trim() || !profile?.pincode?.trim();
+      if (missing) {
+        setError('Please complete your profile (Location, Landmark & Pincode) before booking.');
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     setError('');
 

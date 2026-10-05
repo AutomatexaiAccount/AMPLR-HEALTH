@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { supabase } from '../lib/supabase';
 import { Loader2, ShoppingCart, CheckCircle2, ChevronRight } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const ServiceCartBlock = ({ searchTitle }) => {
   const navigate = useNavigate();
@@ -10,6 +11,44 @@ const ServiceCartBlock = ({ searchTitle }) => {
   const [subServices, setSubServices] = useState([]);
   const [serviceDetails, setServiceDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  /* ── Profile completion check ── */
+  const checkProfileComplete = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate('/login');
+      return false;
+    }
+    const { data: profile } = await supabase
+      .from('users')
+      .select('location, landmark, pincode')
+      .eq('id', session.user.id)
+      .single();
+
+    const missing = !profile?.location?.trim() || !profile?.landmark?.trim() || !profile?.pincode?.trim();
+    if (missing) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Complete Your Profile First!',
+        html: `
+          <p style="margin-bottom:12px">To book a service, we need your address details so our healthcare professional can reach you.</p>
+          <div style="background:#fef3c7;border-radius:8px;padding:12px;text-align:left;font-size:0.9rem">
+            <strong>Missing fields:</strong><br/>
+            ${!profile?.location?.trim() ? '📍 Location (House No, Street)<br/>' : ''}
+            ${!profile?.landmark?.trim() ? '🏫 Landmark<br/>' : ''}
+            ${!profile?.pincode?.trim() ? '📮 Pincode' : ''}
+          </div>`,
+        confirmButtonText: '✏️ Complete My Profile',
+        confirmButtonColor: '#c1121f',
+        showCancelButton: true,
+        cancelButtonText: 'Later',
+      }).then((result) => {
+        if (result.isConfirmed) navigate('/profile');
+      });
+      return false;
+    }
+    return true;
+  };
 
   useEffect(() => {
     const fetchServiceData = async () => {
@@ -134,11 +173,8 @@ const ServiceCartBlock = ({ searchTitle }) => {
                       type="checkbox"
                       checked={isSelected}
                       onChange={async () => {
-                        const { data: { session } } = await supabase.auth.getSession();
-                        if (!session) {
-                          navigate('/login');
-                          return;
-                        }
+                        const ok = await checkProfileComplete();
+                        if (!ok) return;
                         if (!isSelected) {
                           addToCart({ type: 'sub_service', id: sub.id, title: sub.title, price: sub.price, serviceId: serviceDetails?.id });
                         }
@@ -165,12 +201,9 @@ const ServiceCartBlock = ({ searchTitle }) => {
         {/* Main service add button */}
         {serviceDetails && (
           <button
-            onClick={async () => {
-              const { data: { session } } = await supabase.auth.getSession();
-              if (!session) {
-                navigate('/login');
-                return;
-              }
+                    onClick={async () => {
+              const ok = await checkProfileComplete();
+              if (!ok) return;
               if (!isMainAdded) {
                 addToCart({ type: 'service', id: serviceDetails.id, title: serviceDetails.title, price: serviceDetails.price });
               } else {

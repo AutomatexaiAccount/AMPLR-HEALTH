@@ -54,8 +54,9 @@ const DynamicFormModal = ({ isOpen, onClose, formKey }) => {
     
     try {
       // 1. Extract common fields for easy filtering
-      const fullName = formData.providerName || formData.hospitalName || formData.patientName || formData.contactPerson || "Unknown";
-      const mobileNumber = formData.mobile || "Unknown";
+      const fullName = formData.providerName || formData.hospitalName || formData.patientName || formData.contactPerson || formData.fullName || formData.name || "Unknown";
+      const mobileNumber = formData.mobile || formData.phone || "Unknown";
+      const emailAddress = formData.email || formData.emailAddress || formData.email_address || "";
       
       // 4. Save to Supabase
       const { error } = await supabase
@@ -65,6 +66,7 @@ const DynamicFormModal = ({ isOpen, onClose, formKey }) => {
             form_type: formKey,
             full_name: fullName,
             mobile_number: mobileNumber,
+            email_address: emailAddress,
             form_data: formData
           }
         ]);
@@ -74,8 +76,9 @@ const DynamicFormModal = ({ isOpen, onClose, formKey }) => {
       MySwal.fire({
         icon: 'success',
         title: 'Application Submitted!',
-        html: '<p>Thank you. Our team will review your application and contact you soon.</p><p style="margin-top: 15px; color: var(--primary); font-weight: 500;">Please send your relevant documents (ID proof, certificates, etc.) via WhatsApp to <b>7997888448</b> or email to <b><a href="mailto:amplrhealth@gmail.com?subject=Document%20Submission&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0APlease%20find%20my%20documents%20attached." style="color: inherit; text-decoration: underline;">amplrhealth@gmail.com</a></b> for verification.</p>',
-        confirmButtonColor: 'var(--primary)'
+        html: '<p>Thank you. Our team will review your application and contact you soon.</p><p style="margin-top: 12px; padding: 10px; background: #f0fdf4; border-radius: 8px; color: #15803d; font-size: 0.95rem;">✅ <strong>Once approved</strong>, you will receive your unique <strong>Partner ID</strong>, dashboard instructions, and a confirmation message via WhatsApp.</p><p style="margin-top: 15px; color: var(--primary); font-weight: 500;">Please send your relevant documents (ID proof, certificates, etc.) via WhatsApp to <b>7997888448</b> or email to <b><a href="mailto:amplrhealth@gmail.com?subject=Document%20Submission&body=Hi%20AMPLR%20Health%20Team,%0D%0A%0D%0APlease%20find%20my%20documents%20attached." style="color: inherit; text-decoration: underline;">amplrhealth@gmail.com</a></b> for verification.</p>',
+        confirmButtonColor: 'var(--primary)',
+        width: '500px'
       });
       
       setFormData({});

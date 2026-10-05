@@ -7,7 +7,7 @@ import {
   Edit2, Save, X, Heart, TrendingUp, Handshake,
   Phone, Mail, Calendar, RefreshCw, AlertCircle,
   ChevronRight, Loader2, Eye, User, Menu, ArrowRight,
-  Zap, FileText, UserPlus, Settings, ShieldCheck, Tag, Plus, Trash2, Download, Upload,
+  Zap, FileText, UserPlus, Settings, ShieldCheck, Tag, Plus, Trash2, Download, Upload, MapPin,
   Briefcase
 } from 'lucide-react';
 import Swal from 'sweetalert2';
@@ -262,6 +262,7 @@ const AdminDashboard = () => {
   const [partnersProfileList, setPartnersProfileList] = useState([]);
   const [adminUser, setAdminUser] = useState(null);
   const [familyMembersCount, setFamilyMembersCount] = useState(0);
+  const [pendingPartnersCount, setPendingPartnersCount] = useState(0);
   const [promoCodes, setPromoCodes] = useState([]);
 
   // Sidebar mobile
@@ -364,7 +365,7 @@ const AdminDashboard = () => {
     setLoading(true);
     setFetchError(null);
     try {
-      const [bkRes, svRes, cuRes, fmRes, pcRes, ppRes] = await Promise.all([
+      const [bkRes, svRes, cuRes, fmRes, pcRes, ppRes, pendRes] = await Promise.all([
         supabase.from('bookings')
           .select('*, services(title, price), users(full_name, phone), family_members(name, relationship)')
           .order('created_at', { ascending: false }),
@@ -372,7 +373,8 @@ const AdminDashboard = () => {
         supabase.from('users').select('*').eq('role', 'user').order('created_at', { ascending: false }),
         supabase.from('family_members').select('id', { count: 'exact' }),
         supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
-        supabase.from('partner_applications').select('*').eq('status', 'Approved').order('created_at', { ascending: false })
+        supabase.from('partner_applications').select('*').eq('status', 'Approved').order('created_at', { ascending: false }),
+        supabase.from('partner_applications').select('id', { count: 'exact' }).eq('status', 'Pending')
       ]);
 
       if (bkRes.error) throw bkRes.error;
@@ -390,6 +392,7 @@ const AdminDashboard = () => {
       setCustomers(cuRes.data || []);
       setPartnersProfileList(ppRes?.data || []);
       setFamilyMembersCount(fmRes.data?.length || 0);
+      setPendingPartnersCount(pendRes.count || 0);
     } catch (err) {
       console.error('fetchData error:', err);
       setFetchError('Unable to load dashboard data. Please check your connection.');
@@ -445,10 +448,29 @@ const AdminDashboard = () => {
       })
       .subscribe();
 
+    const partnerCh = supabase
+      .channel('adm-rt-partners')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'partner_applications' }, (payload) => {
+        setPendingPartnersCount(c => c + 1);
+        const name = payload.new.full_name || 'New partner';
+        addToast('New Partner Application', name, 'realtime');
+        addNotification('Partner Application', `${name} applied to be a partner`, 'partner');
+        addActivity(`${name} submitted a partner application`, 'partner');
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'partner_applications' }, (payload) => {
+        if (payload.old.status === 'Pending' && payload.new.status !== 'Pending') {
+          setPendingPartnersCount(c => Math.max(0, c - 1));
+        } else if (payload.old.status !== 'Pending' && payload.new.status === 'Pending') {
+          setPendingPartnersCount(c => c + 1);
+        }
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(bookingCh);
       supabase.removeChannel(familyCh);
       supabase.removeChannel(customerCh);
+      supabase.removeChannel(partnerCh);
     };
   }, [addToast, addNotification, addActivity]);
 
@@ -943,7 +965,7 @@ const AdminDashboard = () => {
     { id: 'partnersProfile', icon: Briefcase, label: 'Partners Profile' },
     { id: 'services', icon: Activity, label: 'Services' },
     { id: 'promocodes', icon: Tag, label: 'Promo Codes' },
-    { id: 'partners', icon: Handshake, label: 'Partners' },
+    { id: 'partners', icon: Handshake, label: 'Partners', badge: pendingPartnersCount || null },
   ];
 
   /* ═══ RENDER ═══ */
@@ -1537,6 +1559,7 @@ const AdminDashboard = () => {
                           <th>Partner</th>
                           <th>Phone</th>
                           <th>Email</th>
+                          <th>Partner ID</th>
                           <th>Joined</th>
                           <th></th>
                         </tr>
@@ -1560,6 +1583,15 @@ const AdminDashboard = () => {
                             </td>
                             <td><span className="adm-cell-sub">{p.mobile_number || '—'}</span></td>
                             <td><span className="adm-cell-sub">{p.email_address || '—'}</span></td>
+                            <td>
+                              {p.partner_id ? (
+                                <span style={{ background: '#ecfdf5', color: '#059669', padding: '3px 10px', borderRadius: '20px', fontWeight: 700, fontSize: '0.82rem', letterSpacing: '0.5px' }}>
+                                  {p.partner_id}
+                                </span>
+                              ) : (
+                                <span className="adm-cell-sub" style={{ color: '#94a3b8' }}>—</span>
+                              )}
+                            </td>
                             <td><span className="adm-cell-sub">{new Date(p.created_at).toLocaleDateString('en-IN')}</span></td>
                             <td><Eye size={15} className="adm-row-eye" /></td>
                           </tr>
@@ -1736,6 +1768,22 @@ const AdminDashboard = () => {
                           <span className="adm-detail-value adm-detail-mono">{selectedCustomer.id.substring(0, 12)}…</span>
                         </div>
                         <div className="adm-detail-item">
+                          <span className="adm-detail-label">Location</span>
+                          <span className="adm-detail-value">{selectedCustomer.location || <span style={{color:'#94a3b8',fontStyle:'italic'}}>Not set</span>}</span>
+                        </div>
+                        <div className="adm-detail-item">
+                          <span className="adm-detail-label">Landmark</span>
+                          <span className="adm-detail-value">{selectedCustomer.landmark || <span style={{color:'#94a3b8',fontStyle:'italic'}}>Not set</span>}</span>
+                        </div>
+                        <div className="adm-detail-item">
+                          <span className="adm-detail-label">Pincode</span>
+                          <span className="adm-detail-value">{selectedCustomer.pincode || <span style={{color:'#94a3b8',fontStyle:'italic'}}>Not set</span>}</span>
+                        </div>
+                        <div className="adm-detail-item">
+                          <span className="adm-detail-label">Member Since</span>
+                          <span className="adm-detail-value">{new Date(selectedCustomer.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                        </div>
+                        <div className="adm-detail-item">
                           <span className="adm-detail-label">Family Members</span>
                           <span className="adm-detail-value">{customerData.family.length}</span>
                         </div>
@@ -1828,6 +1876,11 @@ const AdminDashboard = () => {
               </div>
               <div className="adm-drawer-profile-info">
                 <h4 className="adm-drawer-name">{selectedPartner.full_name || 'Anonymous Partner'}</h4>
+                {selectedPartner.partner_id && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#ecfdf5', color: '#059669', borderRadius: '20px', padding: '2px 10px', fontSize: '0.8rem', fontWeight: 700, marginBottom: '6px' }}>
+                    <ShieldCheck size={11} /> {selectedPartner.partner_id}
+                  </div>
+                )}
                 <div className="adm-drawer-meta-chips">
                   {selectedPartner.mobile_number && (
                     <span className="adm-meta-chip"><Phone size={12} />{selectedPartner.mobile_number}</span>
@@ -1863,6 +1916,15 @@ const AdminDashboard = () => {
               {/* Overview */}
               {partnerTab === 'overview' && (
                 <div className="adm-drawer-section">
+                  {selectedPartner.partner_id && (
+                    <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '10px', padding: '12px 16px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <ShieldCheck size={18} color="#059669" />
+                      <div>
+                        <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Partner ID</div>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#065f46', letterSpacing: '1px' }}>{selectedPartner.partner_id}</div>
+                      </div>
+                    </div>
+                  )}
                   <div className="adm-detail-grid">
                     <div className="adm-detail-item">
                       <span className="adm-detail-label">Full Name</span>
@@ -1879,6 +1941,14 @@ const AdminDashboard = () => {
                     <div className="adm-detail-item">
                       <span className="adm-detail-label">Status</span>
                       <span className="adm-detail-value" style={{ textTransform: 'capitalize' }}>{selectedPartner.status || 'Pending'}</span>
+                    </div>
+                    <div className="adm-detail-item">
+                      <span className="adm-detail-label">Location</span>
+                      <span className="adm-detail-value">{selectedPartner.form_data?.location || selectedPartner.form_data?.city || selectedPartner.form_data?.address || <span style={{color:'#94a3b8',fontStyle:'italic'}}>Not provided</span>}</span>
+                    </div>
+                    <div className="adm-detail-item">
+                      <span className="adm-detail-label">Member Since</span>
+                      <span className="adm-detail-value">{new Date(selectedPartner.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     </div>
                   </div>
                 </div>
