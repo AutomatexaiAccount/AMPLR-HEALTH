@@ -326,6 +326,22 @@ const CustomerProfile = () => {
         return;
       }
 
+      // CHECK IF PHONE IS DUPLICATE using our Guard
+      if (editForm.phone && editForm.phone.trim() !== '') {
+        const formattedPhone = editForm.phone.trim().startsWith('+') ? editForm.phone.trim() : `+91${editForm.phone.trim()}`;
+        const phoneForDb = formattedPhone.replace('+', '');
+        
+        // Only check if it's different from the user's current phone
+        if (freshUser.phone !== phoneForDb && freshUser.phone !== formattedPhone) {
+          const { data: phoneExists, error: rpcError } = await supabase.rpc('check_phone_exists', { phone_number: phoneForDb });
+          if (phoneExists) {
+             setEditError('This phone number is already registered with another account.');
+             setEditSaving(false);
+             return;
+          }
+        }
+      }
+
       const updatePayload = {
         data: {
           ...freshUser.user_metadata,

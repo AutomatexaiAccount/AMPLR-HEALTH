@@ -79,7 +79,7 @@ const CustomerLogin = () => {
     setLoading(true); setError(''); setSuccess('');
     try {
       const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
+        email: email.trim().toLowerCase(),
         password,
         options: {
           emailRedirectTo: 'https://amplrhealth.com/verified',
@@ -90,7 +90,13 @@ const CustomerLogin = () => {
       if (data?.user?.identities?.length === 0) {
         throw new Error('This email ID is already registered. Please sign in instead.');
       }
-      setSuccess("You have successfully registered! Please check your email and verify your account to start booking.");
+      setSuccess(
+        <div style={{ lineHeight: '1.4' }}>
+          You have successfully registered! Please check your email and verify your account to start booking.
+          <br /><br />
+          <strong>Note:</strong> If you entered an incorrect email ID, you will need to restart the sign up process.
+        </div>
+      );
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -101,13 +107,25 @@ const CustomerLogin = () => {
   // --- Sign Up (Phone OTP) ---
   const handleSendOtp = async (e) => {
     e.preventDefault();
-    if (!phone || phone.length < 10) {
-      setError("Please enter a valid 10-digit mobile number.");
+    const indianPhoneRegex = /^[6-9]\d{9}$/;
+    if (!phone || !indianPhoneRegex.test(phone)) {
+      setError("Please enter a valid 10-digit Indian mobile number.");
       return;
     }
     setLoading(true); setError(''); setSuccess('');
     try {
       const formattedPhone = phone.startsWith('+') ? phone : `+91${phone}`;
+      
+      // Supabase stores phone in auth.users WITHOUT the '+' sign (e.g., 919876543210)
+      const phoneForDb = formattedPhone.replace('+', '');
+      const { data: phoneExists, error: rpcError } = await supabase.rpc('check_phone_exists', { phone_number: phoneForDb });
+      
+      if (phoneExists) {
+        setError("This number is already registered with us. Please Sign In instead.");
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithOtp({ phone: formattedPhone });
       if (error) throw error;
       setSuccess("OTP sent successfully to your mobile number!");
@@ -153,16 +171,34 @@ const CustomerLogin = () => {
     }
     setLoading(true); setError(''); setSuccess('');
     try {
-      const { error } = await supabase.auth.updateUser({
-        email: email,
+      const { data: authData, error } = await supabase.auth.updateUser({
+        email: email.trim().toLowerCase(),
         password: password,
         data: { full_name: fullName }
+      }, {
+        emailRedirectTo: 'https://amplrhealth.com/verified'
       });
       if (error) throw error;
+
+      // Sync the new email to the public users table
+      if (authData?.user?.id) {
+        const { error: dbError } = await supabase
+          .from('users')
+          .update({ email: email })
+          .eq('id', authData.user.id);
+          
+        if (dbError) console.error("Failed to update public users table:", dbError);
+      }
       
       await supabase.auth.signOut(); // Sign out to force email verification
       
-      setSuccess("A verification link has been sent. Please verify your account to start booking services.");
+      setSuccess(
+        <div style={{ lineHeight: '1.4' }}>
+          A verification link has been sent. Please verify your account to start booking services.
+          <br /><br />
+          <strong>Note:</strong> If you entered an incorrect email ID, you will need to restart the sign up process.
+        </div>
+      );
       setShowProfileForm(false);
       setShowOtpInput(false);
       setPhone('');
@@ -172,7 +208,11 @@ const CustomerLogin = () => {
       setFullName('');
       setIsSignUp(false); // Switch back to login
     } catch (err) {
-      setError(err.message || 'Failed to update profile.');
+      if (err.message && err.message.toLowerCase().includes('already registered')) {
+        setError('This email is already registered with another account. Please use a different email or Sign In.');
+      } else {
+        setError(err.message || 'Failed to update profile. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
