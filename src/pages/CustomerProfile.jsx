@@ -280,7 +280,7 @@ const CustomerProfile = () => {
   const openEditModal = () => {
     setEditForm({
       fullName: user?.user_metadata?.full_name || '',
-      phone: user?.phone || '',
+      phone: user?.phone || publicUser?.phone || '',
       landmark: publicUser?.landmark || '',
       location: publicUser?.location || '',
       pincode: publicUser?.pincode || '',
@@ -326,20 +326,41 @@ const CustomerProfile = () => {
         return;
       }
 
-      // CHECK IF PHONE IS DUPLICATE using our Guard
+      // Canonical phone normalization
+      const normalizePhoneStr = (p) => {
+        if (!p) return '';
+        const digits = p.replace(/\D/g, '');
+        if (digits.length === 10) return `+91${digits}`;
+        if (digits.length === 12 && digits.startsWith('91')) return `+${digits}`;
+        return p.startsWith('+') ? p : `+${p}`;
+      };
+
+      let canonicalPhone = null;
+      const userCurrentPhone = normalizePhoneStr(freshUser.phone || publicUser?.phone);
+      
       if (editForm.phone && editForm.phone.trim() !== '') {
-        const formattedPhone = editForm.phone.trim().startsWith('+') ? editForm.phone.trim() : `+91${editForm.phone.trim()}`;
-        const phoneForDb = formattedPhone.replace('+', '');
+        canonicalPhone = normalizePhoneStr(editForm.phone.trim());
         
-        // Only check if it's different from the user's current phone
-        if (freshUser.phone !== phoneForDb && freshUser.phone !== formattedPhone) {
-          const { data: phoneExists, error: rpcError } = await supabase.rpc('check_phone_exists', { phone_number: phoneForDb });
-          if (phoneExists) {
-             setEditError('This phone number is already registered with another account.');
-             setEditSaving(false);
-             return;
+        // Only check if it's a completely NEW/DIFFERENT phone number from what user already has
+        if (userCurrentPhone && canonicalPhone !== userCurrentPhone) {
+          try {
+            const { data: statusData } = await supabase.rpc('check_phone_status', { phone_number: canonicalPhone });
+            if (statusData?.is_complete || statusData?.status === 'complete') {
+              setEditError('This phone number is already registered with another account.');
+              setEditSaving(false);
+              return;
+            }
+          } catch (rpcErr) {
+            const { data: phoneExists } = await supabase.rpc('check_phone_exists', { phone_number: canonicalPhone });
+            if (phoneExists) {
+              setEditError('This phone number is already registered with another account.');
+              setEditSaving(false);
+              return;
+            }
           }
         }
+      } else if (userCurrentPhone) {
+        canonicalPhone = userCurrentPhone;
       }
 
       const updatePayload = {
@@ -358,11 +379,11 @@ const CustomerProfile = () => {
         return;
       }
 
-      // Update public.users table with new fields including phone
+      // Update public.users table with new fields including canonical phone
       const { error: dbError } = await supabase
         .from('users')
         .update({
-          phone: editForm.phone.trim() || null,
+          phone: canonicalPhone || null,
           landmark: editForm.landmark.trim(),
           location: editForm.location.trim(),
           pincode: editForm.pincode.trim(),
@@ -373,21 +394,18 @@ const CustomerProfile = () => {
       if (!dbError) {
         setPublicUser(prev => ({
           ...prev,
-          phone: editForm.phone.trim() || null,
+          phone: canonicalPhone || null,
           landmark: editForm.landmark.trim(),
           location: editForm.location.trim(),
           pincode: editForm.pincode.trim(),
           gender: editForm.gender || null
         }));
-        // Also update user.phone if we want to reflect it locally on the auth object
         if (data.user) {
-          data.user.phone = editForm.phone.trim() || null;
+          data.user.phone = canonicalPhone || data.user.phone || null;
         }
       } else {
         console.error('Failed to update public user details:', dbError);
       }
-
-
 
       // Update local user state immediately (no page refresh)
       setUser(data.user);
@@ -718,10 +736,17 @@ const CustomerProfile = () => {
                       setEditForm(prev => ({ ...prev, phone: e.target.value }));
                       if (editErrors.phone) setEditErrors(prev => ({ ...prev, phone: '' }));
                     }}
-                    placeholder="+91 98765 43210"
-                    disabled={editSaving}
+                    placeholder="+919876543210"
+                    disabled={editSaving || Boolean(user?.phone || publicUser?.phone)}
+                    readOnly={Boolean(user?.phone || publicUser?.phone)}
+                    style={Boolean(user?.phone || publicUser?.phone) ? { backgroundColor: '#f1f5f9', cursor: 'not-allowed' } : {}}
                     autoComplete="tel"
                   />
+                  {Boolean(user?.phone || publicUser?.phone) && (
+                    <span style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                      Registered mobile number cannot be modified directly.
+                    </span>
+                  )}
                   {editErrors.phone && <span className="form-error">{editErrors.phone}</span>}
                 </div>
 

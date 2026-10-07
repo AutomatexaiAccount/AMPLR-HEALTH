@@ -30,6 +30,7 @@ import CustomerProfile from './pages/CustomerProfile';
 import PartnerPortal from './pages/PartnerPortal';
 import Verified from './pages/Verified';
 import ResetPassword from './pages/ResetPassword';
+import AuthVerify from './pages/AuthVerify';
 import { CartProvider, useCart } from './context/CartContext';
 import CartDrawer from './components/CartDrawer';
 import './index.css';
@@ -202,9 +203,10 @@ function AppContent() {
   const isVerifiedRoute = location.pathname === '/verified';
   const isProfileRoute = location.pathname === '/profile';
   const isResetPasswordRoute = location.pathname === '/reset-password';
+  const isAuthVerifyRoute = location.pathname.startsWith('/auth/verify');
   const isPartnerPortalRoute = location.pathname.startsWith('/partner-portal') || location.pathname.startsWith('/partner-setup') || location.pathname.startsWith('/partner-login');
   
-  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute || isVerifiedRoute || isProfileRoute || isResetPasswordRoute || isPartnerPortalRoute;
+  const hideHeaderFooter = isAdminRoute || isCustomerLoginRoute || isVerifiedRoute || isProfileRoute || isResetPasswordRoute || isAuthVerifyRoute || isPartnerPortalRoute;
   const hideFooter = hideHeaderFooter;
 
   const [user, setUser] = useState(null);
@@ -894,6 +896,7 @@ function AppContent() {
           <Route path="/login" element={<CustomerLogin />} />
           <Route path="/profile" element={<CustomerProfile />} />
           <Route path="/verified" element={<Verified />} />
+          <Route path="/auth/verify" element={<AuthVerify />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/" element={<Home />} />
           <Route path="/offers" element={<Offers />} />

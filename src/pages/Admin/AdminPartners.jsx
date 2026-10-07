@@ -98,18 +98,33 @@ const AdminPartners = () => {
   };
 
   const sendWhatsAppMessage = (app, initialPassword = '') => {
-    const phone = app.mobile_number;
-    const formattedPhone = phone.replace(/\D/g, ''); // strip non-digits
-    const finalPhone = formattedPhone.length === 10 ? `91${formattedPhone}` : formattedPhone;
+    const rawPhone = app.mobile_number || app.phone || app.phone_number || (app.form_data && (app.form_data.mobile || app.form_data.phone || app.form_data.mobile_number)) || '';
+    let digits = String(rawPhone).replace(/\D/g, ''); // strip non-digits
     
-    const partnerIdText = app.partner_id ? `\n\n🪪 Your Partner ID: *${app.partner_id}*` : '';
-    const emailText = app.email_address ? `\n📧 Login Email: *${app.email_address}*` : '';
-    const passText = initialPassword ? `\n🔑 Initial Password: *${initialPassword}*` : '';
+    // Strip leading zeros (e.g., 07597901057 -> 7597901057)
+    if (digits.startsWith('0')) {
+      digits = digits.replace(/^0+/, '');
+    }
+    
+    let finalPhone = digits;
+    if (digits.length === 10) {
+      finalPhone = `91${digits}`;
+    } else if (digits.length === 12 && digits.startsWith('91')) {
+      finalPhone = digits;
+    }
+    
+    const partnerIdText = app.partner_id ? `\n\n* Your Partner ID: *${app.partner_id}*` : '';
+    const emailText = app.email_address ? `\n* Login Email: *${app.email_address}*` : '';
+    const passText = initialPassword ? `\n* Initial Password: *${initialPassword}*` : '';
+    const fullName = app.full_name || (app.form_data && app.form_data.full_name) || 'Partner';
+    const emailAddr = app.email_address || (app.form_data && app.form_data.email) || '';
     
     const message = encodeURIComponent(
-      `Hello ${app.full_name},\n\n🎉 Welcome to the AMPLR HEALTH family!${partnerIdText}${emailText}${passText}\n\nYour application has been approved and your account has been created.\n\n⚠️ *IMPORTANT ACTION REQUIRED:*\nWe have sent a verification link to your email address (${app.email_address}). Please click that link to activate your account first.\n\nAfter verifying your email, you can log in to your Partner Dashboard here:\n👉 www.amplrhealth.com/partner-login\n\n(Note: You can change your password anytime after logging in from your Partner Profile.)\n\nRegards,\nAMPLR HEALTH Team`
+      `Hello ${fullName},\n\n*Welcome to the AMPLR HEALTH family!*${partnerIdText}${emailText}${passText}\n\nYour application has been approved and your account has been created.\n\n*IMPORTANT ACTION REQUIRED:*\nWe have sent a verification link to your email address (${emailAddr}). Please click that link to activate your account first.\n\nAfter verifying your email, you can log in to your Partner Dashboard here:\nhttps://www.amplrhealth.com/partner-login\n\n(Note: You can change your password anytime after logging in from your Partner Profile.)\n\nRegards,\nAMPLR HEALTH Team`
     );
-    window.open(`https://wa.me/${finalPhone}?text=${message}`, '_blank');
+    
+    const waUrl = `https://api.whatsapp.com/send?phone=${finalPhone}&text=${message}`;
+    window.open(waUrl, '_blank');
   };
 
   const handleApprove = async (app) => {

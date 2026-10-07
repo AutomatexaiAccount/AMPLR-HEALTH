@@ -25,8 +25,8 @@ if (file_exists($envFile)) {
     foreach ($lines as $line) {
         if (strpos(trim($line), '#') === 0) continue;
         list($name, $value) = explode('=', $line, 2);
-        if (trim($name) == 'VITE_CASHFREE_CLIENT_ID') $clientId = trim($value);
-        if (trim($name) == 'VITE_CASHFREE_CLIENT_SECRET') $clientSecret = trim($value);
+        if (trim($name) == 'CASHFREE_APP_ID') $clientId = trim($value);
+        if (trim($name) == 'CASHFREE_SECRET_KEY') $clientSecret = trim($value);
     }
 }
 

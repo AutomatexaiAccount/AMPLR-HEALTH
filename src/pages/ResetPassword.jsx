@@ -14,13 +14,22 @@ const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Check if there is an active session for password recovery
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        console.log('No active recovery session detected.');
+      }
+    });
+  }, []);
+
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError("Passwords do not match. Please try again.");
       return;
     }
 
@@ -39,10 +48,10 @@ const ResetPassword = () => {
       
       setSuccess("Your password has been successfully updated! Redirecting to login...");
       setTimeout(() => {
-        navigate('/login');
-      }, 3000);
+        navigate('/partner-login');
+      }, 2000);
     } catch (err) {
-      setError(err.message || "Failed to update password. Please try the reset link again.");
+      setError(err.message || "Failed to update password. Please request a new reset link.");
     } finally {
       setLoading(false);
     }
@@ -77,7 +86,7 @@ const ResetPassword = () => {
               <button 
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#52525b', padding: 0 }}
+                style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#71717a', padding: 0 }}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -99,7 +108,7 @@ const ResetPassword = () => {
               <button 
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#52525b', padding: 0 }}
+                style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#71717a', padding: 0 }}
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -110,14 +119,29 @@ const ResetPassword = () => {
             {loading ? 'UPDATING...' : 'UPDATE PASSWORD'} <ArrowRight size={18} />
           </button>
         </form>
+
+        <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1.5rem', fontSize: '0.85rem' }}>
+          <button 
+            onClick={() => navigate('/partner-login')}
+            style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Partner Login
+          </button>
+          <span style={{ color: '#52525b' }}>•</span>
+          <button 
+            onClick={() => navigate('/login')}
+            style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Customer Login
+          </button>
+        </div>
       </div>
 
       <div className="reset-footer">
         <div className="secure-badge">
-          <ShieldCheck size={14} color="#eab308" />
-          <span>SECURE CONNECTION</span>
+          <ShieldCheck size={14} color="#e11d48" />
+          <span>SECURE ENCRYPTED CONNECTION</span>
         </div>
-        <p>Designed & Managed by <strong>AutomateX</strong></p>
       </div>
     </div>
   );
