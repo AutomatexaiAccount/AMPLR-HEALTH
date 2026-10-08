@@ -43,10 +43,10 @@ foreach ($possibleEnvFiles as $envFile) {
 
 // Fallback to Production Credentials if .env is blocked by server open_basedir settings
 if (empty($clientId)) {
-    $clientId = '1067272895f577bc2e259b3bbd082727601';
+    $clientId = '1437690733526cab2ea264e88680967341';
 }
 if (empty($clientSecret)) {
-    $clientSecret = 'cfsk_ma_prod_3763eb8c3971eef86f2b056157053e19_aaebfb55';
+    $clientSecret = 'cfsk_ma_prod_c9f18ed442b42a44a4a582a7f7b21cc0_563ad564';
 }
 
 // Get the POST data
