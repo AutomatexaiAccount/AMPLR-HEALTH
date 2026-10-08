@@ -9,6 +9,7 @@ import {
   CreditCard, ChevronRight, Activity, Award, Bell,
   Sparkles, RefreshCw, Smartphone
 } from 'lucide-react';
+import Swal from 'sweetalert2';
 import './PartnerPortal.css';
 
 const PartnerPortal = () => {
@@ -43,6 +44,11 @@ const PartnerPortal = () => {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [passStatus, setPassStatus] = useState({ msg: '', type: '' });
+
+  // OTP Modal State
+  const [otpModalBooking, setOtpModalBooking] = useState(null);
+  const [otpInput, setOtpInput] = useState('');
+  const [otpError, setOtpError] = useState('');
 
   // Form State for Login / Setup
   const [email, setEmail] = useState('');
@@ -104,6 +110,7 @@ const PartnerPortal = () => {
       const { data, error } = await supabase
         .from('bookings')
         .select('*, services(title, price)')
+        .eq('assigned_partner_uuid', partner.user_id)
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -152,6 +159,57 @@ const PartnerPortal = () => {
       navigator.clipboard.writeText(partnerProfile.partner_id);
       setCopiedId(true);
       setTimeout(() => setCopiedId(false), 2000);
+    }
+  };
+
+  const handleLifecycleUpdate = async (booking, newStatus) => {
+    let updates = { service_lifecycle_status: newStatus };
+    
+    if (newStatus === 'travel_started') {
+      updates.travel_started_at = new Date().toISOString();
+    } else if (newStatus === 'reached') {
+      updates.reached_at = new Date().toISOString();
+      // Generate OTP securely
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      updates.service_otp = otp;
+      
+      // WhatsApp alert to customer with OTP
+      const waText = `Hi ${booking.customer_name}, your Amplr Health partner ${partnerProfile.full_name} has reached your location. Your service OTP is ${otp}. Please share it with the partner to start the service.`;
+      if (booking.customer_phone) {
+        const cleanPhone = booking.customer_phone.replace(/\D/g, '');
+        window.open(`https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(waText)}`, '_blank');
+      } else {
+        Swal.fire('OTP Generated', `Generated OTP: ${otp} (Customer phone missing)`, 'info');
+      }
+    } else if (newStatus === 'otp_verified') {
+      if (!otpInput) {
+        setOtpError("Please enter the OTP.");
+        return;
+      }
+      if (otpInput !== booking.service_otp) {
+        setOtpError("Incorrect OTP. Please try again.");
+        return;
+      }
+      updates.otp_verified_at = new Date().toISOString();
+      updates.service_started_at = new Date().toISOString();
+      setOtpModalBooking(null);
+      setOtpInput('');
+      setOtpError('');
+    } else if (newStatus === 'completed') {
+      updates.service_completed_at = new Date().toISOString();
+      updates.status = 'completed'; // Update main status
+      Swal.fire('Success', 'Service Completed successfully!', 'success');
+    }
+
+    try {
+      const { error } = await supabase.from('bookings').update(updates).eq('id', booking.id);
+      if (error) throw error;
+      
+      // Update local state
+      setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, ...updates } : b));
+    } catch (err) {
+      console.error("Error updating lifecycle:", err);
+      Swal.fire('Error', 'Failed to update status. Please try again.', 'error');
     }
   };
 
@@ -358,7 +416,7 @@ const PartnerPortal = () => {
 
     const filteredBookings = bookings.filter(b => {
       if (bookingFilter === 'active') return b.status === 'Confirmed' || b.status === 'In-Progress' || b.status === 'Pending';
-      if (bookingFilter === 'completed') return b.status === 'Completed';
+      if (bookingFilter === 'completed') return b.status?.toLowerCase() === 'completed';
       return true;
     });
 
@@ -577,7 +635,7 @@ const PartnerPortal = () => {
               ) : (
                 <div className="bookings-cards-list">
                   {filteredBookings.map((b, idx) => {
-                    const isDone = b.status === 'Completed';
+                    const isDone = b.status?.toLowerCase() === 'completed';
                     const patientPhone = b.customer_phone || b.phone || '';
                     const cleanPhone = patientPhone.replace(/\D/g, '');
 
@@ -585,9 +643,9 @@ const PartnerPortal = () => {
                       <div key={b.id || idx} className={`booking-patient-card ${isDone ? 'done-card' : ''}`}>
                         <div className="bcard-top-row">
                           <div className="bcard-id-time">
-                            <span className="bcard-badge">{b.id || `BK-${idx + 100}`}</span>
+                            <span className="bcard-badge">{(b.id ? (b.id.length > 15 ? b.id.substring(0, 8).toUpperCase() : b.id) : `BK-${idx + 100}`)}</span>
                             <span className="bcard-date-time">
-                              <Calendar size={13} /> {b.booking_date || 'Today'} · <Clock size={13} /> {b.booking_time || '10:00 AM'}
+                              <Calendar size={13} /> {b.booking_date ? new Date(b.booking_date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Today'} · <Clock size={13} /> {(b.booking_date && b.booking_date.includes('T')) ? new Date(b.booking_date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : (b.booking_time || '10:00 AM')}
                             </span>
                           </div>
                           <span className={`status-pill ${isDone ? 'status-completed' : 'status-active'}`}>
@@ -643,6 +701,37 @@ const PartnerPortal = () => {
                             <MapPin size={15} /> Maps
                           </a>
                         </div>
+
+                        {/* Interactive Lifecycle Buttons */}
+                        {!isDone && (
+                          <div className="lifecycle-actions" style={{ marginTop: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <h4 style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Service Progress</h4>
+                            
+                            {(!b.service_lifecycle_status || b.service_lifecycle_status === 'pending') && (
+                              <button className="partner-btn primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }} onClick={() => handleLifecycleUpdate(b, 'travel_started')}>
+                                🚀 Start Travel
+                              </button>
+                            )}
+                            
+                            {b.service_lifecycle_status === 'travel_started' && (
+                              <button className="partner-btn primary" style={{ backgroundColor: '#eab308', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }} onClick={() => handleLifecycleUpdate(b, 'reached')}>
+                                📍 Reached Location
+                              </button>
+                            )}
+                            
+                            {b.service_lifecycle_status === 'reached' && (
+                              <button className="partner-btn primary" style={{ backgroundColor: '#8b5cf6', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }} onClick={() => setOtpModalBooking(b)}>
+                                🔐 Enter OTP to Start
+                              </button>
+                            )}
+                            
+                            {b.service_lifecycle_status === 'otp_verified' && (
+                              <button className="partner-btn primary" style={{ backgroundColor: '#22c55e', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }} onClick={() => handleLifecycleUpdate(b, 'completed')}>
+                                ✅ Complete Service
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -910,6 +999,48 @@ const PartnerPortal = () => {
                       <Phone size={15} /> Helpline: +91 7997888448
                     </a>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── OTP MODAL ── */}
+          {otpModalBooking && (
+            <div className="otp-modal-overlay">
+              <div className="otp-modal-card">
+                <h3>Enter Service OTP</h3>
+                <p>Please enter the 6-digit OTP sent to the patient to start the service.</p>
+                
+                {otpError && <div className="otp-error-alert">{otpError}</div>}
+                
+                <input 
+                  type="text" 
+                  maxLength="6"
+                  placeholder="Enter 6-digit OTP"
+                  value={otpInput}
+                  onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                  className="otp-input-field"
+                  autoFocus
+                />
+                
+                <div className="otp-modal-actions">
+                  <button 
+                    className="btn-cancel-pass"
+                    onClick={() => {
+                      setOtpModalBooking(null);
+                      setOtpInput('');
+                      setOtpError('');
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="btn-update-pass"
+                    style={{ backgroundColor: '#22c55e', color: 'white' }}
+                    onClick={() => handleLifecycleUpdate(otpModalBooking, 'otp_verified')}
+                  >
+                    Verify & Start
+                  </button>
                 </div>
               </div>
             </div>

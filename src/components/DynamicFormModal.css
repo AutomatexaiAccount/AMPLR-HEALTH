@@ -105,6 +105,7 @@
   color: #0f172a;
   transition: all 0.2s;
   background: white;
+  text-align: left !important;
 }
 
 .partner-form-input:focus,

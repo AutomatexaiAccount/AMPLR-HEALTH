@@ -49,6 +49,24 @@ const playNotifBeep = () => {
   }
 };
 
+const getEligiblePartners = (booking, partnersList) => {
+  const serviceTitle = (booking.services?.title || '').toLowerCase();
+  return partnersList.filter(p => {
+    if (p.status !== 'Approved') return false;
+    const formType = (p.form_type || '').toLowerCase();
+    
+    if (serviceTitle.includes('lab')) return formType.includes('lab') || formType.includes('phleb');
+    if (serviceTitle.includes('physio')) return formType.includes('physio');
+    if (serviceTitle.includes('nurs')) return formType.includes('nurse');
+    if (serviceTitle.includes('doctor') || serviceTitle.includes('consult')) return formType.includes('doctor');
+    if (serviceTitle.includes('ecg')) return formType.includes('ecg');
+    if (serviceTitle.includes('ambulance')) return formType.includes('ambulance');
+    if (serviceTitle.includes('caregiver') || serviceTitle.includes('caretaker')) return formType.includes('caregiver') || formType.includes('caretaker');
+    
+    return true; 
+  });
+};
+
 /* ═══════════════════════════════════════════════
    HELPER COMPONENTS
 ═══════════════════════════════════════════════ */
@@ -498,9 +516,11 @@ const AdminDashboard = () => {
     const currentBooking = bookings.find(b => b.id === bookingId);
     const prevStatus = currentBooking?.status || 'pending';
 
+    const displayStatus = newStatus === 'confirmed' ? 'ACCEPTED' : newStatus.toUpperCase();
+
     Swal.fire({
       title: 'Update Booking Status?',
-      text: `Change status to "${newStatus.toUpperCase()}"?`,
+      text: `Change status to "${displayStatus}"?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#0f766e',
@@ -516,9 +536,11 @@ const AdminDashboard = () => {
         const { error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId);
         if (error) throw error;
         setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
+        
+        const displayStatusLower = newStatus === 'confirmed' ? 'accepted' : newStatus;
         Swal.fire({
           title: 'Updated!',
-          text: `Booking marked as ${newStatus}.`,
+          text: `Booking marked as ${displayStatusLower}.`,
           icon: 'success',
           timer: 2000,
           showConfirmButton: false,
@@ -530,6 +552,65 @@ const AdminDashboard = () => {
         Swal.fire('Error', err.message || 'Unable to update booking status.', 'error');
       }
     });
+  };
+
+  const assignPartnerToBooking = async (booking, partnerAppId, selectEl) => {
+    if (booking.status !== 'confirmed') {
+      Swal.fire({
+        title: 'Action Not Allowed',
+        text: 'Please accept the booking first before assigning a partner!',
+        icon: 'warning',
+        confirmButtonColor: '#0f766e'
+      });
+      if (selectEl) selectEl.value = "";
+      return;
+    }
+
+    const partner = partnersProfileList.find(p => p.id === partnerAppId);
+    if (!partner) return;
+
+    const result = await Swal.fire({
+      title: 'Assign Partner?',
+      text: `Assign ${partner.full_name} to this booking?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Assign',
+      confirmButtonColor: '#0f766e'
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const { error } = await supabase.from('bookings').update({
+        assigned_partner_id: partner.partner_id,
+        assigned_partner_uuid: partner.user_id,
+        assigned_partner_name: partner.full_name,
+        assigned_partner_phone: partner.mobile_number
+      }).eq('id', booking.id);
+
+      if (error) throw error;
+      
+      setBookings(prev => prev.map(b => b.id === booking.id ? {
+        ...b,
+        assigned_partner_id: partner.partner_id,
+        assigned_partner_uuid: partner.user_id,
+        assigned_partner_name: partner.full_name,
+        assigned_partner_phone: partner.mobile_number
+      } : b));
+
+      Swal.fire('Assigned!', 'Partner has been assigned.', 'success');
+
+      // WhatsApp alert
+      if (partner.mobile_number) {
+        const waText = `Hello ${partner.full_name}, you have a new assignment for ${booking.customer_name}. Service: ${booking.services?.title || 'Healthcare'}. Please check your Partner Portal.`;
+        const waUrl = `https://wa.me/${partner.mobile_number.replace(/\D/g, '')}?text=${encodeURIComponent(waText)}`;
+        window.open(waUrl, '_blank');
+      }
+      
+    } catch (err) {
+      console.error(err);
+      Swal.fire('Error', 'Could not assign partner.', 'error');
+    }
   };
 
   /* ─── CSV EXPORT & IMPORT ─── */
@@ -1194,6 +1275,7 @@ const AdminDashboard = () => {
                             <th>Service</th>
                             <th>Amount</th>
                             <th>Status</th>
+                            <th>Assigned Partner</th>
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -1206,7 +1288,61 @@ const AdminDashboard = () => {
                               </td>
                               <td><div className="adm-cell-main">{b.services?.title || 'Unknown'}</div></td>
                               <td><div className="adm-cell-amount">₹{b.amount}</div></td>
-                              <td><StatusBadge status={b.status} /></td>
+                              <td>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
+                                  <StatusBadge status={b.status} />
+                                  {b.service_lifecycle_status && b.service_lifecycle_status !== 'pending' && (
+                                    <div style={{ fontSize: '0.7rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', background: '#f1f5f9', color: '#475569', whiteSpace: 'nowrap' }}>
+                                      {b.service_lifecycle_status === 'travel_started' && '🚗 On the Way'}
+                                      {b.service_lifecycle_status === 'reached' && '📍 Reached'}
+                                      {b.service_lifecycle_status === 'otp_verified' && '⚙️ In Progress'}
+                                      {b.service_lifecycle_status === 'completed' && '✅ Done'}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                              <td>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                  {b.assigned_partner_name ? (
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0f766e' }}>
+                                      {b.assigned_partner_name}
+                                    </div>
+                                  ) : (
+                                    (() => {
+                                      const eligible = getEligiblePartners(b, partnersProfileList);
+                                      if (eligible.length === 0) {
+                                        return (
+                                          <div 
+                                            className="adm-select" 
+                                            style={{ width: '120px', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }} 
+                                            onClick={() => Swal.fire({
+                                              title: 'No Provider Available!',
+                                              text: 'There are no approved partners for this service category. You have to arrange a provider yourself.',
+                                              icon: 'warning',
+                                              confirmButtonColor: '#0f766e'
+                                            })}
+                                          >
+                                            Assign...
+                                          </div>
+                                        );
+                                      }
+                                      return (
+                                        <select 
+                                          className="adm-select" 
+                                          style={{ width: '120px', padding: '4px' }}
+                                          onChange={(e) => assignPartnerToBooking(b, e.target.value, e.target)}
+                                          defaultValue=""
+                                        >
+                                          <option value="" disabled>Assign...</option>
+                                          {eligible.map(p => (
+                                            <option key={p.id} value={p.id}>{p.full_name}</option>
+                                          ))}
+                                        </select>
+                                      );
+                                    })()
+                                  )}
+                                </div>
+                              </td>
                               <td>
                                 <select className="adm-select" value={b.status} onChange={e => updateBookingStatus(b.id, e.target.value, e.target)}>
                                   <option value="pending">Pending</option>
@@ -1339,6 +1475,7 @@ const AdminDashboard = () => {
                           <th>Service</th>
                           <th>Patient</th>
                           <th>Amount</th>
+                          <th>Assigned Partner</th>
                           <th>Status</th>
                           <th>Action</th>
                         </tr>
@@ -1376,7 +1513,56 @@ const AdminDashboard = () => {
                                 <div className={`adm-cell-pay adm-cell-pay--${b.payment_status}`}>{b.payment_status}</div>
                               )}
                             </td>
-                            <td><StatusBadge status={b.status} /></td>
+                            <td>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {b.assigned_partner_name ? (
+                                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0f766e' }}>
+                                    {b.assigned_partner_name}
+                                    <br/>
+                                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{b.assigned_partner_phone}</span>
+                                  </div>
+                                ) : (
+                                  <div style={{ display: 'flex', gap: '4px' }}>
+                                    {(() => {
+                                      const eligible = getEligiblePartners(b, partnersProfileList);
+                                      if (eligible.length === 0) {
+                                        return (
+                                          <select className="adm-select" style={{ width: '140px', padding: '4px', color: '#dc2626', fontSize: '11px' }} disabled>
+                                            <option>No provider available, arrange yourself</option>
+                                          </select>
+                                        );
+                                      }
+                                      return (
+                                        <select 
+                                          className="adm-select" 
+                                          style={{ width: '120px', padding: '4px' }}
+                                          onChange={(e) => assignPartnerToBooking(b, e.target.value, e.target)}
+                                          defaultValue=""
+                                        >
+                                          <option value="" disabled>Assign...</option>
+                                          {eligible.map(p => (
+                                            <option key={p.id} value={p.id}>{p.full_name} ({p.partner_id})</option>
+                                          ))}
+                                        </select>
+                                      );
+                                    })()}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
+                                <StatusBadge status={b.status} />
+                                {b.service_lifecycle_status && b.service_lifecycle_status !== 'pending' && (
+                                  <div style={{ fontSize: '0.7rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', background: '#f1f5f9', color: '#475569', whiteSpace: 'nowrap' }}>
+                                    {b.service_lifecycle_status === 'travel_started' && '🚗 On the Way'}
+                                    {b.service_lifecycle_status === 'reached' && '📍 Reached'}
+                                    {b.service_lifecycle_status === 'otp_verified' && '⚙️ In Progress'}
+                                    {b.service_lifecycle_status === 'completed' && '✅ Done'}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
                             <td>
                               <select
                                 className="adm-select"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Trash2, ChevronRight, CheckCircle, Loader2, Download } from 'lucide-react';
+import { X, ShoppingCart, Trash2, ChevronRight, CheckCircle, Loader2, Download, Shield } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { supabase } from '../lib/supabase';
 import html2pdf from 'html2pdf.js';
@@ -521,7 +521,6 @@ const CartDrawer = () => {
                       <input 
                         type="text" 
                         className="form-input"
-                        style={{ textAlign: 'left', paddingLeft: '14px' }}
                         value={formData.name} 
                         onChange={e => setFormData({...formData, name: e.target.value})} 
                         required 
@@ -558,7 +557,6 @@ const CartDrawer = () => {
                       <input 
                         type="text" 
                         className="form-input"
-                        style={{ textAlign: 'left', paddingLeft: '14px' }}
                         value={formData.location} 
                         onChange={e => setFormData({...formData, location: e.target.value})} 
                         required 
@@ -605,6 +603,38 @@ const CartDrawer = () => {
                       </div>
                     </div>
                   </form>
+                  
+                  {/* ── Dummy Order Summary (Requested by Client) ── */}
+                  <div className="cart-order-summary">
+                    <h4 className="summary-title">ORDER SUMMARY</h4>
+                    
+                    <div className="summary-items">
+                      <div className="summary-item">
+                        <div className="summary-item-info">
+                          <span className="summary-item-name">Sample Collection Service</span>
+                          <span className="summary-item-qty">x 1</span>
+                        </div>
+                        <span className="summary-item-price">₹499.00</span>
+                      </div>
+                    </div>
+
+                    <div className="summary-breakdown">
+                      <div className="summary-row">
+                        <span>Item Total</span>
+                        <span>₹499.00</span>
+                      </div>
+                    </div>
+
+                    <div className="summary-total">
+                      <span>Grand Total</span>
+                      <span>₹499.00</span>
+                    </div>
+
+                    <div className="summary-secure-badge">
+                      <Shield size={14} />
+                      <span>Secure 256-bit SSL Encryption</span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
