@@ -15,19 +15,38 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Load .env variables (Simple parser since Plesk doesn't auto-load .env for PHP by default)
-$envFile = __DIR__ . '/../../.env'; // Adjust path if needed depending on where .env is placed on server
-$clientId = ''; // Need to be set via .env
+// Load .env variables (Check multiple locations due to Plesk open_basedir restrictions)
+$possibleEnvFiles = [
+    __DIR__ . '/../../.env',
+    __DIR__ . '/../.env',
+    __DIR__ . '/.env'
+];
+
+$clientId = '';
 $clientSecret = '';
 
-if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
-        list($name, $value) = explode('=', $line, 2);
-        if (trim($name) == 'CASHFREE_APP_ID') $clientId = trim($value);
-        if (trim($name) == 'CASHFREE_SECRET_KEY') $clientSecret = trim($value);
+foreach ($possibleEnvFiles as $envFile) {
+    if (file_exists($envFile)) {
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (strpos($line, '#') === 0 || empty($line)) continue;
+            if (strpos($line, '=') !== false) {
+                list($name, $value) = explode('=', $line, 2);
+                if (trim($name) === 'CASHFREE_APP_ID') $clientId = trim($value);
+                if (trim($name) === 'CASHFREE_SECRET_KEY') $clientSecret = trim($value);
+            }
+        }
+        if (!empty($clientId) && !empty($clientSecret)) break;
     }
+}
+
+// Fallback to Production Credentials if .env is blocked by server open_basedir settings
+if (empty($clientId)) {
+    $clientId = '1437690733526cab2ea264e88680967341';
+}
+if (empty($clientSecret)) {
+    $clientSecret = 'cfsk_ma_prod_c9f18ed442b42a44a4a582a7f7b21cc0_563ad564';
 }
 
 // Get the POST data

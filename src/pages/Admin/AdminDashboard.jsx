@@ -325,9 +325,10 @@ const AdminDashboard = () => {
   // Search and Filter
   const [searchQuery, setSearchQuery] = useState('');
   const [bookingFilter, setBookingFilter] = useState('active');
+  const todayStr = new Date().toISOString().split('T')[0];
   const [globalFilter, setGlobalFilter] = useState({
-    fromDate: '',
-    toDate: '',
+    fromDate: todayStr,
+    toDate: todayStr,
     serviceId: '',
     status: ''
   });

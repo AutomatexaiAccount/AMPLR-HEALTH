@@ -522,25 +522,6 @@ const PartnerPortal = () => {
               </div>
             </div>
 
-            <div className="kpi-card">
-              <div className="kpi-icon-box bg-green">
-                <Award size={20} />
-              </div>
-              <div className="kpi-details">
-                <span className="kpi-value">100%</span>
-                <span className="kpi-label">Satisfaction Rate</span>
-              </div>
-            </div>
-
-            <div className="kpi-card">
-              <div className="kpi-icon-box bg-amber">
-                <Star size={20} />
-              </div>
-              <div className="kpi-details">
-                <span className="kpi-value">4.9 ★</span>
-                <span className="kpi-label">Partner Rating</span>
-              </div>
-            </div>
 
             <div className="kpi-card">
               <div className="kpi-icon-box bg-purple">
