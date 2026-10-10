@@ -1,8 +1,26 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # ── CRITICAL: Allow /api/ PHP scripts to execute directly ──────────────
+  # Do NOT redirect API requests to index.html
+  RewriteRule ^api/ - [L]
+
+  # ── SPA Fallback: Redirect all other routes to index.html ──────────────
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
 </IfModule>
+
+# ── Security Headers ────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ── Enable PHP in /api/ directory ──────────────────────────────────────────
+<FilesMatch "\.php$">
+  SetHandler application/x-httpd-php
+</FilesMatch>

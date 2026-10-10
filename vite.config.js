@@ -25,8 +25,8 @@ export default defineConfig(({ mode }) => {
                     headers: {
                       'Content-Type': 'application/json',
                       'x-api-version': '2023-08-01',
-                      'x-client-id': env.VITE_CASHFREE_CLIENT_ID,
-                      'x-client-secret': env.VITE_CASHFREE_CLIENT_SECRET
+                      'x-client-id': env.CASHFREE_APP_ID,
+                      'x-client-secret': env.CASHFREE_SECRET_KEY
                     },
                     body: JSON.stringify({
                       order_id: `ORDER_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
                         customer_phone: (data.customer_phone || '9999999999').replace(/[^0-9]/g, '').substring(0, 14)
                       },
                       order_meta: {
-                        return_url: `http://localhost:3000/${data.return_path || ''}?order_id={order_id}`
+                        return_url: `https://amplrhealth.com/${data.return_path || ''}?order_id={order_id}`
                       }
                     })
                   });
